@@ -1,186 +1,260 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="color-scheme" content="dark">
-<title>trading3 · Demo</title>
-<style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="referrer" content="no-referrer">
+  <title>Rebate-Share · Demo</title>
+  <style>
 :root {
-  --bg: #0b1020;
-  --card: #151d33;
-  --line: #253049;
-  --text: #e8eef8;
-  --muted: #8b9bb4;
-  --gold: #d4b36a;
-  --gold-2: #f0d59a;
-  --green: #3dd68c;
-  --red: #f07178;
-  --blue: #7aa2ff;
-  --warn: #e6b84d;
-  --radius: 16px;
-  --shadow: 0 10px 40px rgba(0,0,0,.35);
+  --bg: #06080f;
+  --bg2: #0b1020;
+  --card: rgba(16, 24, 42, .62);
+  --card-solid: #10182a;
+  --line: rgba(212, 179, 106, .16);
+  --text: #f3efe6;
+  --muted: #93a0b8;
+  --gold: #e0c078;
+  --gold-2: #f5e2b0;
+  --emerald: #3ee0a0;
+  --emerald-dim: rgba(62, 224, 160, .15);
+  --red: #ff7a82;
+  --blue: #8bb4ff;
+  --warn: #ffc857;
+  --radius: 20px;
+  --shadow: 0 20px 60px rgba(0,0,0,.45);
+  --glass: blur(18px) saturate(140%);
 }
 * { box-sizing: border-box; }
 html, body { margin: 0; padding: 0; }
 body {
-  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-  background:
-    radial-gradient(1200px 600px at 10% -10%, #1a2748 0%, transparent 55%),
-    radial-gradient(900px 500px at 100% 0%, #1b1630 0%, transparent 50%),
-    var(--bg);
+  font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
   color: var(--text);
   min-height: 100vh;
+  background:
+    radial-gradient(900px 500px at 8% -10%, rgba(224,192,120,.16), transparent 55%),
+    radial-gradient(800px 480px at 100% 0%, rgba(62,224,160,.08), transparent 50%),
+    radial-gradient(700px 400px at 50% 120%, rgba(80,100,180,.12), transparent 50%),
+    var(--bg);
+  background-attachment: fixed;
 }
-a { color: var(--gold); text-decoration: none; cursor: pointer; }
+body::before {
+  content: "";
+  position: fixed; inset: 0; pointer-events: none; z-index: 0;
+  background-image:
+    linear-gradient(rgba(255,255,255,.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,.025) 1px, transparent 1px);
+  background-size: 48px 48px;
+  mask-image: radial-gradient(ellipse at center, #000 30%, transparent 80%);
+}
+a { color: var(--gold); text-decoration: none; }
 a:hover { color: var(--gold-2); }
-button { font: inherit; }
 .banner {
-  background: #2a2310; color: #f0d59a; text-align: center;
-  padding: 8px 16px; font-size: 13px; border-bottom: 1px solid #4a3c1a;
+  position: relative; z-index: 5;
+  background: linear-gradient(90deg, #2a210e, #1a2a22 70%);
+  color: var(--gold-2);
+  text-align: center; padding: 8px 16px; font-size: 12px;
+  border-bottom: 1px solid rgba(224,192,120,.25);
 }
-.banner.impersonate { background: #1a2a20; color: var(--green); border-color: #2a4a38; }
-.banner.impersonate a { color: var(--green); }
+.banner.impersonate { background: #10261c; color: var(--emerald); }
+.banner.warn-over {
+  background: linear-gradient(90deg, #3a1a12, #3a2a10);
+  color: var(--warn); font-weight: 600;
+}
+.ticker {
+  position: relative; z-index: 4;
+  overflow: hidden; white-space: nowrap;
+  border-bottom: 1px solid var(--line);
+  background: rgba(6,8,15,.7);
+  backdrop-filter: var(--glass);
+  font-variant-numeric: tabular-nums;
+  font-size: 12px; color: var(--muted);
+  height: 32px; line-height: 32px;
+}
+.ticker-track { display: inline-block; padding-left: 100%; animation: ticker 28s linear infinite; }
+.ticker b { color: var(--gold); font-weight: 600; margin: 0 6px 0 22px; }
+.ticker .up { color: var(--emerald); }
+@keyframes ticker { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+
+.shell { position: relative; z-index: 1; display: grid; grid-template-columns: 250px 1fr; min-height: calc(100vh - 68px); }
 .topbar {
   display: none; align-items: center; gap: 10px;
   padding: 10px 16px; border-bottom: 1px solid var(--line);
-  background: rgba(12,16,30,.92);
+  background: rgba(8,10,18,.8); backdrop-filter: var(--glass);
+  position: relative; z-index: 6;
 }
-.menu-btn {
-  background: #1c2640; color: var(--text); border: 1px solid var(--line);
-  border-radius: 8px; padding: 8px 10px; font-weight: 700;
-}
-.shell { display: grid; grid-template-columns: 250px 1fr; min-height: calc(100vh - 36px); }
+.menu-btn { background: rgba(255,255,255,.06); color: var(--text); border: 1px solid var(--line); border-radius: 10px; padding: 8px 12px; font-weight: 700; cursor: pointer; }
 .sidebar {
-  background: rgba(12, 16, 30, .92);
+  background: rgba(8, 12, 22, .78);
+  backdrop-filter: var(--glass);
   border-right: 1px solid var(--line);
-  padding: 20px 16px;
+  padding: 22px 16px;
   display: flex; flex-direction: column;
-  position: sticky; top: 0; height: calc(100vh - 36px);
+  position: sticky; top: 0; height: calc(100vh - 68px);
 }
-.brand { display: flex; gap: 10px; align-items: center; color: var(--text); margin-bottom: 24px; }
-.brand small { display: block; color: var(--muted); font-size: 11px; font-weight: 400; }
+.brand { display: flex; gap: 10px; align-items: center; color: var(--text); margin-bottom: 22px; }
+.brand small { display: block; color: var(--muted); font-size: 11px; font-weight: 400; letter-spacing: .04em; }
 .logo {
-  width: 36px; height: 36px; border-radius: 10px;
-  background: linear-gradient(135deg, #d4b36a, #8a6a2e);
-  color: #1a1408; font-weight: 700; display: grid; place-items: center; flex-shrink: 0;
+  width: 38px; height: 38px; border-radius: 12px;
+  background: conic-gradient(from 210deg, #f5e2b0, #b8873a, #3ee0a0, #f5e2b0);
+  color: #140e04; font-weight: 800; display: grid; place-items: center;
+  box-shadow: 0 0 24px rgba(224,192,120,.35);
+  flex-shrink: 0;
 }
 nav { display: flex; flex-direction: column; gap: 2px; flex: 1; overflow: auto; }
-nav a { color: var(--muted); padding: 8px 10px; border-radius: 8px; font-weight: 500; }
-nav a:hover, nav a.on { background: #1c2640; color: var(--text); }
+nav a { color: var(--muted); padding: 9px 12px; border-radius: 10px; font-weight: 500; transition: .2s ease; }
+nav a:hover, nav a.on { background: rgba(224,192,120,.1); color: var(--text); }
 nav a.on { box-shadow: inset 2px 0 0 var(--gold); }
-.nav-label {
-  margin: 18px 10px 6px; font-size: 11px; letter-spacing: .12em;
-  text-transform: uppercase; color: var(--muted);
-}
+.nav-label { margin: 18px 12px 6px; font-size: 10px; letter-spacing: .16em; text-transform: uppercase; color: var(--muted); }
 .side-foot { border-top: 1px solid var(--line); padding-top: 14px; }
 .who { display: flex; gap: 8px; align-items: center; margin-bottom: 10px; }
 .avatar {
-  width: 32px; height: 32px; border-radius: 50%; background: #243050;
-  display: grid; place-items: center; font-weight: 600;
+  width: 34px; height: 34px; border-radius: 50%;
+  background: linear-gradient(135deg, #3ee0a0, #e0c078);
+  color: #0a0c10; display: grid; place-items: center; font-weight: 700;
 }
 .lang { display: flex; gap: 6px; margin: 8px 0; }
 .lang a, .lang button {
-  color: var(--muted); border: 1px solid var(--line); border-radius: 6px;
+  color: var(--muted); border: 1px solid var(--line); border-radius: 7px;
   padding: 2px 8px; font-size: 12px; background: transparent; cursor: pointer;
 }
 .lang a.on, .lang button.on { border-color: var(--gold); color: var(--gold); }
 .logout { color: var(--muted); font-size: 13px; background: none; border: 0; padding: 0; cursor: pointer; }
-.main { padding: 28px 32px 48px; max-width: 1200px; }
+.main { padding: 28px 32px 64px; max-width: 1180px; animation: fadeup .45s ease; }
+@keyframes fadeup { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
 .page-head { display: flex; align-items: center; gap: 12px; margin-bottom: 22px; flex-wrap: wrap; }
-.page-head h1 { margin: 0; font-size: 28px; letter-spacing: -.02em; }
-h2 { font-size: 16px; margin: 0 0 14px; font-weight: 600; }
+.page-head h1 { margin: 0; font-size: 28px; letter-spacing: -.03em; font-weight: 700; }
+h2 { font-size: 15px; margin: 0 0 14px; font-weight: 600; letter-spacing: .02em; }
 .card {
-  background: var(--card); border: 1px solid var(--line); border-radius: var(--radius);
-  padding: 20px; box-shadow: var(--shadow); margin-bottom: 18px;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 20px;
+  box-shadow: var(--shadow);
+  margin-bottom: 16px;
+  backdrop-filter: var(--glass);
+  position: relative; overflow: hidden;
 }
-.card.narrow { max-width: 640px; }
-.kpis { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 18px; }
-.kpi span { color: var(--muted); font-size: 13px; display: block; }
+.card.narrow { max-width: 680px; }
+.kpis { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 16px; }
+.kpi span { color: var(--muted); font-size: 12px; display: block; letter-spacing: .04em; text-transform: uppercase; }
 .kpi strong { font-size: 24px; display: block; margin-top: 6px; letter-spacing: -.02em; }
 .kpi small { font-size: 13px; color: var(--gold); font-weight: 500; }
+.kpi.warn-kpi { border-color: rgba(255,200,87,.45); box-shadow: 0 0 0 1px rgba(255,200,87,.2), var(--shadow); }
+.kpi.warn-kpi strong { color: var(--warn); }
 .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
 .muted { color: var(--muted); }
-.hint { color: var(--muted); font-size: 13px; line-height: 1.5; }
+.hint { color: var(--muted); font-size: 13px; line-height: 1.55; }
 .mt { margin-top: 12px; }
 .tag {
-  display: inline-block; font-style: normal; font-size: 10px; letter-spacing: .08em;
-  border: 1px solid var(--gold); color: var(--gold); padding: 2px 6px; border-radius: 999px;
+  display: inline-block; font-style: normal; font-size: 10px; letter-spacing: .1em;
+  border: 1px solid var(--gold); color: var(--gold); padding: 2px 7px; border-radius: 999px;
   vertical-align: middle;
 }
 .tag.sm { font-size: 9px; padding: 1px 5px; }
 .tag.gold { background: #2a2310; }
-.pill { display: inline-block; background: #1c2640; border: 1px solid var(--line); padding: 6px 12px; border-radius: 999px; }
+.pill { display: inline-block; background: rgba(255,255,255,.05); border: 1px solid var(--line); padding: 6px 12px; border-radius: 999px; }
 .copy-row { display: flex; gap: 8px; }
 .copy-row input { flex: 1; }
 input, select, button, textarea { font: inherit; color: var(--text); }
 input, select, textarea {
-  width: 100%; background: #0e1526; border: 1px solid var(--line);
-  border-radius: 10px; padding: 10px 12px;
+  width: 100%; background: rgba(6,10,20,.7); border: 1px solid var(--line);
+  border-radius: 12px; padding: 10px 12px;
 }
 input:focus, select:focus, textarea:focus { outline: 1px solid var(--gold); border-color: var(--gold); }
 label { display: block; margin-bottom: 12px; color: var(--muted); font-size: 13px; }
 label input, label select, label textarea { margin-top: 6px; }
-.btn, button.btn, .stack > button, form.stack button[type=submit] {
-  background: linear-gradient(180deg, #e0c17a, #c9a04e);
-  color: #1a1408; border: 0; border-radius: 10px; padding: 10px 16px;
-  font-weight: 600; cursor: pointer; display: inline-block;
+.btn, button.btn, form.stack button[type=submit], .stack > button {
+  background: linear-gradient(180deg, #f0d792, #c9a24a);
+  color: #16110a; border: 0; border-radius: 12px; padding: 10px 16px;
+  font-weight: 700; cursor: pointer; display: inline-block;
+  box-shadow: 0 8px 20px rgba(224,192,120,.2);
+  transition: transform .15s ease, box-shadow .15s ease;
 }
-.btn.ghost, button.ghost {
-  background: transparent; color: var(--text); border: 1px solid var(--line);
-}
-.btn.sm, button.sm { padding: 6px 10px; font-size: 12px; border-radius: 8px; }
-.btn.danger, button.danger { color: var(--red); border-color: #5a3038; background: transparent; }
+.btn:hover, form.stack button[type=submit]:hover { transform: translateY(-1px); }
+.btn.ghost, button.ghost { background: transparent; color: var(--text); border: 1px solid var(--line); box-shadow: none; }
+.btn.sm, button.sm { padding: 6px 10px; font-size: 12px; border-radius: 9px; }
+.btn.danger, button.danger { color: var(--red); border-color: #5a3038; background: transparent; box-shadow: none; }
 .actions { display: flex; flex-wrap: wrap; gap: 8px; }
-.flash { border-radius: 10px; padding: 10px 14px; margin-bottom: 14px; border: 1px solid var(--line); background: #1c2640; }
-.flash.ok { border-color: #1e4a36; background: #10281c; color: var(--green); }
-.flash.error { border-color: #5a3038; background: #2a1518; color: var(--red); }
-.flash.warn { border-color: #5a4a20; background: #2a2310; color: var(--warn); }
+.flash { border-radius: 12px; padding: 10px 14px; margin-bottom: 14px; border: 1px solid var(--line); background: rgba(28,38,64,.7); }
+.flash.ok { border-color: rgba(62,224,160,.35); background: rgba(16,40,28,.7); color: var(--emerald); }
+.flash.error { border-color: #5a3038; background: rgba(42,21,24,.7); color: var(--red); }
+.flash.warn { border-color: #5a4a20; background: rgba(42,35,16,.7); color: var(--warn); }
 .status { display: inline-block; padding: 6px 10px; border-radius: 999px; font-weight: 600; }
-.status.ok { background: #10281c; color: var(--green); }
-.status.no { background: #2a1518; color: var(--red); }
+.status.ok { background: var(--emerald-dim); color: var(--emerald); }
+.status.no { background: rgba(255,122,130,.12); color: var(--red); }
 .status.sm { font-size: 12px; padding: 3px 8px; font-weight: 500; }
-.status.pending { background: #2a2310; color: var(--warn); }
-.status.approved { background: #1a2748; color: var(--blue); }
-.status.paid { background: #10281c; color: var(--green); }
-.status.rejected { background: #2a1518; color: var(--red); }
+.status.pending { background: rgba(255,200,87,.12); color: var(--warn); }
+.status.approved { background: rgba(139,180,255,.12); color: var(--blue); }
+.status.paid { background: var(--emerald-dim); color: var(--emerald); }
+.status.rejected { background: rgba(255,122,130,.12); color: var(--red); }
 .table-wrap { overflow: auto; -webkit-overflow-scrolling: touch; }
 table { width: 100%; border-collapse: collapse; font-size: 14px; }
-th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--line); vertical-align: top; }
-th { color: var(--muted); font-weight: 500; font-size: 12px; text-transform: uppercase; letter-spacing: .04em; }
-.num { text-align: right; font-variant-numeric: tabular-nums; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
-.mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 12px; }
+th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid rgba(255,255,255,.05); vertical-align: top; }
+th { color: var(--muted); font-weight: 500; font-size: 11px; text-transform: uppercase; letter-spacing: .06em; }
+.num { text-align: right; font-variant-numeric: tabular-nums; font-family: ui-monospace, Menlo, Consolas, monospace; }
+.mono { font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 12px; }
 .facts { padding-left: 18px; }
-.tree { list-style: none; margin: 0; padding-left: 18px; border-left: 1px dashed var(--line); }
-.tree-node { padding: 6px 0; display: flex; flex-wrap: wrap; gap: 8px; align-items: baseline; }
+.tree { list-style: none; margin: 0; padding-left: 18px; border-left: 1px dashed rgba(224,192,120,.3); }
+.tree-node { padding: 7px 0; display: flex; flex-wrap: wrap; gap: 8px; align-items: baseline; animation: fadeup .5s ease; }
 .tree-node.root { margin-bottom: 8px; }
+.tree li { position: relative; }
+.tree li::before {
+  content: ""; position: absolute; left: -18px; top: 16px; width: 14px; height: 1px;
+  background: rgba(224,192,120,.35);
+}
 .search { display: flex; gap: 8px; margin-bottom: 14px; max-width: 480px; }
 .rates { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; }
-fieldset { border: 1px solid var(--line); border-radius: 12px; padding: 12px; margin: 0 0 12px; }
+fieldset { border: 1px solid var(--line); border-radius: 14px; padding: 12px; margin: 0 0 12px; }
 legend { color: var(--muted); padding: 0 6px; }
 .check { display: flex; align-items: center; gap: 8px; color: var(--text); }
 .check input { width: auto; }
 .inline-actions { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
 .inline-actions input[type=text] { width: 140px; padding: 6px 8px; }
-.auth-wrap { max-width: 460px; margin: 40px auto 80px; padding: 0 16px; }
+.auth-wrap { max-width: 480px; margin: 48px auto 80px; padding: 0 16px; position: relative; z-index: 1; animation: fadeup .5s ease; }
 .auth-top { display: flex; align-items: center; gap: 10px; margin-bottom: 20px; }
 .auth-top .lang { margin-left: auto; }
 .auth-card h1 { margin: 0 0 6px; }
 .roles { display: grid; gap: 10px; margin-top: 16px; }
 .role {
-  text-align: left; width: 100%; background: #0e1526; border: 1px solid var(--line);
-  color: var(--text); padding: 14px 16px; border-radius: 12px; cursor: pointer;
+  text-align: left; width: 100%; background: rgba(8,12,22,.7); border: 1px solid var(--line);
+  color: var(--text); padding: 14px 16px; border-radius: 14px; cursor: pointer;
+  transition: border-color .2s, transform .15s;
 }
-.role:hover { border-color: var(--gold); }
+.role:hover { border-color: var(--gold); transform: translateY(-1px); }
 .role strong { display: block; font-size: 15px; }
 .role span { color: var(--muted); font-size: 13px; font-weight: 400; }
 .demo-box {
-  margin-top: 18px; padding: 12px; border-radius: 10px; background: #0e1526;
+  margin-top: 18px; padding: 12px; border-radius: 12px; background: rgba(8,12,22,.6);
   border: 1px dashed var(--line); font-size: 13px; color: var(--muted); line-height: 1.6;
 }
 .demo-box strong { color: var(--gold); display: block; margin-bottom: 4px; }
-.footer { text-align: center; color: var(--muted); font-size: 12px; margin-top: 24px; }
+.footer { text-align: center; color: var(--muted); font-size: 12px; margin-top: 24px; line-height: 1.5; padding: 0 12px 24px; }
+.fine { font-size: 11px; color: var(--muted); line-height: 1.5; margin-top: 18px; }
+
+/* ranks */
+.badge {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 4px 10px; border-radius: 999px; font-size: 12px; font-weight: 700;
+  letter-spacing: .06em; text-transform: uppercase;
+}
+.badge.starter { background: #1c2436; color: #c5d0e6; border: 1px solid #3a465e; }
+.badge.bronze { background: #2a1c12; color: #e0a070; border: 1px solid #8a5a32; }
+.badge.silver { background: #1c2228; color: #d7e0ea; border: 1px solid #8a98a8; }
+.badge.gold { background: #2a210e; color: #f0d792; border: 1px solid #c9a24a; box-shadow: 0 0 16px rgba(224,192,120,.25); }
+.badge.elite { background: linear-gradient(90deg, #14261c, #2a210e); color: #f5e2b0; border: 1px solid #3ee0a0; box-shadow: 0 0 18px rgba(62,224,160,.25); }
+.badge.none { background: #1a1520; color: var(--muted); border: 1px solid var(--line); }
+.bars { display: grid; gap: 8px; margin-top: 12px; }
+.bar-label { display: flex; justify-content: space-between; font-size: 12px; color: var(--muted); }
+.bar { height: 8px; border-radius: 99px; background: rgba(255,255,255,.06); overflow: hidden; }
+.bar > i { display: block; height: 100%; width: 0; border-radius: 99px;
+  background: linear-gradient(90deg, #3ee0a0, #e0c078);
+  box-shadow: 0 0 10px rgba(62,224,160,.4);
+  transition: width 1s ease;
+}
+.chart { width: 100%; height: 180px; display: block; }
 .scrim { display: none; }
+
 @media (max-width: 980px) {
   .shell { grid-template-columns: 1fr; }
   .topbar { display: flex; }
@@ -189,792 +263,898 @@ legend { color: var(--muted); padding: 0 6px; }
     width: min(280px, 90vw); height: 100%; z-index: 30;
   }
   body.nav-open .sidebar { display: flex; }
-  body.nav-open .scrim { display: block; position: fixed; inset: 0; background: rgba(0,0,0,.5); z-index: 25; }
+  body.nav-open .scrim { display: block; position: fixed; inset: 0; background: rgba(0,0,0,.55); z-index: 25; }
   .kpis, .grid-2, .rates { grid-template-columns: 1fr 1fr; }
 }
 @media (max-width: 640px) {
-  .main { padding: 16px; }
+  .main { padding: 16px 14px 80px; }
   .kpis, .grid-2, .rates { grid-template-columns: 1fr; }
   .page-head h1 { font-size: 22px; }
   .auth-wrap { margin: 20px auto 40px; }
 }
 
-</style>
+  </style>
 </head>
 <body>
-<div id="app"></div>
-<script>
-(function () {
-  "use strict";
-  var I18N = {"de": {"portal": "trading3", "tagline": "IB-Portal · Testdaten", "test_banner": "TESTVERSION mit Beispieldaten. Keine echten Auszahlungen, kein echter PU-Prime-Zugang. Offline-Demo.", "login": "Anmelden", "logout": "Abmelden", "pick_role": "Als Beispielnutzer öffnen — kein Passwort nötig.", "role_admin": "Admin — sieht alles, berechnet Provisionen, gibt Auszahlungen frei", "role_anna": "Berechtigt — Einzahlung und 2+ Partner erfüllt", "role_georg": "Nicht berechtigt — nur 1 direkter Partner", "role_rita": "Tiefe Kette — 10 Ebenen über ihr", "email": "E-Mail", "name": "Name", "referred_by": "Geworben von", "dashboard": "Dashboard", "network": "Netzwerk", "commissions": "Provisionen", "withdrawals": "Auszahlungen", "profile": "Profil", "admin": "Admin", "users": "Nutzer", "tree": "Struktur", "import_data": "Datenimport", "calculate": "Berechnung", "payouts": "Auszahlungen", "settings": "Einstellungen", "welcome": "Willkommen", "commission_balance": "Provisionsguthaben", "pu_balance": "PU Prime Guthaben", "pu_equity": "PU Prime Equity", "lots": "Lots", "lots_period": "Lots (letzte Periode)", "no_pu_data": "Noch keine PU-Prime-Daten für dieses Konto.", "ref_link": "Dein Empfehlungslink", "copy": "Kopieren", "copied": "Kopiert", "open_pu": "Bei PU Prime registrieren (IB-Link)", "enter_client_id": "Trage deine PU-Prime-Client-ID in deinem Profil ein, damit Lots zugeordnet werden können.", "direct_partners": "Direkte Partner", "eligible": "Berechtigt", "not_eligible": "Nicht berechtigt", "eligibility_hint": "Provisionen erhältst du ab {deposit} Einzahlung (USD-Äquivalent) und mindestens {partners} direkten Partnern. Nicht erfüllte Stufen fließen an das Haus (Kevin).", "deposit": "Einzahlung", "example": "BEISPIEL", "recent_commissions": "Letzte Provisionen", "no_commissions": "Noch keine Provisionen.", "level": "Ebene", "amount": "Betrag", "period": "Periode", "reason": "Grund", "trader": "Trader", "reason_house": "Hausanteil", "reason_level": "Netzwerk-Ebene", "reason_unused_level": "Ungenutzte Ebene (an Haus)", "reason_ineligible": "Upline nicht berechtigt (an Haus)", "network_title": "Dein Netzwerk", "level_overview": "Ebenen-Übersicht", "people": "Personen", "volume": "Volumen (Lots)", "no_downline": "Noch keine Partner in deinem Netzwerk.", "downline_tree": "Struktur unter dir", "request_withdrawal": "USDT-Auszahlung anfordern", "available": "Verfügbar", "usdt_address": "USDT-Adresse", "network_chain": "Netzwerk", "trc20": "TRC20 (Tron)", "erc20": "ERC20 (Ethereum)", "request": "Anfordern", "withdrawal_history": "Auszahlungshistorie", "status": "Status", "pending": "Ausstehend", "approved": "Freigegeben", "paid": "Ausgezahlt", "rejected": "Abgelehnt", "min_withdrawal": "Mindestbetrag", "insufficient": "Nicht genug Guthaben.", "need_address": "Bitte zuerst USDT-Adresse und Netzwerk im Profil hinterlegen.", "withdrawal_ok": "Auszahlung wurde angefordert.", "save": "Speichern", "saved": "Gespeichert.", "client_id": "PU-Prime-Client-ID", "profile_hint": "Nach der Registrierung bei PU Prime über den IB-Link trägst du hier deine Client-ID ein.", "admin_overview": "Admin-Übersicht", "all_users": "Alle Nutzer", "full_tree": "Gesamte Struktur", "run_calc": "Provisionen berechnen", "run_calc_hint": "Berechnet die Verteilung für alle importierten Lots einer Periode. Eine erneute Berechnung ersetzt die vorherige dieser Periode.", "run": "Berechnen", "recalc": "Erneut berechnen", "calc_done": "Berechnung für {period} abgeschlossen: {lines} Buchungen, {total} USDT.", "no_lots": "Keine Lots für diese Periode gefunden.", "csv_upload": "CSV einfügen oder Datei wählen", "csv_hint": "Spalten: pu_prime_client_id, period, lots, balance, equity, deposit (optional).", "download_sample": "Beispiel-CSV", "manual_entry": "Manuelle Eingabe", "balance": "Kontostand", "equity": "Equity", "source": "Quelle", "imported_ok": "Import: {imported} zugeordnet, {unmatched} ohne Portal-Nutzer, {errors} Fehler.", "snapshots": "Importierte Perioden", "payout_requests": "Auszahlungsanträge", "approve": "Freigeben", "mark_paid": "Als ausgezahlt markieren", "reject": "Ablehnen", "ib_link": "PU-Prime-IB-Link", "min_deposit": "Mindesteinzahlung (USD-Äquivalent)", "min_partners": "Min. direkte Partner", "house_rate": "Hausanteil je Lot (USD)", "level_rates": "Sätze je Ebene (USD / Lot)", "ineligible_to_house": "Nicht berechtigte / ungenutzte Ebenen an das Haus (Kevin) auszahlen", "ineligible_to_house_help": "Wenn aktiv, fließen Beträge von Uplines ohne Berechtigung und von fehlenden Ebenen an Kevin. Wenn inaktiv, werden nur berechtigte Ebenen gutgeschrieben, der Rest bleibt unverteilt.", "actions": "Aktionen", "login_as": "Als Nutzer öffnen", "back_to_admin": "Zurück zum Admin", "partners": "Partner", "house": "Haus (Kevin)", "impersonating": "Du siehst das Portal als", "no_withdrawals": "Keine Anträge.", "period_placeholder": "z. B. 2026-11", "invalid_amount": "Ungültiger Betrag.", "required": "Bitte alle Pflichtfelder ausfüllen.", "footer": "trading3 · Testportal · Keine Anlageberatung.", "admin_note": "Notiz", "date": "Datum", "total_users": "Nutzer", "pending_payouts": "Offene Auszahlungen", "paid_out": "Ausgezahlt", "unmatched_clients": "Nicht zugeordnet", "search": "Suchen", "self_trade_note": "Du erhältst keine Provision auf dein eigenes Handelsvolumen.", "calc_runs": "Bisherige Läufe", "lines": "Buchungen", "upload": "Importieren", "add": "Hinzufügen", "select_user": "Nutzer wählen", "reset_demo": "Demo zurücksetzen", "reset_done": "Demo-Daten wurden zurückgesetzt.", "menu": "Menü"}, "en": {"portal": "trading3", "tagline": "IB portal · sample data", "test_banner": "TEST VERSION with example data. No real payouts, no live PU Prime access. Offline demo.", "login": "Log in", "logout": "Log out", "pick_role": "Open as an example user — no password needed.", "role_admin": "Admin — sees everything, runs commissions, approves payouts", "role_anna": "Eligible — deposit and 2+ partners met", "role_georg": "Not eligible — only 1 direct partner", "role_rita": "Deep chain — 10 levels above her", "email": "Email", "name": "Name", "referred_by": "Referred by", "dashboard": "Dashboard", "network": "Network", "commissions": "Commissions", "withdrawals": "Withdrawals", "profile": "Profile", "admin": "Admin", "users": "Users", "tree": "Tree", "import_data": "Data import", "calculate": "Calculation", "payouts": "Payouts", "settings": "Settings", "welcome": "Welcome", "commission_balance": "Commission balance", "pu_balance": "PU Prime balance", "pu_equity": "PU Prime equity", "lots": "Lots", "lots_period": "Lots (latest period)", "no_pu_data": "No PU Prime data for this account yet.", "ref_link": "Your referral link", "copy": "Copy", "copied": "Copied", "open_pu": "Register at PU Prime (IB link)", "enter_client_id": "Enter your PU Prime client ID in your profile so lots can be matched.", "direct_partners": "Direct partners", "eligible": "Eligible", "not_eligible": "Not eligible", "eligibility_hint": "You earn commissions once your deposit is at least {deposit} (USD equivalent) and you have at least {partners} direct partners. Amounts for ineligible or missing levels go to the house (Kevin).", "deposit": "Deposit", "example": "EXAMPLE", "recent_commissions": "Recent commissions", "no_commissions": "No commissions yet.", "level": "Level", "amount": "Amount", "period": "Period", "reason": "Reason", "trader": "Trader", "reason_house": "House share", "reason_level": "Network level", "reason_unused_level": "Unused level (to house)", "reason_ineligible": "Upline not eligible (to house)", "network_title": "Your network", "level_overview": "Level overview", "people": "People", "volume": "Volume (lots)", "no_downline": "No partners in your network yet.", "downline_tree": "Structure below you", "request_withdrawal": "Request USDT withdrawal", "available": "Available", "usdt_address": "USDT address", "network_chain": "Network", "trc20": "TRC20 (Tron)", "erc20": "ERC20 (Ethereum)", "request": "Request", "withdrawal_history": "Withdrawal history", "status": "Status", "pending": "Pending", "approved": "Approved", "paid": "Paid", "rejected": "Rejected", "min_withdrawal": "Minimum amount", "insufficient": "Insufficient balance.", "need_address": "Please add a USDT address and network in your profile first.", "withdrawal_ok": "Withdrawal requested.", "save": "Save", "saved": "Saved.", "client_id": "PU Prime client ID", "profile_hint": "After registering at PU Prime with the IB link, enter your client ID here.", "admin_overview": "Admin overview", "all_users": "All users", "full_tree": "Full tree", "run_calc": "Calculate commissions", "run_calc_hint": "Distributes all imported lots for a period. Re-running replaces the previous calculation for that period.", "run": "Calculate", "recalc": "Recalculate", "calc_done": "Calculation for {period} finished: {lines} entries, {total} USDT.", "no_lots": "No lots found for this period.", "csv_upload": "Paste CSV or choose a file", "csv_hint": "Columns: pu_prime_client_id, period, lots, balance, equity, deposit (optional).", "download_sample": "Sample CSV", "manual_entry": "Manual entry", "balance": "Balance", "equity": "Equity", "source": "Source", "imported_ok": "Import: {imported} matched, {unmatched} unmatched, {errors} errors.", "snapshots": "Imported periods", "payout_requests": "Payout requests", "approve": "Approve", "mark_paid": "Mark paid", "reject": "Reject", "ib_link": "PU Prime IB link", "min_deposit": "Minimum deposit (USD equivalent)", "min_partners": "Min. direct partners", "house_rate": "House share per lot (USD)", "level_rates": "Rates per level (USD / lot)", "ineligible_to_house": "Pay unused / ineligible levels to the house (Kevin)", "ineligible_to_house_help": "When on, amounts for ineligible uplines and missing levels go to Kevin. When off, only eligible levels are credited and the rest is left unallocated.", "actions": "Actions", "login_as": "Open as user", "back_to_admin": "Back to admin", "partners": "Partners", "house": "House (Kevin)", "impersonating": "You are viewing the portal as", "no_withdrawals": "No requests.", "period_placeholder": "e.g. 2026-11", "invalid_amount": "Invalid amount.", "required": "Please fill in all required fields.", "footer": "trading3 · Test portal · Not investment advice.", "admin_note": "Note", "date": "Date", "total_users": "Users", "pending_payouts": "Open payouts", "paid_out": "Paid out", "unmatched_clients": "Unmatched", "search": "Search", "self_trade_note": "You do not earn commission on your own trading volume.", "calc_runs": "Previous runs", "lines": "Entries", "upload": "Import", "add": "Add", "select_user": "Select user", "reset_demo": "Reset demo", "reset_done": "Demo data has been reset.", "menu": "Menu"}};
-  var DEFAULT_RATES = {1:5,2:2.5,3:1.5,4:1,5:0.5,6:0.5,7:0.5,8:0.5,9:0.5,10:0.5};
-  var HOUSE_RATE = 5, MAX_LEVELS = 10, STORE = "trading3-demo-v1";
-
-  var SEED_USERS = [
-    [1,"Kevin Müller","kevin@trading3.local",1,null,"KEVIN","PU100000",10000,"TXkevinHouseWalletPlaceholder"],
-    [2,"Anna Weber","anna@example.com",0,1,"ANNA4X","PU100001",2500,"TXexampleAddressForDemoOnly123456"],
-    [3,"Ben Hoffmann","ben@example.com",0,2,"BEN8K","PU100002",1800,"TXexampleAddressForDemoOnly123456"],
-    [4,"Clara Schmidt","clara@example.com",0,3,"CLARA1","PU100003",400,"TXexampleAddressForDemoOnly123456"],
-    [5,"David Bauer","david@example.com",0,3,"DAVID2","PU100004",120,"TXexampleAddressForDemoOnly123456"],
-    [6,"Eva Klein","eva@example.com",0,2,"EVA3C","PU100005",900,"TXexampleAddressForDemoOnly123456"],
-    [7,"Felix Wagner","felix@example.com",0,2,"FELIX7","PU100006",750,"TXexampleAddressForDemoOnly123456"],
-    [8,"Georg Fischer","georg@example.com",0,1,"GEORG9","PU100007",500,"TXexampleAddressForDemoOnly123456"],
-    [9,"Hanna Becker","hanna@example.com",0,8,"HANNA5","PU100008",350,"TXexampleAddressForDemoOnly123456"],
-    [10,"Ines Schäfer","ines@example.com",0,1,"INES2R","PU100009",2000,"TXexampleAddressForDemoOnly123456"],
-    [11,"Jonas Koch","jonas@example.com",0,10,"JONAS3","PU100010",600,"TXexampleAddressForDemoOnly123456"],
-    [12,"Klara Wolf","klara@example.com",0,11,"KLARA4","PU100011",450,"TXexampleAddressForDemoOnly123456"],
-    [13,"Leon Neumann","leon@example.com",0,12,"LEON8M","PU100012",800,"TXexampleAddressForDemoOnly123456"],
-    [14,"Mia Schwarz","mia@example.com",0,13,"MIA6T","PU100013",320,"TXexampleAddressForDemoOnly123456"],
-    [15,"Nico Krüger","nico@example.com",0,14,"NICO1P","PU100014",150,"TXexampleAddressForDemoOnly123456"],
-    [16,"Olga Hartmann","olga@example.com",0,15,"OLGA2W","PU100015",700,"TXexampleAddressForDemoOnly123456"],
-    [17,"Paul Werner","paul@example.com",0,16,"PAUL9X","PU100016",410,"TXexampleAddressForDemoOnly123456"],
-    [18,"Quinn Lorenz","quinn@example.com",0,17,"QUINN5","PU100017",550,"TXexampleAddressForDemoOnly123456"],
-    [19,"Rita Vogel","rita@example.com",0,18,"RITA3Z","PU100018",380,"TXexampleAddressForDemoOnly123456"],
-    [20,"Sara Albrecht","sara@example.com",0,10,"SARA8B","PU100019",220,"TXexampleAddressForDemoOnly123456"],
-    [21,"Tom Seidel","tom@example.com",0,1,"TOM4D","PU100020",100,"TXexampleAddressForDemoOnly123456"],
-    [22,"Uma Brandt","uma@example.com",0,1,"UMA7E","PU100021",800,"TXexampleAddressForDemoOnly123456"],
-    [23,"Viktor Graf","viktor@example.com",0,6,"VIKTOR","PU100022",340,"TXexampleAddressForDemoOnly123456"],
-    [24,"Wendy Lang","wendy@example.com",0,6,"WENDY2","PU100023",0,"TXexampleAddressForDemoOnly123456"],
-    [25,"Yara Sommer","yara@example.com",0,7,"YARA9K","PU100024",610,"TXexampleAddressForDemoOnly123456"],
-    [26,"Zara Jung","zara@example.com",0,7,"ZARA1L","PU100025",290,"TXexampleAddressForDemoOnly123456"]
+  <noscript>Bitte JavaScript aktivieren / Please enable JavaScript to view this offline demo.</noscript>
+  <script>
+window.T3_I18N = {"de": {"portal": "Rebate-Share", "tagline": "Wöchentlicher Netzwerk-Pool", "test_banner": "TESTVERSION mit Beispieldaten. Keine echten Auszahlungen. Provisionen stammen aus Handelsvolumen (Rebates), nicht aus Handelsgewinnen. Keine Renditezusage.", "fine_print": "Provisionen werden aus dem Handelsvolumen (PU-Prime-Rebates) berechnet, nicht aus Handelsgewinnen. Es gibt keine Renditezusage. Auszahlung des Netzwerk-Pools jeweils samstags in USDT.", "login": "Anmelden", "logout": "Abmelden", "register": "Registrieren", "email": "E-Mail", "password": "Passwort", "name": "Name", "confirm_password": "Passwort bestätigen", "no_account": "Noch kein Konto?", "have_account": "Schon registriert?", "login_failed": "E-Mail oder Passwort ist falsch.", "email_taken": "Diese E-Mail ist bereits registriert.", "password_mismatch": "Passwörter stimmen nicht überein.", "password_short": "Passwort muss mindestens 6 Zeichen haben.", "referred_by": "Geworben von", "dashboard": "Dashboard", "network": "Netzwerk", "commissions": "Pool", "statement": "Wochenausweis", "withdrawals": "Auszahlungen", "profile": "Profil", "admin": "Admin", "users": "Nutzer", "tree": "Struktur", "import_data": "Datenimport", "calculate": "Wochenlauf", "payouts": "Auszahlungen", "settings": "Einstellungen", "welcome": "Willkommen", "commission_balance": "USDT-Guthaben", "pool_this_week": "Netzwerk-Pool diese Woche", "pu_balance": "PU Prime Guthaben", "pu_equity": "PU Prime Equity", "lots": "Lots", "lots_period": "Lots (diese Woche)", "rebate": "Rebate", "no_pu_data": "Noch keine PU-Prime-Daten für dieses Konto.", "ref_link": "Dein Empfehlungslink", "copy": "Kopieren", "copied": "Kopiert", "open_pu": "Bei PU Prime registrieren (IB-Link)", "enter_client_id": "Trage deine PU-Prime-Client-ID oder User-ID im Profil ein, damit Lots zugeordnet werden können.", "direct_partners": "Direkte Partner", "eligible": "Berechtigt", "not_eligible": "Nicht berechtigt", "eligibility_hint": "Starter ab {deposit} Einzahlung (USD-Äquivalent) und {partners} direkten Partnern. Höhere Ränge schalten mehr Ebenen frei. Nicht erfüllte oder ranggesperrte Stufen bleiben im Haus-Anteil (Kevin).", "deposit": "Einzahlung", "example": "BEISPIEL", "recent_commissions": "Letzte Gutschriften", "no_commissions": "Noch keine Gutschriften.", "level": "Ebene", "amount": "Betrag", "period": "Woche", "reason": "Grund", "trader": "Konto", "reason_house": "Haus-Residual (Rebate minus Auszahlungen)", "reason_level": "Netzwerk-Ebene", "reason_unused_level": "Ungenutzte Ebene (im Residual)", "reason_ineligible": "Upline nicht berechtigt (im Residual)", "reason_rank_locked": "Rang schaltet diese Ebene nicht frei (im Residual)", "rate_per_lot": "$ pro Lot", "network_title": "Dein Netzwerk", "level_overview": "Ebenen-Übersicht", "people": "Personen", "volume": "Volumen (Lots)", "no_downline": "Noch keine Partner in deinem Netzwerk.", "downline_tree": "Struktur unter dir", "request_withdrawal": "USDT-Auszahlung anfordern", "available": "Verfügbar", "usdt_address": "USDT-Adresse", "network_chain": "Netzwerk", "trc20": "TRC20 (Tron)", "erc20": "ERC20 (Ethereum)", "request": "Anfordern", "withdrawal_history": "Auszahlungshistorie", "status": "Status", "pending": "Ausstehend", "approved": "Freigegeben", "paid": "Ausgezahlt", "rejected": "Abgelehnt", "min_withdrawal": "Mindestbetrag", "insufficient": "Nicht genug Guthaben.", "need_address": "Bitte zuerst USDT-Adresse und Netzwerk im Profil hinterlegen.", "withdrawal_ok": "Auszahlung wurde angefordert. Auszahlung des Pools jeweils samstags.", "save": "Speichern", "saved": "Gespeichert.", "client_id": "PU-Prime-Account", "pu_user_id": "PU-Prime-User-ID", "language": "Sprache", "profile_hint": "Nach der Registrierung bei PU Prime über den IB-Link trägst du hier Account- und User-ID ein.", "admin_overview": "Admin-Übersicht", "all_users": "Alle Nutzer", "full_tree": "Gesamte Struktur", "run_calc": "Netzwerk-Pool berechnen", "run_calc_hint": "Verteilt die Rebates der gewählten Woche nach $ pro Lot. Ein erneuter Lauf ersetzt die vorherige Berechnung dieser Woche. Der Sicherheitsdeckel (optional) skaliert Auszahlungen, falls sie den tatsächlichen PU-Prime-Rebate übersteigen — standardmäßig AUS.", "run": "Berechnen", "recalc": "Erneut berechnen", "calc_done": "Lauf für {period}: {lines} Buchungen, Auszahlungen {payouts} USDT, Rebate {rebate} USDT, Kevin netto {net} USDT.", "no_lots": "Keine zugeordneten Lots für diese Woche gefunden.", "csv_upload": "CSV / XLSX hochladen", "csv_hint": "PU-Prime-Exporte: Rebate Report (Account-Ansicht), Funds Report, Account Report. Oder CSV mit pu_prime_client_id, period, lots, rebate, balance, equity.", "download_sample": "Beispiel-CSV", "manual_entry": "Manuelle Eingabe", "balance": "Kontostand", "equity": "Equity", "source": "Quelle", "imported_ok": "Import {kind}: {rows} Zeilen, {matched} zugeordnet, {unmapped} offen.", "snapshots": "Wochenwerte", "payout_requests": "Auszahlungsanträge", "approve": "Freigeben", "mark_paid": "Als ausgezahlt markieren", "reject": "Ablehnen", "ib_link": "PU-Prime-IB-Link", "min_deposit": "Mindesteinzahlung (USD-Äquivalent)", "min_partners": "Min. direkte Partner (Starter)", "level_rates": "Sätze je Ebene (USD / Lot)", "cap_enabled": "Sicherheitsdeckel: Auszahlungen je Konto auf den tatsächlichen PU-Prime-Rebate begrenzen", "cap_help": "Standardmäßig AUS. Wenn aktiv, werden die Ebenen proportional gekürzt, sobald die Summe den Rebate dieses Kontos übersteigt. Kevin behält jeweils Rebate minus ausgezahlte Beträge.", "ineligible_to_house": "Nicht berechtigte / ungenutzte / ranggesperrte Ebenen bleiben im Haus-Anteil (Kevin)", "actions": "Aktionen", "login_as": "Als Nutzer öffnen", "back_to_admin": "Zurück zum Admin", "partners": "Partner", "house": "Haus (Kevin)", "impersonating": "Du siehst das Portal als", "no_withdrawals": "Keine Anträge.", "period_placeholder": "z. B. 2026-11-07", "invalid_amount": "Ungültiger Betrag.", "required": "Bitte alle Pflichtfelder ausfüllen.", "footer": "Rebate-Share · Netzwerk-Pool · Keine Anlageberatung.", "admin_note": "Notiz", "date": "Datum", "total_users": "Nutzer", "pending_payouts": "Offene Auszahlungen", "paid_out": "Ausgezahlt", "unmatched_clients": "Nicht zugeordnet", "search": "Suchen", "self_trade_note": "Du erhältst keine Provision auf dein eigenes Handelsvolumen.", "calc_runs": "Bisherige Läufe", "lines": "Buchungen", "upload": "Importieren", "add": "Hinzufügen", "select_user": "Nutzer wählen", "rank": "Rang", "rank_starter": "Starter", "rank_bronze": "Bronze", "rank_silver": "Silber", "rank_gold": "Gold", "rank_elite": "Elite", "rank_none": "Kein Rang", "rank_unlocks": "schaltet L1–L{n} frei", "next_rank": "Nächster Rang", "progress": "Fortschritt", "network_lots": "Netzwerk-Lots (Woche)", "week_earnings": "Diese Woche", "paid_saturday": "Auszahlung samstags in USDT", "warning_over_rebate": "Achtung: Netzwerk-Auszahlungen übersteigen den tatsächlichen PU-Prime-Rebate. Kevins Netto ist negativ.", "house_net": "Kevin netto", "total_rebate": "PU-Prime-Rebate", "total_payouts": "Netzwerk-Auszahlungen", "cap_status": "Sicherheitsdeckel", "on": "AN", "off": "AUS", "statement_title": "Wochenausweis", "statement_hint": "Vergleichbar mit deiner eigenen PU-Prime-Handelshistorie. Partner sind anonymisiert (Initialen / letzte 3 Stellen der Account-Nummer).", "per_level": "Nach Ebene", "per_partner": "Nach Partner", "pct": "Anteil", "anonymized": "Anonymisiert", "pnl_approx": "Ungefähres P/L (nur Info)", "pnl_hint": "Equity-Veränderung minus Netto-Einzahlungen. Nur Orientierung, keine Provisionsgrundlage.", "unmapped": "Nicht zugeordnete Accounts", "map_to": "Zuordnen zu", "map": "Zuordnen", "import_folder": "Ordner-Import (Rebate + Funds + Accounts)", "folder_hint": "Wähle die drei PU-Prime-xlsx-Dateien einer Woche, oder nutze weekly_run.py auf dem Server.", "ticker_live": "Netzwerk diese Woche", "ranks_settings": "Rang-Schwellen (direkte Partner / wöchentliche Netzwerk-Lots / max. Ebene)", "mapped": "Zugeordnet"}, "en": {"portal": "Rebate-Share", "tagline": "Weekly network pool", "test_banner": "TEST VERSION with example data. No real payouts. Commissions are calculated from trading volume (rebates), not from trading profits. No return promise.", "fine_print": "Commissions are calculated from trading volume (PU Prime rebates), not from trading profits. There is no return promise. The network pool is paid every Saturday in USDT.", "login": "Log in", "logout": "Log out", "register": "Sign up", "email": "Email", "password": "Password", "name": "Name", "confirm_password": "Confirm password", "no_account": "No account yet?", "have_account": "Already registered?", "login_failed": "Email or password is incorrect.", "email_taken": "This email is already registered.", "password_mismatch": "Passwords do not match.", "password_short": "Password must be at least 6 characters.", "referred_by": "Referred by", "dashboard": "Dashboard", "network": "Network", "commissions": "Pool", "statement": "Weekly statement", "withdrawals": "Withdrawals", "profile": "Profile", "admin": "Admin", "users": "Users", "tree": "Tree", "import_data": "Data import", "calculate": "Weekly run", "payouts": "Payouts", "settings": "Settings", "welcome": "Welcome", "commission_balance": "USDT balance", "pool_this_week": "Network pool this week", "pu_balance": "PU Prime balance", "pu_equity": "PU Prime equity", "lots": "Lots", "lots_period": "Lots (this week)", "rebate": "Rebate", "no_pu_data": "No PU Prime data for this account yet.", "ref_link": "Your referral link", "copy": "Copy", "copied": "Copied", "open_pu": "Register at PU Prime (IB link)", "enter_client_id": "Enter your PU Prime account or user ID in your profile so lots can be matched.", "direct_partners": "Direct partners", "eligible": "Eligible", "not_eligible": "Not eligible", "eligibility_hint": "Starter once your deposit is at least {deposit} (USD equivalent) and you have {partners} direct partners. Higher ranks unlock more levels. Ineligible or rank-locked levels stay in the house residual (Kevin).", "deposit": "Deposit", "example": "EXAMPLE", "recent_commissions": "Recent credits", "no_commissions": "No credits yet.", "level": "Level", "amount": "Amount", "period": "Week", "reason": "Reason", "trader": "Account", "reason_house": "House residual (rebate minus payouts)", "reason_level": "Network level", "reason_unused_level": "Unused level (in residual)", "reason_ineligible": "Upline not eligible (in residual)", "reason_rank_locked": "Rank does not unlock this level (in residual)", "rate_per_lot": "$ per lot", "network_title": "Your network", "level_overview": "Level overview", "people": "People", "volume": "Volume (lots)", "no_downline": "No partners in your network yet.", "downline_tree": "Structure below you", "request_withdrawal": "Request USDT withdrawal", "available": "Available", "usdt_address": "USDT address", "network_chain": "Network", "trc20": "TRC20 (Tron)", "erc20": "ERC20 (Ethereum)", "request": "Request", "withdrawal_history": "Withdrawal history", "status": "Status", "pending": "Pending", "approved": "Approved", "paid": "Paid", "rejected": "Rejected", "min_withdrawal": "Minimum amount", "insufficient": "Insufficient balance.", "need_address": "Please add a USDT address and network in your profile first.", "withdrawal_ok": "Withdrawal requested. The pool is paid every Saturday.", "save": "Save", "saved": "Saved.", "client_id": "PU Prime account", "pu_user_id": "PU Prime user ID", "language": "Language", "profile_hint": "After registering at PU Prime with the IB link, enter your account and user ID here.", "admin_overview": "Admin overview", "all_users": "All users", "full_tree": "Full tree", "run_calc": "Calculate the network pool", "run_calc_hint": "Distributes the selected week's rebates at $ per lot. Re-running replaces that week's calculation. The optional safety cap scales payouts if they exceed the actual PU Prime rebate — OFF by default.", "run": "Calculate", "recalc": "Recalculate", "calc_done": "Run for {period}: {lines} entries, payouts {payouts} USDT, rebate {rebate} USDT, Kevin net {net} USDT.", "no_lots": "No mapped lots found for this week.", "csv_upload": "Upload CSV / XLSX", "csv_hint": "PU Prime exports: Rebate Report (account view), Funds Report, Account Report. Or CSV with pu_prime_client_id, period, lots, rebate, balance, equity.", "download_sample": "Sample CSV", "manual_entry": "Manual entry", "balance": "Balance", "equity": "Equity", "source": "Source", "imported_ok": "Import {kind}: {rows} rows, {matched} mapped, {unmapped} unmapped.", "snapshots": "Weekly figures", "payout_requests": "Payout requests", "approve": "Approve", "mark_paid": "Mark paid", "reject": "Reject", "ib_link": "PU Prime IB link", "min_deposit": "Minimum deposit (USD equivalent)", "min_partners": "Min. direct partners (Starter)", "level_rates": "Rates per level (USD / lot)", "cap_enabled": "Safety cap: limit per-account payouts to the actual PU Prime rebate", "cap_help": "OFF by default. When on, levels are scaled down proportionally if their total would exceed that account's rebate. Kevin always keeps rebate minus amounts paid out.", "ineligible_to_house": "Unused / ineligible / rank-locked levels stay in the house residual (Kevin)", "actions": "Actions", "login_as": "Open as user", "back_to_admin": "Back to admin", "partners": "Partners", "house": "House (Kevin)", "impersonating": "You are viewing the portal as", "no_withdrawals": "No requests.", "period_placeholder": "e.g. 2026-11-07", "invalid_amount": "Invalid amount.", "required": "Please fill in all required fields.", "footer": "Rebate-Share · Network pool · Not investment advice.", "admin_note": "Note", "date": "Date", "total_users": "Users", "pending_payouts": "Open payouts", "paid_out": "Paid out", "unmatched_clients": "Unmapped", "search": "Search", "self_trade_note": "You do not earn commission on your own trading volume.", "calc_runs": "Previous runs", "lines": "Entries", "upload": "Import", "add": "Add", "select_user": "Select user", "rank": "Rank", "rank_starter": "Starter", "rank_bronze": "Bronze", "rank_silver": "Silver", "rank_gold": "Gold", "rank_elite": "Elite", "rank_none": "No rank", "rank_unlocks": "unlocks L1–L{n}", "next_rank": "Next rank", "progress": "Progress", "network_lots": "Network lots (week)", "week_earnings": "This week", "paid_saturday": "Paid every Saturday in USDT", "warning_over_rebate": "Warning: network payouts exceed the actual PU Prime rebate. Kevin's net is negative.", "house_net": "Kevin net", "total_rebate": "PU Prime rebate", "total_payouts": "Network payouts", "cap_status": "Safety cap", "on": "ON", "off": "OFF", "statement_title": "Weekly statement", "statement_hint": "Compare with your own PU Prime trade history. Partners are anonymized (initials / last 3 digits of the account number).", "per_level": "By level", "per_partner": "By partner", "pct": "Share", "anonymized": "Anonymized", "pnl_approx": "Approximate P/L (info only)", "pnl_hint": "Equity change minus net deposits. For orientation only — not a basis for commissions.", "unmapped": "Unmapped accounts", "map_to": "Map to", "map": "Map", "import_folder": "Folder import (rebate + funds + accounts)", "folder_hint": "Upload the three PU Prime xlsx files for a week, or run weekly_run.py on the server.", "ticker_live": "Network this week", "ranks_settings": "Rank thresholds (direct partners / weekly network lots / max level)", "mapped": "Mapped"}};
+(function (global) {
+  var RATES = {1:5,2:2.5,3:1.5,4:1,5:0.5,6:0.5,7:0.5,8:0.5,9:0.5,10:0.5};
+  var RANKS = [
+    {id:"starter", max_level:3, min_partners:2, min_network_lots:0, min_deposit:300},
+    {id:"bronze", max_level:5, min_partners:3, min_network_lots:2, min_deposit:300},
+    {id:"silver", max_level:7, min_partners:5, min_network_lots:5, min_deposit:300},
+    {id:"gold", max_level:9, min_partners:8, min_network_lots:10, min_deposit:300},
+    {id:"elite", max_level:10, min_partners:12, min_network_lots:20, min_deposit:300}
   ];
-
-  var SEED_SNAPS = [
-    ["PU100001","2026-10",12.4,4200,4380],["PU100002","2026-10",8.0,2100,2050],
-    ["PU100003","2026-10",3.5,680,710],["PU100004","2026-10",2.0,90,70],
-    ["PU100005","2026-10",6.2,1500,1620],["PU100006","2026-10",4.0,980,1010],
-    ["PU100007","2026-10",5.5,800,760],["PU100008","2026-10",1.2,400,390],
-    ["PU100009","2026-10",10.0,3100,3250],["PU100010","2026-10",2.5,700,690],
-    ["PU100018","2026-10",7.0,520,545],["PU100019","2026-10",1.8,250,240],
-    ["PU100020","2026-10",4.0,80,60],["PU100021","2026-10",3.0,900,940],
-    ["PU100022","2026-10",1.5,360,355],["PU100024","2026-10",2.2,700,715],
-    ["PU100025","2026-10",0.8,300,280],
-    ["PU100001","2026-11",4.0,4100,4010],["PU100002","2026-11",3.0,2000,2150],
-    ["PU100003","2026-11",1.0,720,700],["PU100005","2026-11",2.5,1600,1580],
-    ["PU100009","2026-11",3.5,3300,3410],["PU100018","2026-11",2.0,560,590],
-    ["PU100021","2026-11",1.5,950,970]
-  ];
-
-  function t(key, vars) {
-    var pack = I18N[state.lang] || I18N.de;
-    var text = pack[key] || I18N.de[key] || key;
-    if (vars) text = text.replace(/\{(\w+)\}/g, function (_, k) { return vars[k] != null ? vars[k] : ""; });
-    return text;
-  }
-  function esc(s) {
-    return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) {
-      return ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c];
-    });
-  }
-  function money(n) { return (Number(n) || 0).toFixed(2); }
-  function round2(n) { return Math.round(Number(n) * 100) / 100; }
-  function nowStr() {
-    try { return new Date().toLocaleString("sv-SE", { timeZone: "Europe/Berlin" }).slice(0, 16); }
-    catch (e) { return new Date().toISOString().slice(0, 16).replace("T", " "); }
-  }
-  function isEligible(deposit, partners, minDeposit, minPartners, always) {
+  function r2(n){ return Math.round((n + Number.EPSILON) * 100) / 100; }
+  function isEligible(deposit, partners, minD, minP, always){
     if (always) return true;
-    return deposit >= minDeposit && partners >= minPartners;
+    return deposit + 1e-9 >= minD && partners >= minP;
   }
-  function walkUpline(startId, getRef, maxLevels) {
-    maxLevels = maxLevels || MAX_LEVELS;
-    var chain = [], seen = {}, current = startId;
-    seen[startId] = true;
-    for (var i = 0; i < maxLevels; i++) {
-      var ref = getRef(current);
-      if (ref == null || seen[ref]) break;
-      chain.push(ref);
-      seen[ref] = true;
-      current = ref;
+  function walkUpline(sourceId, refs){
+    var chain=[], seen={}, id=refs[sourceId], guard=0;
+    while (id && !seen[id] && guard++ < 20){
+      seen[id]=1; chain.push(id); id=refs[id];
     }
-    return chain;
+    return chain.slice(0,10);
   }
-  function calculateLotCommissions(opts) {
-    var lots = opts.lots, upline = (opts.uplineIds || []).slice(0, opts.maxLevels || MAX_LEVELS);
-    var eligibility = opts.eligibility || {};
-    var rates = opts.rates || DEFAULT_RATES;
-    var houseRate = opts.houseRate != null ? opts.houseRate : HOUSE_RATE;
-    var houseId = opts.houseUserId;
-    var ineligToHouse = opts.ineligibleToHouse !== false;
-    var maxLevels = opts.maxLevels || MAX_LEVELS;
-    var sourceId = opts.sourceUserId;
-    var lines = [];
-    if (lots <= 0) return { lines: lines, total: 0 };
-    var houseAmount = round2(houseRate * lots);
-    if (houseAmount) {
-      lines.push({ recipientId: houseId, level: 0, amount: houseAmount, lots: lots, reason: "house", sourceUserId: sourceId, intendedUserId: null });
+  function rankFor(opts){
+    if (opts.alwaysMax) return RANKS[RANKS.length-1];
+    var table = opts.ranks || RANKS;
+    var minD = opts.minDeposit, minP = opts.minPartners;
+    var found=null;
+    for (var i=0;i<table.length;i++){
+      var r=table[i];
+      var needD = (minD!=null && r.id==="starter") ? minD : r.min_deposit;
+      var needP = (minP!=null && r.id==="starter") ? minP : r.min_partners;
+      if (opts.deposit+1e-9>=needD && opts.partners>=needP && opts.networkLots+1e-9>=r.min_network_lots){
+        found=r;
+      } else break;
     }
-    for (var level = 1; level <= maxLevels; level++) {
-      var rate = Number(rates[level] || 0);
-      var amount = round2(rate * lots);
-      if (!amount) continue;
-      var idx = level - 1;
-      if (idx >= upline.length) {
-        lines.push({ recipientId: houseId, level: level, amount: amount, lots: lots, reason: "unused_level", sourceUserId: sourceId, intendedUserId: null });
+    return found;
+  }
+  function maxLevel(rank){ return rank ? rank.max_level : 0; }
+  function rankProgress(opts){
+    var table=opts.ranks||RANKS;
+    var current=rankFor(opts);
+    if (opts.alwaysMax) return {current:current,next:null,partners_pct:100,lots_pct:100,overall_pct:100};
+    var nxt=null;
+    if (!current) nxt=table[0];
+    else {
+      var i=table.findIndex(function(r){return r.id===current.id;});
+      if (i+1<table.length) nxt=table[i+1];
+    }
+    if (!nxt) return {current:current,next:null,partners_pct:100,lots_pct:100,overall_pct:100};
+    function pct(have,need){ need=+need||0; if(need<=0) return 100; return Math.max(0,Math.min(100,Math.round(1000*have/need)/10)); }
+    if (!current){
+      var p=pct(opts.partners, (opts.minPartners!=null)?opts.minPartners:nxt.min_partners);
+      var d=pct(opts.deposit, (opts.minDeposit!=null)?opts.minDeposit:nxt.min_deposit);
+      var l=pct(opts.networkLots, nxt.min_network_lots);
+      return {current:null,next:nxt,partners_pct:p,lots_pct:l,deposit_pct:d,overall_pct:Math.min(p,d, (+nxt.min_network_lots?l:Math.min(p,d)))};
+    }
+    var pp=pct(opts.partners,nxt.min_partners), ll=pct(opts.networkLots,nxt.min_network_lots);
+    return {current:current,next:nxt,partners_pct:pp,lots_pct:ll,overall_pct:Math.min(pp,ll)};
+  }
+  function scaleToCap(lines, rebate){
+    var pay=0;
+    lines.forEach(function(L){ if(L.reason!=="house") pay+=L.amount; });
+    if (rebate+1e-9>=pay) return {lines:lines, scale:1};
+    var scale = rebate / (pay||1);
+    var out=[], acc=0, last=-1;
+    lines.forEach(function(L,i){
+      if (L.reason==="house"){ out.push(Object.assign({},L)); return; }
+      var a=r2(L.amount*scale);
+      out.push(Object.assign({},L,{amount:a,scale:scale}));
+      acc+=a; last=out.length-1;
+    });
+    if (last>=0){
+      var diff=r2(rebate-acc);
+      out[last].amount=r2(out[last].amount+diff);
+    }
+    return {lines:out, scale:scale};
+  }
+  function calculate(opts){
+    var lots=opts.lots, rebate=opts.rebate||0, rates=opts.rates||RATES;
+    var elig=opts.eligibility||{}, unlock=opts.maxLevelByUser||{};
+    var lines=[], payouts=0;
+    var up=opts.uplineIds||[];
+    for (var lvl=1; lvl<=10; lvl++){
+      var uid=up[lvl-1];
+      var rate=rates[lvl]||0;
+      var raw=r2(lots*rate);
+      if (!uid){
         continue;
       }
-      var uid = upline[idx];
-      if (eligibility[uid]) {
-        lines.push({ recipientId: uid, level: level, amount: amount, lots: lots, reason: "level", sourceUserId: sourceId, intendedUserId: uid });
-      } else if (ineligToHouse) {
-        lines.push({ recipientId: houseId, level: level, amount: amount, lots: lots, reason: "ineligible", sourceUserId: sourceId, intendedUserId: uid });
+      var maxL = (unlock[uid]!=null)?unlock[uid]:10;
+      if (maxL < lvl){
+        continue;
       }
+      if (!elig[uid]){
+        continue;
+      }
+      lines.push({
+        source_user_id:opts.sourceUserId, recipient_id:uid, intended_user_id:uid,
+        level:lvl, lots:lots, rebate:rebate, rate:rate, amount:raw, reason:"level", scale:1
+      });
+      payouts=r2(payouts+raw);
     }
-    var total = 0;
-    for (var i = 0; i < lines.length; i++) total += lines[i].amount;
-    return { lines: lines, total: round2(total) };
-  }
-  function defaultSettings() {
-    return {
-      puPrimeIbLink: "https://www.puprime.com/register?ib=PLACEHOLDER",
-      minDeposit: 300, minPartners: 2, houseRate: HOUSE_RATE,
-      rates: Object.assign({}, DEFAULT_RATES), ineligibleToHouse: true, minWithdrawal: 10
-    };
-  }
-  function seedUsers() {
-    return SEED_USERS.map(function (u) {
-      return {
-        id: u[0], name: u[1], email: u[2], isAdmin: !!u[3], referrerId: u[4],
-        referralCode: u[5], clientId: u[6], deposit: u[7], usdtAddress: u[8],
-        usdtNetwork: "TRC20", isExample: true
-      };
+    if (opts.capEnabled){
+      var sc=scaleToCap(lines, rebate);
+      lines=sc.lines;
+      payouts=0;
+      lines.forEach(function(L){ payouts=r2(payouts+L.amount); });
+    }
+    var houseNet=r2(rebate-payouts);
+    lines.push({
+      source_user_id:opts.sourceUserId, recipient_id:opts.houseUserId, intended_user_id:null,
+      level:0, lots:lots, rebate:rebate, rate:null, amount:houseNet, reason:"house", scale:1
     });
+    return {lines:lines, network_payouts:payouts, house_net:houseNet};
   }
-  function seedSnaps() {
-    var users = seedUsers();
-    var byClient = {};
-    users.forEach(function (u) { byClient[u.clientId] = u.id; });
-    return SEED_SNAPS.map(function (s, i) {
-      return { id: i + 1, clientId: s[0], period: s[1], lots: s[2], balance: s[3], equity: s[4], userId: byClient[s[0]] || null, source: "seed" };
-    });
-  }
-  function defaultState() {
-    var s = {
-      version: 1, lang: "de", uid: null, impersonator: null, page: "login",
-      search: "", flash: null, navOpen: false, nextId: 100,
-      users: seedUsers(), snapshots: seedSnaps(), commissions: [], withdrawals: [],
-      runs: [], settings: defaultSettings()
-    };
-    s.withdrawals.push({
-      id: 1, userId: 2, amount: 50, usdtAddress: "TXexampleAddressForDemoOnly123456",
-      usdtNetwork: "TRC20", status: "pending", adminNote: "", createdAt: "2026-11-14 11:44"
-    });
-    runPeriod(s, "2026-10");
-    return s;
-  }
-  function userById(s, id) {
-    for (var i = 0; i < s.users.length; i++) if (s.users[i].id === id) return s.users[i];
-    return null;
-  }
-  function partnerCount(s, uid) {
-    var n = 0;
-    for (var i = 0; i < s.users.length; i++) if (s.users[i].referrerId === uid) n++;
+  function partnerCount(users, id){
+    var n=0; users.forEach(function(u){ if(u.referrer_id===id) n++; });
     return n;
   }
-  function userEligible(s, u) {
-    if (!u) return false;
-    return isEligible(u.deposit, partnerCount(s, u.id), s.settings.minDeposit, s.settings.minPartners, !!u.isAdmin);
-  }
-  function availableBalance(s, uid) {
-    var earned = 0, reserved = 0;
-    for (var i = 0; i < s.commissions.length; i++) if (s.commissions[i].recipientId === uid) earned += s.commissions[i].amount;
-    for (var j = 0; j < s.withdrawals.length; j++) {
-      var w = s.withdrawals[j];
-      if (w.userId === uid && (w.status === "pending" || w.status === "approved" || w.status === "paid")) reserved += w.amount;
-    }
-    return round2(earned - reserved);
-  }
-  function latestSnap(s, uid) {
-    var best = null;
-    for (var i = 0; i < s.snapshots.length; i++) {
-      var sn = s.snapshots[i];
-      if (sn.userId !== uid) continue;
-      if (!best || sn.period > best.period || (sn.period === best.period && sn.id > best.id)) best = sn;
-    }
-    return best;
-  }
-  function houseId(s) {
-    for (var i = 0; i < s.users.length; i++) if (s.users[i].isAdmin) return s.users[i].id;
-    return 1;
-  }
-  function runPeriod(s, period) {
-    s.commissions = s.commissions.filter(function (c) { return c.period !== period; });
-    s.runs = s.runs.filter(function (r) { return r.period !== period; });
-    var hid = houseId(s);
-    var refs = {};
-    s.users.forEach(function (u) { refs[u.id] = u.referrerId; });
-    var elig = {};
-    s.users.forEach(function (u) { elig[u.id] = userEligible(s, u); });
-    var linesN = 0, total = 0, created = nowStr();
-    var runId = s.nextId++;
-    for (var i = 0; i < s.snapshots.length; i++) {
-      var sn = s.snapshots[i];
-      if (sn.period !== period || !sn.userId || !(sn.lots > 0)) continue;
-      var res = calculateLotCommissions({
-        sourceUserId: sn.userId, lots: sn.lots,
-        uplineIds: walkUpline(sn.userId, function (id) { return refs[id]; }),
-        eligibility: elig, rates: s.settings.rates, houseRate: s.settings.houseRate,
-        houseUserId: hid, ineligibleToHouse: s.settings.ineligibleToHouse
-      });
-      for (var j = 0; j < res.lines.length; j++) {
-        var L = res.lines[j];
-        s.commissions.push({
-          id: s.nextId++, runId: runId, period: period, sourceUserId: L.sourceUserId,
-          recipientId: L.recipientId, intendedUserId: L.intendedUserId, level: L.level,
-          lots: L.lots, amount: L.amount, reason: L.reason, createdAt: created
+  function downlineIds(users, root){
+    var refs={}; users.forEach(function(u){ if(!refs[u.referrer_id]) refs[u.referrer_id]=[]; refs[u.referrer_id].push(u.id); });
+    var ids=[], frontier=[root], seen={}; seen[root]=1;
+    while(frontier.length){
+      var nxt=[];
+      frontier.forEach(function(id){
+        (refs[id]||[]).forEach(function(cid){
+          if(!seen[cid]){ seen[cid]=1; ids.push(cid); nxt.push(cid); }
         });
-        linesN++; total += L.amount;
-      }
+      });
+      frontier=nxt;
     }
-    if (linesN) s.runs.unshift({ id: runId, period: period, createdAt: created, lines: linesN, total: round2(total) });
-    return { ok: linesN > 0, lines: linesN, total: round2(total), period: period };
+    return ids;
   }
-  function loadState() {
-    try {
-      var raw = localStorage.getItem(STORE);
-      if (!raw) return defaultState();
-      var s = JSON.parse(raw);
-      if (!s || s.version !== 1 || !s.users || !s.users.length) return defaultState();
-      s.navOpen = false; s.flash = null;
-      return s;
-    } catch (e) { return defaultState(); }
+  function networkLots(users, weekly, root, week){
+    var ids=downlineIds(users, root);
+    var s=0;
+    weekly.forEach(function(w){
+      if(w.week===week && ids.indexOf(w.user_id)>=0) s+=w.lots;
+    });
+    return s;
   }
-  function saveState() {
-    try {
-      var copy = Object.assign({}, state, { flash: null, navOpen: false });
-      localStorage.setItem(STORE, JSON.stringify(copy));
-    } catch (e) {}
+  function userProgress(state, user, week){
+    var partners=partnerCount(state.users, user.id);
+    var nl=networkLots(state.users, state.weekly, user.id, week);
+    var prog=rankProgress({
+      deposit:user.deposit, partners:partners, networkLots:nl,
+      ranks:state.settings.ranks, alwaysMax:!!user.is_admin,
+      minDeposit:state.settings.min_deposit, minPartners:state.settings.min_partners
+    });
+    return {
+      partners:partners, network_lots:nl, prog:prog, rank:prog.current,
+      max_level:maxLevel(prog.current),
+      eligible:isEligible(user.deposit, partners, state.settings.min_deposit, state.settings.min_partners, !!user.is_admin)
+    };
+  }
+  function runWeek(state, week){
+    var settings=state.settings;
+    var refs={}; state.users.forEach(function(u){ refs[u.id]=u.referrer_id; });
+    var house=state.users.find(function(u){return u.is_admin;});
+    var unlock={}, elig={};
+    state.users.forEach(function(u){
+      var p=userProgress(state,u,week);
+      unlock[u.id]=p.max_level;
+      elig[u.id]=p.max_level>0;
+    });
+    var lines=[], payouts=0, rebate=0;
+    state.weekly.forEach(function(w){
+      if(w.week!==week || !w.user_id || !(w.lots>0)) return;
+      rebate=r2(rebate+(w.rebate||0));
+      var chain=walkUpline(w.user_id, refs);
+      var res=calculate({
+        sourceUserId:w.user_id, lots:w.lots, rebate:w.rebate||0,
+        uplineIds:chain, eligibility:elig, rates:settings.rates,
+        houseUserId:house.id, capEnabled:!!settings.cap_enabled,
+        maxLevelByUser:unlock
+      });
+      payouts=r2(payouts+res.network_payouts);
+      res.lines.forEach(function(L){
+        lines.push(Object.assign({period:week, source_account:w.account}, L));
+      });
+    });
+    var houseNet=r2(rebate-payouts);
+    // replace this week's commissions
+    state.commissions=state.commissions.filter(function(c){return c.period!==week;});
+    state.commissions=state.commissions.concat(lines);
+    state.runs=state.runs.filter(function(r){return r.period!==week;});
+    state.runs.unshift({
+      period:week, cap_enabled:!!settings.cap_enabled,
+      total_rebate:rebate, total_payouts:payouts, house_net:houseNet,
+      created_at: week==="2026-11-07" ? "2026-11-14 08:00:00" : "2026-11-07 08:00:00",
+      warning: payouts-rebate>0.009
+    });
+    return {ok:lines.length>0, total_rebate:rebate, total_payouts:payouts, house_net:houseNet, warning:payouts-rebate>0.009, lines:lines.length, period:week};
+  }
+  function available(state, userId){
+    var earned=0, reserved=0;
+    state.commissions.forEach(function(c){ if(c.recipient_id===userId) earned+=c.amount; });
+    state.withdrawals.forEach(function(w){
+      if(w.user_id===userId && ["pending","approved","paid"].indexOf(w.status)>=0) reserved+=w.amount;
+    });
+    return r2(earned-reserved);
+  }
+  function anonymize(name, account){
+    var parts=String(name||"").split(/\s+/).filter(function(p){return p && p.toUpperCase()!=="EXAMPLE";});
+    var ini=parts.length?parts.map(function(p){return p[0].toUpperCase();}).join(".")+".":"—";
+    if(account) return ini+" · …"+String(account).slice(-3);
+    return ini;
+  }
+  global.T3 = {
+    RATES:RATES, RANKS:RANKS, r2:r2, isEligible:isEligible, walkUpline:walkUpline,
+    rankFor:rankFor, maxLevel:maxLevel, rankProgress:rankProgress, calculate:calculate,
+    partnerCount:partnerCount, downlineIds:downlineIds, networkLots:networkLots,
+    userProgress:userProgress, runWeek:runWeek, available:available, anonymize:anonymize
+  };
+})(this);
+
+(function (global) {
+  var USERS = [
+    {id:1,name:"Kevin Müller",email:"kevin@trading3.local",code:"KEVIN",referrer_id:null,client:"PU100000",deposit:10000,is_admin:1,is_example:1},
+    {id:2,name:"Anna Weber",email:"anna@example.com",code:"ANNA4X",referrer_id:1,client:"PU100001",deposit:2500,is_admin:0,is_example:1},
+    {id:3,name:"Ben Hoffmann",email:"ben@example.com",code:"BEN8K",referrer_id:2,client:"PU100002",deposit:1800,is_admin:0,is_example:1},
+    {id:4,name:"Clara Schmidt",email:"clara@example.com",code:"CLARA1",referrer_id:3,client:"PU100003",deposit:400,is_admin:0,is_example:1},
+    {id:5,name:"David Bauer",email:"david@example.com",code:"DAVID2",referrer_id:3,client:"PU100004",deposit:120,is_admin:0,is_example:1},
+    {id:6,name:"Eva Klein",email:"eva@example.com",code:"EVA3C",referrer_id:2,client:"PU100005",deposit:900,is_admin:0,is_example:1},
+    {id:7,name:"Felix Wagner",email:"felix@example.com",code:"FELIX7",referrer_id:2,client:"PU100006",deposit:750,is_admin:0,is_example:1},
+    {id:8,name:"Georg Fischer",email:"georg@example.com",code:"GEORG9",referrer_id:1,client:"PU100007",deposit:500,is_admin:0,is_example:1},
+    {id:9,name:"Hanna Becker",email:"hanna@example.com",code:"HANNA5",referrer_id:8,client:"PU100008",deposit:350,is_admin:0,is_example:1},
+    {id:10,name:"Ines Schäfer",email:"ines@example.com",code:"INES2R",referrer_id:1,client:"PU100009",deposit:2000,is_admin:0,is_example:1},
+    {id:11,name:"Jonas Koch",email:"jonas@example.com",code:"JONAS3",referrer_id:10,client:"PU100010",deposit:600,is_admin:0,is_example:1},
+    {id:12,name:"Klara Wolf",email:"klara@example.com",code:"KLARA4",referrer_id:11,client:"PU100011",deposit:450,is_admin:0,is_example:1},
+    {id:13,name:"Leon Neumann",email:"leon@example.com",code:"LEON8M",referrer_id:12,client:"PU100012",deposit:800,is_admin:0,is_example:1},
+    {id:14,name:"Mia Schwarz",email:"mia@example.com",code:"MIA6T",referrer_id:13,client:"PU100013",deposit:320,is_admin:0,is_example:1},
+    {id:15,name:"Nico Krüger",email:"nico@example.com",code:"NICO1P",referrer_id:14,client:"PU100014",deposit:150,is_admin:0,is_example:1},
+    {id:16,name:"Olga Hartmann",email:"olga@example.com",code:"OLGA2W",referrer_id:15,client:"PU100015",deposit:700,is_admin:0,is_example:1},
+    {id:17,name:"Paul Werner",email:"paul@example.com",code:"PAUL9X",referrer_id:16,client:"PU100016",deposit:410,is_admin:0,is_example:1},
+    {id:18,name:"Quinn Lorenz",email:"quinn@example.com",code:"QUINN5",referrer_id:17,client:"PU100017",deposit:550,is_admin:0,is_example:1},
+    {id:19,name:"Rita Vogel",email:"rita@example.com",code:"RITA3Z",referrer_id:18,client:"PU100018",deposit:380,is_admin:0,is_example:1},
+    {id:20,name:"Sara Albrecht",email:"sara@example.com",code:"SARA8B",referrer_id:10,client:"PU100019",deposit:220,is_admin:0,is_example:1},
+    {id:21,name:"Tom Seidel",email:"tom@example.com",code:"TOM4D",referrer_id:1,client:"PU100020",deposit:100,is_admin:0,is_example:1},
+    {id:22,name:"Uma Brandt",email:"uma@example.com",code:"UMA7E",referrer_id:1,client:"PU100021",deposit:800,is_admin:0,is_example:1},
+    {id:23,name:"Viktor Graf",email:"viktor@example.com",code:"VIKTOR",referrer_id:6,client:"PU100022",deposit:340,is_admin:0,is_example:1},
+    {id:24,name:"Wendy Lang",email:"wendy@example.com",code:"WENDY2",referrer_id:6,client:"PU100023",deposit:0,is_admin:0,is_example:1},
+    {id:25,name:"Yara Sommer",email:"yara@example.com",code:"YARA9K",referrer_id:7,client:"PU100024",deposit:610,is_admin:0,is_example:1},
+    {id:26,name:"Zara Jung",email:"zara@example.com",code:"ZARA1L",referrer_id:7,client:"PU100025",deposit:290,is_admin:0,is_example:1}
+  ];
+  var WEEK="2026-11-07", PREV="2026-10-31";
+  // (client, lots, rebate, balance, equity, deposits)
+  var WEEK_VOL = [
+    ["PU100001",2.47,29.97,4100,4010,0],
+    ["PU100002",2.38,28.83,2000,2150,0],
+    ["PU100006",1.95,24.79,980,1010,0],
+    ["PU100003",0.83,7.78,720,700,0],
+    ["PU100009",0.66,0.66,3300,3410,0],
+    ["PU100021",0.61,0.64,950,970,0]
+  ];
+  var PREV_VOL = [
+    ["PU100001",1.80,21.60,3800,3900,200],
+    ["PU100002",2.10,25.20,1900,1880,0],
+    ["PU100006",1.40,16.80,900,940,0],
+    ["PU100003",0.50,5.40,680,710,0],
+    ["PU100009",0.90,1.10,3100,3200,0],
+    ["PU100005",0.70,8.40,1500,1480,0]
+  ];
+  function byClient(){
+    var m={}; USERS.forEach(function(u){ m[u.client]=u; }); return m;
+  }
+  function weeksFrom(rows, week){
+    var m=byClient();
+    return rows.map(function(r){
+      var u=m[r[0]];
+      return {
+        week:week, account:r[0], user_id:u?u.id:null, lots:r[1], rebate:r[2],
+        balance:r[3], equity:r[4], deposits:r[5]||0, withdrawals:0, net_deposits:r[5]||0,
+        pnl_approx:null, source:"seed"
+      };
+    });
+  }
+  function computePnl(weekly){
+    // equity change minus net deposits, needs previous week same account
+    var prev={};
+    weekly.forEach(function(w){ if(w.week===PREV) prev[w.account]=w; });
+    weekly.forEach(function(w){
+      if(w.week!==WEEK) return;
+      var p=prev[w.account];
+      if(!p || p.equity==null || w.equity==null) { w.pnl_approx=null; return; }
+      w.pnl_approx = T3.r2((w.equity-p.equity) - (w.net_deposits||0));
+    });
+  }
+  function defaultState(){
+    var weekly=weeksFrom(PREV_VOL,PREV).concat(weeksFrom(WEEK_VOL,WEEK));
+    computePnl(weekly);
+    var users=USERS.map(function(u){
+      return Object.assign({
+        usdt_address: u.is_admin ? "TXkevinHouseWalletPlaceholder" : "TXexampleAddressForDemoOnly123456",
+        usdt_network:"TRC20", language:"de"
+      }, u);
+    });
+    var state={
+      version:2,
+      lang:"de",
+      view:"login",
+      uid:null,
+      impersonator:null,
+      users:users,
+      weekly:weekly,
+      commissions:[],
+      runs:[],
+      withdrawals:[{id:1,user_id:2,amount:25,usdt_address:"TXexampleAddressForDemoOnly123456",usdt_network:"TRC20",status:"pending",created_at:"2026-11-13 16:20:00"}],
+      settings:{
+        pu_prime_ib_link:"https://www.puprime.com/register?ib=PLACEHOLDER",
+        min_deposit:300, min_partners:2, min_withdrawal:10,
+        rates:Object.assign({}, T3.RATES),
+        network_per_lot:13,
+        cap_enabled:false,
+        ineligible_to_house:true,
+        ranks:T3.RANKS.map(function(r){return Object.assign({},r);}),
+        payout_weekday:"saturday"
+      }
+    };
+    T3.runWeek(state, PREV);
+    T3.runWeek(state, WEEK);
+    return state;
+  }
+  global.T3_SEED = { USERS:USERS, WEEK:WEEK, PREV:PREV, defaultState:defaultState };
+})(this);
+
+(function () {
+  var KEY="trading3-demo-v2";
+  var I18N = window.T3_I18N;
+  var state;
+  try {
+    var raw=localStorage.getItem(KEY);
+    state = raw ? JSON.parse(raw) : null;
+    if (!state || state.version!==2 || !state.users || !state.settings) state=null;
+  } catch(e){ state=null; }
+  if (!state) state = T3_SEED.defaultState();
+
+  function save(){ try{ localStorage.setItem(KEY, JSON.stringify(state)); }catch(e){} }
+  function t(key, vars){
+    var pack=I18N[state.lang]||I18N.de;
+    var s=pack[key]||I18N.de[key]||key;
+    if(vars) s=s.replace(/\{(\w+)\}/g, function(_,k){ return vars[k]; });
+    return s;
+  }
+  function money(n){ if(n==null||isNaN(n)) return "—"; return Number(n).toLocaleString(state.lang==="de"?"de-DE":"en-US",{minimumFractionDigits:2,maximumFractionDigits:2}); }
+  function lots(n){ if(n==null||isNaN(n)) return "—"; return Number(n).toLocaleString(state.lang==="de"?"de-DE":"en-US",{minimumFractionDigits:2,maximumFractionDigits:2}); }
+  function userById(id){ return state.users.find(function(u){return u.id===id;}); }
+  function current(){ return userById(state.uid); }
+  function week(){ return T3_SEED.WEEK; }
+  function latestRun(){ return state.runs[0]||null; }
+  function weekTotals(w){
+    var lots=0,rebate=0,n=0;
+    state.weekly.forEach(function(x){ if(x.week===w){ lots+=x.lots; rebate+=x.rebate; n++; }});
+    return {lots:T3.r2(lots),rebate:T3.r2(rebate),accounts:n};
+  }
+  function snapFor(uid,w){
+    var rows=state.weekly.filter(function(x){return x.user_id===uid && x.week===w;});
+    if(!rows.length) return null;
+    var a={week:w,lots:0,rebate:0,balance:0,equity:0,deposits:0,pnl_approx:null};
+    var any=false,pnl=0;
+    rows.forEach(function(r){
+      a.lots+=r.lots; a.rebate+=r.rebate; a.balance+=r.balance||0; a.equity+=r.equity||0; a.deposits+=r.deposits||0;
+      if(r.pnl_approx!=null){ pnl+=r.pnl_approx; any=true; }
+    });
+    a.lots=T3.r2(a.lots); a.rebate=T3.r2(a.rebate);
+    if(any) a.pnl_approx=T3.r2(pnl);
+    return a;
+  }
+  function earnings(uid,w){
+    var s=0; state.commissions.forEach(function(c){ if(c.recipient_id===uid && c.period===w) s+=c.amount; });
+    return T3.r2(s);
+  }
+  function overRebate(){
+    var r=latestRun();
+    return !!(r && r.total_payouts - r.total_rebate > 0.009);
+  }
+  function badge(rank){
+    if(!rank) return '<span class="badge none">'+t("rank_none")+'</span>';
+    return '<span class="badge '+rank.id+'">'+t("rank_"+rank.id)+'</span>';
+  }
+  function reason(r){ return t("reason_"+r); }
+  function flashHtml(){
+    if(!state.flash) return "";
+    var c=state.flash.cat||"ok";
+    var m=state.flash.msg; state.flash=null;
+    return '<div class="flash '+c+'">'+m+'</div>';
+  }
+  function navLink(view,label,admin){
+    if(admin) return "";
+    return '<a href="#/'+view+'" class="'+(state.view===view?"on":"")+'">'+label+'</a>';
   }
 
-  var state = loadState();
-  function currentUser() { return state.uid ? userById(state, state.uid) : null; }
-  function go(page) {
-    state.page = page; state.navOpen = false; state.flash = null;
-    try { location.hash = "#/" + page; } catch (e) {}
-    saveState(); render();
+  function shell(inner){
+    var u=current();
+    var run=latestRun();
+    var totals=weekTotals(week());
+    var warn=overRebate();
+    document.documentElement.lang=state.lang;
+    var html='<div class="banner">'+t("test_banner")+'</div>';
+    if(warn && u && u.is_admin && !state.impersonator){
+      html+='<div class="banner warn-over">⚠ '+t("warning_over_rebate")+' · '+t("total_payouts")+' '+money(run.total_payouts)+' $ · '+t("total_rebate")+' '+money(run.total_rebate)+' $ · '+t("house_net")+' '+money(run.house_net)+' $</div>';
+    }
+    if(state.impersonator){
+      html+='<div class="banner impersonate">'+t("impersonating")+' <strong>'+esc(u.name)+'</strong> · <a href="#/stop-impersonate">'+t("back_to_admin")+'</a></div>';
+    }
+    html+='<div class="ticker"><div class="ticker-track">';
+    for(var i=0;i<2;i++){
+      html+='<b>'+t("ticker_live")+'</b> '+week()+' · '+t("lots")+' <span class="up">'+lots(totals.lots)+'</span> · '+t("rebate")+' '+money(totals.rebate)+' $';
+      if(run) html+=' · '+t("total_payouts")+' '+money(run.total_payouts)+' $ · '+t("house_net")+' '+money(run.house_net)+' $ · '+t("cap_status")+' '+(state.settings.cap_enabled?t("on"):t("off"));
+      html+=' · '+t("paid_saturday")+' ';
+    }
+    html+='</div></div>';
+    html+='<div class="topbar"><button class="menu-btn" type="button" data-menu>☰</button><strong>'+t("portal")+'</strong><span class="muted">'+t("tagline")+'</span></div>';
+    html+='<div class="scrim"></div><div class="shell"><aside class="sidebar">';
+    html+='<a class="brand" href="#/dashboard"><span class="logo">R</span><span>'+t("portal")+'<small>'+t("tagline")+'</small></span></a><nav>';
+    html+=navLink("dashboard",t("dashboard"));
+    html+=navLink("network",t("network"));
+    html+=navLink("commissions",t("commissions"));
+    html+=navLink("statement",t("statement"));
+    html+=navLink("withdrawals",t("withdrawals"));
+    html+=navLink("profile",t("profile"));
+    if(u.is_admin && !state.impersonator){
+      html+='<div class="nav-label">'+t("admin")+'</div>';
+      html+=navLink("admin",t("admin_overview"));
+      html+=navLink("admin-users",t("users"));
+      html+=navLink("admin-tree",t("tree"));
+      html+=navLink("admin-import",t("import_data"));
+      html+=navLink("admin-calculate",t("calculate"));
+      html+=navLink("admin-payouts",t("payouts"));
+      html+=navLink("admin-settings",t("settings"));
+    }
+    html+='</nav><div class="side-foot"><div class="who"><span class="avatar">'+esc(u.name[0])+'</span><div><strong>'+esc(u.name)+'</strong> <em class="tag sm">'+t("example")+'</em>';
+    html+='<div class="lang"><button type="button" data-lang="de" class="'+(state.lang==="de"?"on":"")+'">DE</button><button type="button" data-lang="en" class="'+(state.lang==="en"?"on":"")+'">EN</button></div></div></div>';
+    html+='<a class="logout" href="#/logout">'+t("logout")+'</a></div></aside><main class="main">';
+    html+=flashHtml()+inner;
+    html+='<p class="fine">'+t("fine_print")+'</p><p class="footer">'+t("footer")+'</p>';
+    html+='</main></div>';
+    return html;
   }
-  function flash(msg, cat) { state.flash = { msg: msg, cat: cat || "ok" }; render(); }
-  function loginAs(id) {
-    state.uid = id; state.impersonator = null; state.page = "dashboard";
-    state.navOpen = false; saveState(); render();
+
+  function esc(s){ return String(s==null?"":s).replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;"}[c];}); }
+
+  function loginView(){
+    document.documentElement.lang=state.lang;
+    return '<div class="auth-wrap"><div class="auth-top"><span class="logo">R</span><div><strong>'+t("portal")+'</strong><div class="muted">'+t("tagline")+'</div></div><div class="lang"><button type="button" data-lang="de" class="'+(state.lang==="de"?"on":"")+'">DE</button><button type="button" data-lang="en" class="'+(state.lang==="en"?"on":"")+'">EN</button></div></div>'
+      +'<div class="card auth-card"><h1>'+t("login")+'</h1><p class="hint">'+t("paid_saturday")+'</p>'
+      +'<p class="hint">'+t("test_banner")+'</p>'
+      +'<div class="roles">'
+      +roleBtn(1,"Kevin Müller","Admin · Elite · "+t("house"))
+      +roleBtn(2,"Anna Weber",t("eligible")+" · Bronze · L1–L5")
+      +roleBtn(8,"Georg Fischer",t("not_eligible")+" · 1 "+t("partners"))
+      +roleBtn(19,"Rita Vogel",t("not_eligible")+" · "+(state.lang==="de"?"tiefe Kette":"deep chain"))
+      +'</div>'
+      +'<button class="btn ghost mt" type="button" data-reset>'+(state.lang==="de"?"Demo zurücksetzen":"Reset demo")+'</button>'
+      +'<p class="fine">'+t("fine_print")+'</p></div></div>';
   }
-  function collectDownline(s, rootId) {
-    var levelOf = {}, current = [rootId];
-    for (var level = 1; level <= 10; level++) {
-      var next = [];
-      for (var i = 0; i < current.length; i++) {
-        for (var j = 0; j < s.users.length; j++) {
-          var u = s.users[j];
-          if (u.referrerId === current[i] && !levelOf[u.id] && u.id !== rootId) {
-            levelOf[u.id] = level; next.push(u.id);
-          }
-        }
+  function roleBtn(id,name,sub){
+    return '<button class="role" type="button" data-login="'+id+'"><strong>'+esc(name)+'</strong><span>'+esc(sub)+'</span></button>';
+  }
+
+  function bars(info){
+    var nxt=info.prog.next;
+    if(!nxt) return '<p class="hint">'+t("rank_elite")+' — '+t("rank_unlocks",{n:10})+'</p>';
+    var h='<div class="bars">';
+    h+='<div class="bar-label"><span>'+t("next_rank")+': '+t("rank_"+nxt.id)+' (L1–L'+nxt.max_level+')</span><span>'+info.prog.overall_pct+'%</span></div>';
+    h+='<div class="bar"><i data-width="'+info.prog.overall_pct+'"></i></div>';
+    h+='<div class="bar-label"><span>'+t("direct_partners")+' '+info.partners+'/'+nxt.min_partners+'</span><span>'+info.prog.partners_pct+'%</span></div>';
+    h+='<div class="bar"><i data-width="'+info.prog.partners_pct+'"></i></div>';
+    h+='<div class="bar-label"><span>'+t("network_lots")+' '+lots(info.network_lots)+'/'+lots(nxt.min_network_lots)+'</span><span>'+info.prog.lots_pct+'%</span></div>';
+    h+='<div class="bar"><i data-width="'+info.prog.lots_pct+'"></i></div>';
+    if(info.prog.deposit_pct!=null){
+      h+='<div class="bar-label"><span>'+t("deposit")+' '+money(current().deposit)+'/'+money(nxt.min_deposit||state.settings.min_deposit)+'</span><span>'+info.prog.deposit_pct+'%</span></div>';
+      h+='<div class="bar"><i data-width="'+info.prog.deposit_pct+'"></i></div>';
+    }
+    return h+'</div>';
+  }
+
+  function dashView(){
+    var u=current(), w=week(), info=T3.userProgress(state,u,w), snap=snapFor(u.id,w);
+    var bal=T3.available(state,u.id), earned=earnings(u.id,w);
+    var recent=state.commissions.filter(function(c){return c.recipient_id===u.id;}).slice(-8).reverse();
+    var points=[];
+    var periods={};
+    state.commissions.forEach(function(c){ if(c.recipient_id===u.id){ periods[c.period]=(periods[c.period]||0)+c.amount; }});
+    Object.keys(periods).sort().forEach(function(p){ points.push({l:p.slice(5),y:T3.r2(periods[p])}); });
+    var h='<div class="page-head"><h1>'+t("welcome")+', '+esc(u.name.split(" ")[0])+'</h1>'+badge(info.rank);
+    if(info.rank) h+='<span class="muted">'+t("rank_unlocks",{n:info.max_level})+'</span>';
+    h+=' <em class="tag">'+t("example")+'</em></div>';
+    h+='<div class="kpis">';
+    h+='<div class="card kpi"><span>'+t("commission_balance")+'</span><strong><span data-count="'+bal+'" data-decimals="2">'+money(bal)+'</span> USDT</strong><small>'+t("available")+'</small></div>';
+    h+='<div class="card kpi"><span>'+t("week_earnings")+'</span><strong><span data-count="'+earned+'" data-decimals="2">'+money(earned)+'</span> $</strong><small>'+w+' · '+t("paid_saturday")+'</small></div>';
+    h+='<div class="card kpi"><span>'+t("lots_period")+'</span><strong>'+(snap?lots(snap.lots):"—")+'</strong><small>'+(snap?(t("rebate")+" "+money(snap.rebate)+" $"):t("no_pu_data"))+'</small></div>';
+    h+='<div class="card kpi"><span>'+t("direct_partners")+'</span><strong>'+info.partners+'</strong><small>'+(info.eligible?'<span class="status ok sm">'+t("eligible")+'</span>':'<span class="status no sm">'+t("not_eligible")+'</span>')+'</small></div>';
+    h+='</div>';
+    h+='<div class="grid-2"><div class="card"><h2>'+t("rank")+'</h2><p class="hint">'+t("eligibility_hint",{deposit:state.settings.min_deposit,partners:state.settings.min_partners})+'</p>'+bars(info)+'</div>';
+    h+='<div class="card"><h2>'+t("pool_this_week")+'</h2>';
+    if(points.length) h+='<canvas class="chart" data-points=\''+JSON.stringify(points)+'\'></canvas>';
+    else h+='<p class="hint">'+t("no_commissions")+'</p>';
+    if(snap){
+      h+='<p class="hint mt">'+t("pu_balance")+' '+money(snap.balance)+' · '+t("pu_equity")+' '+money(snap.equity);
+      if(snap.pnl_approx!=null) h+=' · '+t("pnl_approx")+' '+money(snap.pnl_approx)+' $';
+      h+='</p><p class="hint">'+t("pnl_hint")+'</p>';
+    }
+    h+='</div></div>';
+    var ref="https://v1cl00.github.io/trading3-demo/#/r/"+u.code;
+    h+='<div class="card"><h2>'+t("ref_link")+'</h2><div class="copy-row"><input id="reflink" readonly value="'+ref+'"><button type="button" class="btn" data-copy="#reflink">'+t("copy")+'</button></div>';
+    h+='<p class="hint mt">'+t("open_pu")+': <span class="mono">'+esc(state.settings.pu_prime_ib_link)+'</span></p>';
+    h+='<p class="hint">'+t("self_trade_note")+'</p></div>';
+    h+='<div class="card"><h2>'+t("recent_commissions")+'</h2>'+commTable(recent)+'</div>';
+    return shell(h);
+  }
+
+  function commTable(rows){
+    if(!rows.length) return '<p class="hint">'+t("no_commissions")+'</p>';
+    var h='<div class="table-wrap"><table><thead><tr><th>'+t("period")+'</th><th>'+t("level")+'</th><th>'+t("trader")+'</th><th class="num">'+t("lots")+'</th><th class="num">'+t("rate_per_lot")+'</th><th>'+t("reason")+'</th><th class="num">'+t("amount")+'</th></tr></thead><tbody>';
+    rows.forEach(function(r){
+      var src=userById(r.source_user_id);
+      var label=r.reason==="house"?t("house"):T3.anonymize(src?src.name:"", r.source_account);
+      h+='<tr><td>'+r.period+'</td><td>L'+(r.level||0)+'</td><td class="mono">'+esc(label)+'</td><td class="num">'+lots(r.lots)+'</td><td class="num">'+(r.rate!=null?money(r.rate):"—")+'</td><td>'+reason(r.reason)+'</td><td class="num">'+money(r.amount)+' $</td></tr>';
+    });
+    return h+'</tbody></table></div>';
+  }
+
+  function levelStats(rootId){
+    var byRef={}; state.users.forEach(function(u){ if(u.referrer_id){ (byRef[u.referrer_id]=byRef[u.referrer_id]||[]).push(u); }});
+    var stats={}; for(var i=1;i<=10;i++) stats[i]={people:0,lots:0};
+    var frontier=[rootId], seen={}; seen[rootId]=1;
+    for(var lvl=1;lvl<=10;lvl++){
+      var nxt=[];
+      frontier.forEach(function(id){
+        (byRef[id]||[]).forEach(function(u){
+          if(seen[u.id]) return;
+          seen[u.id]=1; nxt.push(u.id); stats[lvl].people++;
+          var s=snapFor(u.id,week()); if(s) stats[lvl].lots+=s.lots;
+        });
+      });
+      frontier=nxt; if(!nxt.length) break;
+    }
+    return stats;
+  }
+
+  function treeHtml(rootId){
+    function kids(id){ return state.users.filter(function(u){return u.referrer_id===id;}); }
+    function node(u, isRoot){
+      var info=T3.userProgress(state,u,week());
+      var s=snapFor(u.id,week());
+      var h='<li><div class="tree-node'+(isRoot?" root":"")+'"><strong>'+esc(u.name)+'</strong> <em class="tag sm">'+t("example")+'</em> '+badge(info.rank)
+        +' <span class="muted">'+info.partners+' '+t("partners")+'</span> <span class="muted">'+lots(s?s.lots:0)+' '+t("lots")+'</span> '
+        +(info.eligible?'<span class="status ok sm">'+t("eligible")+'</span>':'<span class="status no sm">'+t("not_eligible")+'</span>')
+        +'</div>';
+      var ch=kids(u.id);
+      if(ch.length){ h+='<ul class="tree">'; ch.forEach(function(c){ h+=node(c,false); }); h+='</ul>'; }
+      return h+'</li>';
+    }
+    return '<ul class="tree">'+node(userById(rootId),true)+'</ul>';
+  }
+
+  function networkView(){
+    var u=current(), info=T3.userProgress(state,u,week()), stats=levelStats(u.id);
+    var h='<div class="page-head"><h1>'+t("network_title")+'</h1>'+badge(info.rank)+'</div>';
+    h+='<div class="card"><h2>'+t("level_overview")+'</h2><div class="table-wrap"><table><thead><tr><th>'+t("level")+'</th><th>'+t("rate_per_lot")+'</th><th>'+t("people")+'</th><th class="num">'+t("volume")+'</th></tr></thead><tbody>';
+    for(var i=1;i<=10;i++){
+      var st=stats[i];
+      h+='<tr'+(i>info.max_level?' class="muted"':'')+'><td>L'+i+(i>info.max_level?' · 🔒':'')+'</td><td>'+money(state.settings.rates[i])+' $</td><td>'+st.people+'</td><td class="num">'+lots(st.lots)+'</td></tr>';
+    }
+    h+='</tbody></table></div></div><div class="card"><h2>'+t("downline_tree")+'</h2>';
+    var has=state.users.some(function(x){return x.referrer_id===u.id;});
+    h+= has?treeHtml(u.id):'<p class="hint">'+t("no_downline")+'</p>';
+    h+='</div>';
+    return shell(h);
+  }
+
+  function poolView(){
+    var rows=state.commissions.filter(function(c){return c.recipient_id===state.uid;}).slice().reverse();
+    return shell('<div class="page-head"><h1>'+t("commissions")+'</h1></div><div class="card">'+commTable(rows)+'</div>');
+  }
+
+  function statementView(){
+    var u=current(), w=week(), snap=snapFor(u.id,w);
+    var lines=state.commissions.filter(function(c){return c.recipient_id===u.id && c.period===w;});
+    var total=0; lines.forEach(function(c){total+=c.amount;}); total=T3.r2(total);
+    var byL={}, byP={};
+    lines.forEach(function(r){
+      var lvl=r.level||0;
+      byL[lvl]=byL[lvl]||{amount:0,lots:0,reason:r.reason};
+      byL[lvl].amount+=r.amount; byL[lvl].lots+=r.lots;
+      var key=r.reason==="house"?"house":(r.source_user_id+"|"+r.source_account);
+      if(!byP[key]){
+        var src=userById(r.source_user_id);
+        byP[key]={label:r.reason==="house"?t("house"):T3.anonymize(src?src.name:"",r.source_account),amount:0,lots:0,level:lvl,reason:r.reason};
       }
-      current = next;
-      if (!current.length) break;
-    }
-    return levelOf;
-  }
-  function levelStats(s, rootId) {
-    var levelOf = collectDownline(s, rootId);
-    var lotsBy = {};
-    s.snapshots.forEach(function (sn) {
-      if (sn.userId) lotsBy[sn.userId] = (lotsBy[sn.userId] || 0) + sn.lots;
+      byP[key].amount+=r.amount; byP[key].lots+=r.lots;
     });
-    var rows = [];
-    for (var lv = 1; lv <= 10; lv++) {
-      var ids = Object.keys(levelOf).filter(function (id) { return levelOf[id] === lv; }).map(Number);
-      var vol = 0;
-      ids.forEach(function (id) { vol += lotsBy[id] || 0; });
-      rows.push({ level: lv, count: ids.length, lots: round2(vol) });
-    }
-    return rows;
-  }
-  function childrenOf(s, uid) {
-    return s.users.filter(function (u) { return u.referrerId === uid; });
-  }
-  function renderTree(s, nodes, depth) {
-    if (!nodes || !nodes.length) return "";
-    var html = '<ul class="tree">';
-    nodes.forEach(function (u) {
-      html += '<li><div class="tree-node"><strong>' + esc(u.name) + '</strong>';
-      if (u.isExample) html += ' <em class="tag sm">' + esc(t("example")) + '</em>';
-      html += ' <span class="muted">' + partnerCount(s, u.id) + " " + esc(t("partners")) + " · " + esc(t("deposit")) + " " + Math.round(u.deposit) + "</span></div>";
-      if (depth < 12) html += renderTree(s, childrenOf(s, u.id), depth + 1);
-      html += "</li>";
+    var h='<div class="page-head"><h1>'+t("statement_title")+'</h1><span class="muted">'+w+'</span></div>';
+    h+='<p class="hint">'+t("statement_hint")+'</p>';
+    h+='<div class="kpis"><div class="card kpi"><span>'+t("week_earnings")+'</span><strong>'+money(total)+' $</strong></div>';
+    h+='<div class="card kpi"><span>'+t("lots")+'</span><strong>'+(snap?lots(snap.lots):"—")+'</strong><small>'+t("self_trade_note")+'</small></div>';
+    h+='<div class="card kpi"><span>'+t("rebate")+'</span><strong>'+(snap?money(snap.rebate)+" $":"—")+'</strong></div>';
+    h+='<div class="card kpi"><span>'+t("pnl_approx")+'</span><strong>'+(snap&&snap.pnl_approx!=null?money(snap.pnl_approx)+" $":"n/a")+'</strong><small>'+t("pnl_hint")+'</small></div></div>';
+    h+='<div class="grid-2"><div class="card"><h2>'+t("per_level")+'</h2><div class="table-wrap"><table><thead><tr><th>'+t("level")+'</th><th class="num">'+t("lots")+'</th><th class="num">'+t("amount")+'</th><th class="num">'+t("pct")+'</th></tr></thead><tbody>';
+    Object.keys(byL).sort(function(a,b){return a-b;}).forEach(function(k){
+      var b=byL[k]; var pct=total?T3.r2(100*b.amount/total):0;
+      h+='<tr><td>'+(b.reason==="house"?t("house"):("L"+k))+'</td><td class="num">'+lots(b.lots)+'</td><td class="num">'+money(b.amount)+' $</td><td class="num">'+pct+'%</td></tr>';
     });
-    return html + "</ul>";
-  }
-  function reasonLabel(r) { return t("reason_" + r); }
-  function commRows(s, uid, limit) {
-    var rows = s.commissions.filter(function (c) { return c.recipientId === uid; });
-    rows.sort(function (a, b) { return b.id - a.id; });
-    if (limit) rows = rows.slice(0, limit);
-    return rows;
-  }
-  function commTable(rows) {
-    if (!rows.length) return '<p class="muted">' + esc(t("no_commissions")) + "</p>";
-    var html = '<div class="table-wrap"><table><thead><tr><th>' + esc(t("period")) + "</th><th>" + esc(t("date")) + "</th><th>" + esc(t("trader")) + "</th><th>" + esc(t("level")) + "</th><th>" + esc(t("lots")) + "</th><th>" + esc(t("reason")) + '</th><th class="num">' + esc(t("amount")) + "</th></tr></thead><tbody>";
-    rows.forEach(function (r) {
-      var src = userById(state, r.sourceUserId);
-      html += "<tr><td>" + esc(r.period) + "</td><td>" + esc(r.createdAt) + "</td><td>" + esc(src ? src.name : r.sourceUserId) + "</td><td>" + (r.level === 0 ? esc(t("house")) : "L" + r.level) + "</td><td>" + money(r.lots) + "</td><td>" + esc(reasonLabel(r.reason)) + '</td><td class="num">' + money(r.amount) + " USDT</td></tr>";
+    h+='</tbody></table></div></div><div class="card"><h2>'+t("per_partner")+' <span class="tag sm">'+t("anonymized")+'</span></h2><div class="table-wrap"><table><thead><tr><th>'+t("trader")+'</th><th>'+t("level")+'</th><th class="num">'+t("lots")+'</th><th class="num">'+t("amount")+'</th><th class="num">'+t("pct")+'</th></tr></thead><tbody>';
+    Object.keys(byP).map(function(k){return byP[k];}).sort(function(a,b){return b.amount-a.amount;}).forEach(function(p){
+      var pct=total?T3.r2(100*p.amount/total):0;
+      h+='<tr><td class="mono">'+esc(p.label)+'</td><td>'+(p.reason==="house"?t("house"):("L"+p.level))+'</td><td class="num">'+lots(p.lots)+'</td><td class="num">'+money(p.amount)+' $</td><td class="num">'+pct+'%</td></tr>';
     });
-    return html + "</tbody></table></div>";
+    h+='</tbody></table></div></div></div>';
+    return shell(h);
   }
-  function langBtns() {
-    return '<div class="lang"><button type="button" data-act="lang" data-lang="de" class="' + (state.lang === "de" ? "on" : "") + '">DE</button><button type="button" data-act="lang" data-lang="en" class="' + (state.lang === "en" ? "on" : "") + '">EN</button></div>';
-  }
-  function refUrl(code) {
-    var base = "trading3-demo.html";
-    try { base = location.href.split("#")[0]; } catch (e) {}
-    return base + "#/r/" + code;
-  }
-  function roleBtn(id, name, hint) {
-    return '<button type="button" class="role" data-act="login" data-id="' + id + '"><strong>' + esc(name) + ' <em class="tag sm">' + esc(t("example")) + "</em></strong><span>" + esc(hint) + "</span></button>";
-  }
-  function renderLogin() {
-    var ref = null;
-    var m = (location.hash || "").match(/#\/r\/([^/]+)/i);
-    if (m) {
-      var code = m[1].toUpperCase();
-      state.users.forEach(function (u) { if (u.referralCode === code) ref = u; });
-    }
-    return '<div class="auth-wrap"><header class="auth-top"><span class="logo">t3</span><strong>trading3</strong>' + langBtns() + "</header>" +
-      '<div class="card auth-card"><h1>' + esc(t("login")) + '</h1><p class="muted">' + esc(t("tagline")) + "</p>" +
-      (ref ? '<p class="pill">' + esc(t("referred_by")) + ": <strong>" + esc(ref.name) + "</strong></p>" : "") +
-      '<p class="hint">' + esc(t("pick_role")) + "</p>" +
-      '<div class="roles">' +
-      roleBtn(1, "Kevin Müller", t("role_admin")) +
-      roleBtn(2, "Anna Weber", t("role_anna")) +
-      roleBtn(8, "Georg Fischer", t("role_georg")) +
-      roleBtn(19, "Rita Vogel", t("role_rita")) +
-      "</div>" +
-      '<div class="demo-box"><strong>' + esc(t("example")) + "</strong>" +
-      (state.lang === "en" ? "26 sample users, 10-level plan, October already calculated. November is imported — run it in Admin." : "26 Beispielnutzer, 10-Ebenen-Plan, Oktober bereits berechnet. November ist importiert — im Admin anstoßen.") +
-      "</div></div>" +
-      '<p class="footer">' + esc(t("footer")) + ' · <a href="#" data-act="reset">' + esc(t("reset_demo")) + "</a></p></div>";
-  }
-  function navLink(page, label) {
-    return '<a href="#/' + page + '" data-act="go" data-page="' + page + '" class="' + (state.page === page ? "on" : "") + '">' + esc(label) + "</a>";
-  }
-  function renderShell(inner) {
-    var u = currentUser();
-    var admin = u && u.isAdmin && !state.impersonator;
-    var html = '<div class="banner">' + esc(t("test_banner")) + "</div>";
-    if (state.impersonator) {
-      html += '<div class="banner impersonate">' + esc(t("impersonating")) + " <strong>" + esc(u.name) + '</strong> · <a href="#/admin-users" data-act="stop-imp">' + esc(t("back_to_admin")) + "</a></div>";
-    }
-    html += '<div class="topbar"><button type="button" class="menu-btn" data-act="menu">' + esc(t("menu")) + '</button><span class="logo">t3</span><strong>trading3</strong></div>';
-    html += '<div class="scrim" data-act="menu-close"></div><div class="shell"><aside class="sidebar">';
-    html += '<a class="brand" href="#/dashboard" data-act="go" data-page="dashboard"><span class="logo">t3</span><span><strong>trading3</strong><small>' + esc(t("tagline")) + "</small></span></a><nav>";
-    html += navLink("dashboard", t("dashboard")) + navLink("network", t("network")) + navLink("commissions", t("commissions")) + navLink("withdrawals", t("withdrawals")) + navLink("profile", t("profile"));
-    if (admin) {
-      html += '<div class="nav-label">' + esc(t("admin")) + "</div>";
-      html += navLink("admin", t("admin_overview")) + navLink("admin-users", t("users")) + navLink("admin-tree", t("tree")) + navLink("admin-import", t("import_data")) + navLink("admin-calculate", t("calculate")) + navLink("admin-payouts", t("payouts")) + navLink("admin-settings", t("settings"));
-    }
-    html += '</nav><div class="side-foot"><div class="who"><span class="avatar">' + esc((u.name || "?").charAt(0)) + "</span><span><strong>" + esc(u.name) + "</strong> ";
-    if (u.isExample) html += '<em class="tag">' + esc(t("example")) + "</em>";
-    html += "</span></div>" + langBtns() + '<button type="button" class="logout" data-act="logout">' + esc(t("logout")) + "</button></div></aside>";
-    html += '<main class="main">';
-    if (state.flash) html += '<div class="flash ' + esc(state.flash.cat) + '">' + esc(state.flash.msg) + "</div>";
-    html += inner + "</main></div>";
-    return html;
-  }
-  function renderDashboard() {
-    var u = currentUser(), s = state, snap = latestSnap(s, u.id), bal = availableBalance(s, u.id);
-    var partners = partnerCount(s, u.id), elig = userEligible(s, u);
-    var html = '<div class="page-head"><h1>' + esc(t("welcome")) + ", " + esc(u.name.split(" ")[0]) + "</h1>";
-    if (u.isExample) html += '<span class="tag">' + esc(t("example")) + "</span></div>"; else html += "</div>";
-    html += '<div class="kpis"><div class="card kpi"><span>' + esc(t("commission_balance")) + "</span><strong>" + money(bal) + " <small>USDT</small></strong></div>";
-    html += '<div class="card kpi"><span>' + esc(t("pu_balance")) + "</span><strong>" + (snap && snap.balance != null ? money(snap.balance) : "—") + "</strong></div>";
-    html += '<div class="card kpi"><span>' + esc(t("pu_equity")) + "</span><strong>" + (snap && snap.equity != null ? money(snap.equity) : "—") + "</strong></div>";
-    html += '<div class="card kpi"><span>' + esc(t("lots_period")) + (snap ? " · " + esc(snap.period) : "") + "</span><strong>" + (snap ? money(snap.lots) : "—") + "</strong></div></div>";
-    if (!u.clientId) html += '<div class="flash warn">' + esc(t("enter_client_id")) + ' <a href="#/profile" data-act="go" data-page="profile">' + esc(t("profile")) + " →</a></div>";
-    if (!snap) html += '<p class="muted">' + esc(t("no_pu_data")) + "</p>";
-    html += '<div class="grid-2"><section class="card"><h2>' + esc(t("ref_link")) + '</h2><div class="copy-row"><input id="refurl" readonly value="' + esc(refUrl(u.referralCode)) + '"><button type="button" class="btn" data-act="copy" data-target="#refurl">' + esc(t("copy")) + "</button></div>";
-    if (s.settings.puPrimeIbLink) html += '<p class="mt"><a class="btn ghost" href="' + esc(s.settings.puPrimeIbLink) + '" target="_blank" rel="noopener">' + esc(t("open_pu")) + "</a></p>";
-    html += '<p class="hint">' + esc(t("self_trade_note")) + "</p></section>";
-    html += '<section class="card"><h2>' + esc(elig ? t("eligible") : t("not_eligible")) + '</h2><div class="status ' + (elig ? "ok" : "no") + '">' + esc(elig ? t("eligible") : t("not_eligible")) + '</div><ul class="facts">';
-    html += "<li>" + esc(t("deposit")) + ": <strong>" + money(u.deposit) + "</strong> / " + s.settings.minDeposit + "</li>";
-    html += "<li>" + esc(t("direct_partners")) + ": <strong>" + partners + "</strong> / " + s.settings.minPartners + "</li></ul>";
-    html += '<p class="hint">' + esc(t("eligibility_hint", { deposit: s.settings.minDeposit, partners: s.settings.minPartners })) + "</p></section></div>";
-    html += '<section class="card"><h2>' + esc(t("recent_commissions")) + "</h2>" + commTable(commRows(s, u.id, 8));
-    if (commRows(s, u.id).length) html += '<p><a href="#/commissions" data-act="go" data-page="commissions">' + esc(t("commissions")) + " →</a></p>";
-    html += "</section>";
-    return html;
-  }
-  function renderNetwork() {
-    var u = currentUser(), levels = levelStats(state, u.id), kids = childrenOf(state, u.id);
-    var html = '<div class="page-head"><h1>' + esc(t("network_title")) + '</h1></div><section class="card"><h2>' + esc(t("level_overview")) + '</h2><div class="table-wrap"><table><thead><tr><th>' + esc(t("level")) + "</th><th>" + esc(t("people")) + '</th><th class="num">' + esc(t("volume")) + "</th></tr></thead><tbody>";
-    levels.forEach(function (lv) {
-      html += "<tr><td>L" + lv.level + "</td><td>" + lv.count + '</td><td class="num">' + money(lv.lots) + "</td></tr>";
-    });
-    html += '</tbody></table></div></section><section class="card"><h2>' + esc(t("downline_tree")) + "</h2>";
-    html += kids.length ? renderTree(state, kids, 0) : '<p class="muted">' + esc(t("no_downline")) + "</p>";
-    return html + "</section>";
-  }
-  function renderCommissions() {
-    var rows = commRows(state, state.uid);
-    var total = 0; rows.forEach(function (r) { total += r.amount; });
-    return '<div class="page-head"><h1>' + esc(t("commissions")) + '</h1><span class="pill">' + money(total) + ' USDT</span></div><section class="card">' + commTable(rows) + "</section>";
-  }
-  function renderWithdrawals() {
-    var u = currentUser(), bal = availableBalance(state, u.id), minW = state.settings.minWithdrawal;
-    var html = '<div class="page-head"><h1>' + esc(t("withdrawals")) + '</h1></div><div class="grid-2"><section class="card"><h2>' + esc(t("request_withdrawal")) + "</h2>";
-    html += "<p>" + esc(t("available")) + ": <strong>" + money(bal) + " USDT</strong> · " + esc(t("min_withdrawal")) + " " + minW + " USDT</p>";
-    if (u.usdtAddress && (u.usdtNetwork === "TRC20" || u.usdtNetwork === "ERC20")) {
-      html += '<p class="muted">' + esc(u.usdtNetwork) + " · " + esc(u.usdtAddress) + '</p><form class="stack" data-form="withdraw"><label>' + esc(t("amount")) + ' (USDT)<input type="number" name="amount" step="0.01" min="' + minW + '" max="' + bal + '" required></label><button type="submit">' + esc(t("request")) + "</button></form>";
-    } else {
-      html += '<p class="hint">' + esc(t("need_address")) + ' <a href="#/profile" data-act="go" data-page="profile">' + esc(t("profile")) + " →</a></p>";
-    }
-    html += '</section><section class="card"><h2>' + esc(t("withdrawal_history")) + "</h2>";
-    var rows = state.withdrawals.filter(function (w) { return w.userId === u.id; }).slice().reverse();
-    if (!rows.length) html += '<p class="muted">' + esc(t("no_withdrawals")) + "</p>";
+
+  function withdrawalsView(){
+    var u=current(), bal=T3.available(state,u.id);
+    var rows=state.withdrawals.filter(function(w){return w.user_id===u.id;}).slice().reverse();
+    var h='<div class="page-head"><h1>'+t("withdrawals")+'</h1></div><div class="grid-2"><div class="card"><h2>'+t("request_withdrawal")+'</h2>';
+    h+='<p>'+t("available")+': <strong>'+money(bal)+' USDT</strong></p><p class="hint">'+t("min_withdrawal")+': '+money(state.settings.min_withdrawal)+' USDT · '+t("paid_saturday")+'</p>';
+    h+='<form data-wd class="stack"><label>'+t("amount")+'<input name="amount" type="number" step="0.01" min="'+state.settings.min_withdrawal+'" required></label>';
+    h+='<p class="hint">'+t("usdt_address")+': <span class="mono">'+esc(u.usdt_address||"—")+'</span> · '+esc(u.usdt_network||"—")+'</p>';
+    h+='<button type="submit">'+t("request")+'</button></form></div><div class="card"><h2>'+t("withdrawal_history")+'</h2>';
+    if(!rows.length) h+='<p class="hint">'+t("no_withdrawals")+'</p>';
     else {
-      html += '<div class="table-wrap"><table><thead><tr><th>' + esc(t("date")) + '</th><th class="num">' + esc(t("amount")) + "</th><th>" + esc(t("network_chain")) + "</th><th>" + esc(t("status")) + "</th></tr></thead><tbody>";
-      rows.forEach(function (r) {
-        html += "<tr><td>" + esc(r.createdAt) + '</td><td class="num">' + money(r.amount) + "</td><td>" + esc(r.usdtNetwork) + '</td><td><span class="status sm ' + esc(r.status) + '">' + esc(t(r.status)) + "</span></td></tr>";
-      });
-      html += "</tbody></table></div>";
+      h+='<div class="table-wrap"><table><thead><tr><th>'+t("date")+'</th><th class="num">'+t("amount")+'</th><th>'+t("status")+'</th></tr></thead><tbody>';
+      rows.forEach(function(r){ h+='<tr><td>'+r.created_at+'</td><td class="num">'+money(r.amount)+'</td><td><span class="status '+r.status+' sm">'+t(r.status)+'</span></td></tr>'; });
+      h+='</tbody></table></div>';
     }
-    return html + "</section></div>";
-  }
-  function renderProfile() {
-    var u = currentUser();
-    return '<div class="page-head"><h1>' + esc(t("profile")) + '</h1></div><section class="card narrow"><p class="hint">' + esc(t("profile_hint")) + '</p><form class="stack" data-form="profile"><label>' + esc(t("client_id")) + '<input type="text" name="clientId" value="' + esc(u.clientId || "") + '" placeholder="PU100001"></label><label>' + esc(t("usdt_address")) + '<input type="text" name="usdtAddress" value="' + esc(u.usdtAddress || "") + '"></label><label>' + esc(t("network_chain")) + '<select name="usdtNetwork"><option value="">—</option><option value="TRC20"' + (u.usdtNetwork === "TRC20" ? " selected" : "") + ">" + esc(t("trc20")) + '</option><option value="ERC20"' + (u.usdtNetwork === "ERC20" ? " selected" : "") + ">" + esc(t("erc20")) + '</option></select></label><p class="muted">' + esc(t("deposit")) + ": " + money(u.deposit) + " (Admin / Import)</p><button type=\"submit\">" + esc(t("save")) + "</button></form></section>";
+    h+='</div></div>';
+    return shell(h);
   }
 
-  function renderAdminHome() {
-    var pending = { c: 0, s: 0 }, paid = 0, unmatched = 0;
-    state.withdrawals.forEach(function (w) {
-      if (w.status === "pending") { pending.c++; pending.s += w.amount; }
-      if (w.status === "paid") paid += w.amount;
-    });
-    state.snapshots.forEach(function (sn) { if (!sn.userId) unmatched++; });
-    var hid = houseId(state);
-    return '<div class="page-head"><h1>' + esc(t("admin_overview")) + '</h1></div><div class="kpis">' +
-      '<div class="card kpi"><span>' + esc(t("total_users")) + "</span><strong>" + state.users.length + "</strong></div>" +
-      '<div class="card kpi"><span>' + esc(t("house")) + "</span><strong>" + money(availableBalance(state, hid)) + " <small>USDT</small></strong></div>" +
-      '<div class="card kpi"><span>' + esc(t("pending_payouts")) + "</span><strong>" + pending.c + " · " + money(pending.s) + "</strong></div>" +
-      '<div class="card kpi"><span>' + esc(t("paid_out")) + "</span><strong>" + money(paid) + "</strong></div></div>" +
-      '<p class="muted">' + esc(t("unmatched_clients")) + ": " + unmatched + '</p><div class="actions">' +
-      '<a class="btn" href="#/admin-users" data-act="go" data-page="admin-users">' + esc(t("users")) + "</a>" +
-      '<a class="btn ghost" href="#/admin-tree" data-act="go" data-page="admin-tree">' + esc(t("tree")) + "</a>" +
-      '<a class="btn ghost" href="#/admin-import" data-act="go" data-page="admin-import">' + esc(t("import_data")) + "</a>" +
-      '<a class="btn ghost" href="#/admin-calculate" data-act="go" data-page="admin-calculate">' + esc(t("calculate")) + "</a>" +
-      '<a class="btn ghost" href="#/admin-payouts" data-act="go" data-page="admin-payouts">' + esc(t("payouts")) + "</a></div>";
-  }
-  function renderAdminUsers() {
-    var q = (state.search || "").toLowerCase();
-    var html = '<div class="page-head"><h1>' + esc(t("all_users")) + '</h1></div><form class="search" data-form="search"><input type="search" name="q" value="' + esc(state.search || "") + '" placeholder="' + esc(t("search")) + '"><button class="btn" type="submit">' + esc(t("search")) + '</button></form><section class="card"><div class="table-wrap"><table><thead><tr><th>ID</th><th>' + esc(t("name")) + "</th><th>" + esc(t("email")) + "</th><th>" + esc(t("client_id")) + "</th><th>" + esc(t("deposit")) + "</th><th>" + esc(t("partners")) + "</th><th>USDT</th><th></th><th>" + esc(t("actions")) + "</th></tr></thead><tbody>";
-    state.users.forEach(function (u) {
-      if (q && [u.name, u.email, u.clientId, u.referralCode].join(" ").toLowerCase().indexOf(q) < 0) return;
-      var elig = userEligible(state, u);
-      html += "<tr><td>" + u.id + "</td><td>" + esc(u.name) + (u.isExample ? ' <em class="tag sm">' + esc(t("example")) + "</em>" : "") + (u.isAdmin ? ' <em class="tag sm gold">Admin</em>' : "") + "</td><td>" + esc(u.email) + '</td><td class="mono">' + esc(u.clientId || "—") + "</td><td>" + Math.round(u.deposit) + "</td><td>" + partnerCount(state, u.id) + '</td><td class="num">' + money(availableBalance(state, u.id)) + '</td><td><span class="status sm ' + (elig ? "ok" : "no") + '">' + esc(elig ? t("eligible") : t("not_eligible")) + "</span></td><td>";
-      if (!u.isAdmin) html += '<button class="btn sm ghost" type="button" data-act="impersonate" data-id="' + u.id + '">' + esc(t("login_as")) + "</button>";
-      html += "</td></tr>";
-    });
-    return html + "</tbody></table></div></section>";
-  }
-  function renderAdminTree() {
-    var root = userById(state, houseId(state));
-    var html = '<div class="page-head"><h1>' + esc(t("full_tree")) + '</h1></div><section class="card">';
-    if (root) {
-      html += '<div class="tree-node root"><strong>' + esc(root.name) + '</strong> <span class="muted">' + partnerCount(state, root.id) + " " + esc(t("partners")) + "</span></div>";
-      html += renderTree(state, childrenOf(state, root.id), 0);
-    }
-    return html + "</section>";
-  }
-  function renderAdminImport() {
-    var html = '<div class="page-head"><h1>' + esc(t("import_data")) + '</h1></div><div class="grid-2"><section class="card"><h2>' + esc(t("csv_upload")) + '</h2><p class="hint">' + esc(t("csv_hint")) + ' <a href="#" data-act="sample-csv">' + esc(t("download_sample")) + "</a></p>";
-    html += '<form class="stack" data-form="csv"><textarea name="csv" rows="6" placeholder="pu_prime_client_id,period,lots,balance,equity,deposit"></textarea><input type="file" name="file" accept=".csv,text/csv"><button type="submit">' + esc(t("upload")) + "</button></form></section>";
-    html += '<section class="card"><h2>' + esc(t("manual_entry")) + '</h2><form class="stack" data-form="manual"><label>' + esc(t("select_user")) + '<select name="userId"><option value="">—</option>';
-    state.users.forEach(function (u) {
-      html += '<option value="' + u.id + '">' + esc(u.name) + " (" + esc(u.clientId || "—") + ")</option>";
-    });
-    html += '</select></label><label>' + esc(t("client_id")) + '<input type="text" name="clientId" placeholder="PU100001"></label><label>' + esc(t("period")) + '<input type="text" name="period" required placeholder="' + esc(t("period_placeholder")) + '" value="2026-11"></label><label>' + esc(t("lots")) + '<input type="number" name="lots" step="0.01" min="0" required value="1"></label><label>' + esc(t("balance")) + '<input type="number" name="balance" step="0.01"></label><label>' + esc(t("equity")) + '<input type="number" name="equity" step="0.01"></label><label>' + esc(t("deposit")) + '<input type="number" name="deposit" step="0.01"></label><button type="submit">' + esc(t("add")) + "</button></form></section></div>";
-    html += '<section class="card"><h2>' + esc(t("snapshots")) + '</h2><div class="table-wrap"><table><thead><tr><th>' + esc(t("period")) + "</th><th>" + esc(t("client_id")) + "</th><th>" + esc(t("name")) + '</th><th class="num">' + esc(t("lots")) + '</th><th class="num">' + esc(t("balance")) + '</th><th class="num">' + esc(t("equity")) + "</th><th>" + esc(t("source")) + "</th></tr></thead><tbody>";
-    var snaps = state.snapshots.slice().sort(function (a, b) { return a.period === b.period ? b.id - a.id : (a.period < b.period ? 1 : -1); });
-    snaps.forEach(function (sn) {
-      var u = sn.userId ? userById(state, sn.userId) : null;
-      html += "<tr><td>" + esc(sn.period) + '</td><td class="mono">' + esc(sn.clientId) + "</td><td>" + esc(u ? u.name : "—") + '</td><td class="num">' + money(sn.lots) + '</td><td class="num">' + (sn.balance != null ? money(sn.balance) : "—") + '</td><td class="num">' + (sn.equity != null ? money(sn.equity) : "—") + "</td><td>" + esc(sn.source) + "</td></tr>";
-    });
-    return html + "</tbody></table></div></section>";
-  }
-  function renderAdminCalculate() {
-    var periods = [];
-    state.snapshots.forEach(function (sn) { if (periods.indexOf(sn.period) < 0) periods.push(sn.period); });
-    periods.sort().reverse();
-    var html = '<div class="page-head"><h1>' + esc(t("run_calc")) + '</h1></div><section class="card narrow"><p class="hint">' + esc(t("run_calc_hint")) + '</p><form class="stack" data-form="calc"><label>' + esc(t("period"));
-    if (periods.length) {
-      html += '<select name="period">';
-      periods.forEach(function (p) { html += '<option value="' + esc(p) + '">' + esc(p) + "</option>"; });
-      html += "</select>";
-    } else html += '<input type="text" name="period" required placeholder="' + esc(t("period_placeholder")) + '">';
-    html += "</label><button type=\"submit\">" + esc(t("run")) + " / " + esc(t("recalc")) + "</button></form></section>";
-    html += '<section class="card"><h2>' + esc(t("calc_runs")) + "</h2>";
-    if (state.runs.length) {
-      html += '<div class="table-wrap"><table><thead><tr><th>' + esc(t("period")) + "</th><th>" + esc(t("date")) + "</th><th>" + esc(t("lines")) + '</th><th class="num">' + esc(t("amount")) + "</th></tr></thead><tbody>";
-      state.runs.forEach(function (r) {
-        html += "<tr><td>" + esc(r.period) + "</td><td>" + esc(r.createdAt) + "</td><td>" + r.lines + '</td><td class="num">' + money(r.total) + " USDT</td></tr>";
-      });
-      html += "</tbody></table></div>";
-    }
-    return html + "</section>";
-  }
-  function renderAdminPayouts() {
-    var rows = state.withdrawals.slice().sort(function (a, b) {
-      var o = { pending: 0, approved: 1, paid: 2, rejected: 3 };
-      return (o[a.status] - o[b.status]) || (b.id - a.id);
-    });
-    var html = '<div class="page-head"><h1>' + esc(t("payout_requests")) + '</h1></div><section class="card">';
-    if (!rows.length) return html + '<p class="muted">' + esc(t("no_withdrawals")) + "</p></section>";
-    html += '<div class="table-wrap"><table><thead><tr><th>#</th><th>' + esc(t("date")) + "</th><th>" + esc(t("name")) + '</th><th class="num">' + esc(t("amount")) + "</th><th>" + esc(t("network_chain")) + "</th><th>" + esc(t("usdt_address")) + "</th><th>" + esc(t("status")) + "</th><th>" + esc(t("actions")) + "</th></tr></thead><tbody>";
-    rows.forEach(function (r) {
-      var u = userById(state, r.userId);
-      html += "<tr><td>" + r.id + "</td><td>" + esc(r.createdAt) + "</td><td>" + esc(u ? u.name : "") + "<br><span class=\"muted\">" + esc(u ? u.email : "") + '</span></td><td class="num">' + money(r.amount) + ' USDT</td><td>' + esc(r.usdtNetwork) + '</td><td class="mono">' + esc(r.usdtAddress) + '</td><td><span class="status sm ' + esc(r.status) + '">' + esc(t(r.status)) + '</span></td><td><form class="inline-actions" data-form="payout" data-id="' + r.id + '"><input type="text" name="adminNote" placeholder="' + esc(t("admin_note")) + '" value="' + esc(r.adminNote || "") + '">';
-      if (r.status === "pending") html += '<button class="btn sm" type="submit" name="action" value="approved">' + esc(t("approve")) + '</button><button class="btn sm ghost danger" type="submit" name="action" value="rejected">' + esc(t("reject")) + "</button>";
-      if (r.status === "approved") html += '<button class="btn sm" type="submit" name="action" value="paid">' + esc(t("mark_paid")) + "</button>";
-      html += "</form></td></tr>";
-    });
-    return html + "</tbody></table></div></section>";
-  }
-  function renderAdminSettings() {
-    var st = state.settings;
-    var html = '<div class="page-head"><h1>' + esc(t("settings")) + '</h1></div><section class="card narrow"><form class="stack" data-form="settings"><label>' + esc(t("ib_link")) + '<input type="url" name="puPrimeIbLink" value="' + esc(st.puPrimeIbLink) + '"></label><label>' + esc(t("min_deposit")) + '<input type="number" name="minDeposit" step="0.01" value="' + st.minDeposit + '"></label><label>' + esc(t("min_partners")) + '<input type="number" name="minPartners" step="1" min="0" value="' + st.minPartners + '"></label><label>' + esc(t("house_rate")) + '<input type="number" name="houseRate" step="0.01" value="' + st.houseRate + '"></label><label>' + esc(t("min_withdrawal")) + '<input type="number" name="minWithdrawal" step="0.01" value="' + st.minWithdrawal + '"></label><fieldset><legend>' + esc(t("level_rates")) + '</legend><div class="rates">';
-    for (var i = 1; i <= 10; i++) {
-      html += "<label>L" + i + '<input type="number" name="rate_' + i + '" step="0.01" value="' + st.rates[i] + '"></label>';
-    }
-    html += '</div></fieldset><label class="check"><input type="checkbox" name="ineligibleToHouse"' + (st.ineligibleToHouse ? " checked" : "") + "> " + esc(t("ineligible_to_house")) + '</label><p class="hint">' + esc(t("ineligible_to_house_help")) + '</p><button type="submit">' + esc(t("save")) + "</button></form>";
-    html += '<p class="mt"><button type="button" class="btn ghost" data-act="reset">' + esc(t("reset_demo")) + "</button></p></section>";
-    return html;
+  function profileView(){
+    var u=current();
+    var h='<div class="page-head"><h1>'+t("profile")+'</h1></div><div class="card narrow"><p class="hint">'+t("profile_hint")+'</p>';
+    h+='<form data-profile class="stack">';
+    h+='<label>'+t("name")+'<input name="name" value="'+esc(u.name)+'" required></label>';
+    h+='<label>'+t("client_id")+'<input name="client" value="'+esc(u.client||"")+'"></label>';
+    h+='<label>'+t("usdt_address")+'<input name="usdt_address" value="'+esc(u.usdt_address||"")+'"></label>';
+    h+='<label>'+t("network_chain")+'<select name="usdt_network"><option value="TRC20"'+(u.usdt_network==="TRC20"?" selected":"")+'>'+t("trc20")+'</option><option value="ERC20"'+(u.usdt_network==="ERC20"?" selected":"")+'>'+t("erc20")+'</option></select></label>';
+    h+='<button type="submit">'+t("save")+'</button></form></div>';
+    return shell(h);
   }
 
-  var PAGES = {
-    login: renderLogin, dashboard: renderDashboard, network: renderNetwork,
-    commissions: renderCommissions, withdrawals: renderWithdrawals, profile: renderProfile,
-    admin: renderAdminHome, "admin-users": renderAdminUsers, "admin-tree": renderAdminTree,
-    "admin-import": renderAdminImport, "admin-calculate": renderAdminCalculate,
-    "admin-payouts": renderAdminPayouts, "admin-settings": renderAdminSettings
-  };
-  function render() {
-    document.documentElement.lang = state.lang;
-    document.body.classList.toggle("nav-open", !!state.navOpen);
-    var u = currentUser();
-    var page = state.page || "login";
-    if (!u) page = "login";
-    else if (page === "login") page = "dashboard";
-    if (page.indexOf("admin") === 0 && u && (!u.isAdmin || state.impersonator)) page = "dashboard";
-    state.page = page;
-    var fn = PAGES[page] || renderDashboard;
-    document.getElementById("app").innerHTML = (page === "login") ? fn() : renderShell(fn());
+  function adminHome(){
+    var run=latestRun(), totals=weekTotals(week()), warn=overRebate();
+    var pending=state.withdrawals.filter(function(w){return w.status==="pending";});
+    var pendAmt=0, paid=0;
+    state.withdrawals.forEach(function(w){ if(w.status==="pending") pendAmt+=w.amount; if(w.status==="paid") paid+=w.amount; });
+    var h='<div class="page-head"><h1>'+t("admin_overview")+'</h1></div>';
+    if(warn) h+='<div class="flash warn">⚠ '+t("warning_over_rebate")+'</div>';
+    h+='<div class="kpis">';
+    h+='<div class="card kpi"><span>'+t("total_users")+'</span><strong>'+state.users.length+'</strong></div>';
+    h+='<div class="card kpi"><span>'+t("pending_payouts")+'</span><strong>'+money(pendAmt)+' USDT</strong><small>'+pending.length+' '+t("payouts")+'</small></div>';
+    h+='<div class="card kpi"><span>'+t("paid_out")+'</span><strong>'+money(paid)+' USDT</strong></div>';
+    h+='<div class="card kpi"><span>'+t("unmapped")+'</span><strong>0</strong></div></div>';
+    h+='<div class="kpis">';
+    h+='<div class="card kpi"><span>'+t("total_rebate")+'</span><strong>'+(run?money(run.total_rebate)+" $":"—")+'</strong><small>'+t("lots")+' '+lots(totals.lots)+' · '+week()+'</small></div>';
+    h+='<div class="card kpi"><span>'+t("total_payouts")+'</span><strong>'+(run?money(run.total_payouts)+" $":"—")+'</strong><small>'+t("cap_status")+': '+(state.settings.cap_enabled?t("on"):t("off"))+'</small></div>';
+    h+='<div class="card kpi'+(warn?" warn-kpi":"")+'"><span>'+t("house_net")+'</span><strong>'+(run?money(run.house_net)+" $":"—")+'</strong><small>'+(warn?("⚠ "+t("warning_over_rebate")):t("paid_saturday"))+'</small></div>';
+    h+='<div class="card kpi"><span>'+t("rate_per_lot")+'</span><strong>'+money(state.settings.network_per_lot)+' $</strong><small>L1 '+money(state.settings.rates[1])+' · L2 '+money(state.settings.rates[2])+'</small></div></div>';
+    h+='<div class="grid-2"><div class="card"><h2>'+t("calc_runs")+'</h2>'+runsTable(state.runs)+'<p class="mt"><a class="btn sm" href="#/admin-calculate">'+t("run_calc")+'</a></p></div>';
+    h+='<div class="card"><h2>'+t("payout_requests")+'</h2>';
+    if(!pending.length) h+='<p class="hint">'+t("no_withdrawals")+'</p>';
+    else {
+      h+='<div class="table-wrap"><table><thead><tr><th>'+t("name")+'</th><th class="num">'+t("amount")+'</th></tr></thead><tbody>';
+      pending.forEach(function(r){ var uu=userById(r.user_id); h+='<tr><td>'+esc(uu?uu.name:"")+'</td><td class="num">'+money(r.amount)+'</td></tr>'; });
+      h+='</tbody></table></div>';
+    }
+    h+='<p class="mt"><a class="btn sm ghost" href="#/admin-payouts">'+t("payouts")+'</a></p></div></div>';
+    return shell(h);
   }
-  function fd(form) {
-    var o = {};
-    Array.prototype.forEach.call(form.elements, function (el) {
-      if (!el.name || el.disabled) return;
-      if (el.type === "checkbox") o[el.name] = el.checked;
-      else if (el.type === "submit") return;
-      else o[el.name] = el.value;
+  function runsTable(runs){
+    if(!runs.length) return "";
+    var h='<div class="table-wrap"><table><thead><tr><th>'+t("period")+'</th><th>'+t("cap_status")+'</th><th class="num">'+t("total_rebate")+'</th><th class="num">'+t("total_payouts")+'</th><th class="num">'+t("house_net")+'</th></tr></thead><tbody>';
+    runs.forEach(function(r){
+      var w=r.total_payouts-r.total_rebate>0.009;
+      h+='<tr class="'+(w?"warn-kpi":"")+'"><td>'+r.period+(w?" ⚠":"")+'</td><td>'+(r.cap_enabled?t("on"):t("off"))+'</td><td class="num">'+money(r.total_rebate)+'</td><td class="num">'+money(r.total_payouts)+'</td><td class="num">'+money(r.house_net)+'</td></tr>';
     });
-    return o;
+    return h+'</tbody></table></div>';
   }
-  function upsertSnap(clientId, period, lots, balance, equity, deposit, source) {
-    clientId = (clientId || "").trim(); period = (period || "").trim();
-    if (!clientId || !period) throw new Error(t("required"));
-    var uid = null;
-    state.users.forEach(function (u) { if (u.clientId === clientId) uid = u.id; });
-    var found = null;
-    state.snapshots.forEach(function (sn) { if (sn.clientId === clientId && sn.period === period) found = sn; });
-    if (found) {
-      found.userId = uid; found.lots = Number(lots) || 0; found.balance = balance; found.equity = equity; found.source = source;
-    } else {
-      state.snapshots.push({ id: state.nextId++, clientId: clientId, period: period, lots: Number(lots) || 0, balance: balance, equity: equity, userId: uid, source: source });
-    }
-    if (deposit != null && deposit !== "" && uid) {
-      var u = userById(state, uid); if (u) u.deposit = Number(deposit);
-    }
-    return { matched: !!uid };
+
+  function adminUsers(){
+    var w=week();
+    var h='<div class="page-head"><h1>'+t("all_users")+'</h1></div><div class="card"><div class="table-wrap"><table><thead><tr><th>'+t("name")+'</th><th>'+t("rank")+'</th><th>'+t("partners")+'</th><th class="num">'+t("lots")+'</th><th class="num">USDT</th><th>'+t("actions")+'</th></tr></thead><tbody>';
+    state.users.forEach(function(u){
+      var info=T3.userProgress(state,u,w), s=snapFor(u.id,w);
+      h+='<tr><td>'+esc(u.name)+' <em class="tag sm">'+t("example")+'</em><div class="muted mono">'+esc(u.email)+' · '+esc(u.client)+'</div></td>';
+      h+='<td>'+badge(info.rank)+' '+(info.eligible?'<span class="status ok sm">'+t("eligible")+'</span>':'<span class="status no sm">'+t("not_eligible")+'</span>')+'</td>';
+      h+='<td>'+info.partners+'</td><td class="num">'+(s?lots(s.lots):"—")+'</td><td class="num">'+money(T3.available(state,u.id))+'</td><td>';
+      if(!u.is_admin) h+='<button class="btn sm ghost" data-impersonate="'+u.id+'">'+t("login_as")+'</button>';
+      h+='</td></tr>';
+    });
+    return shell(h+'</tbody></table></div></div>');
   }
-  function parseCsv(text) {
-    var lines = text.replace(/^\uFEFF/, "").split(/\r?\n/).filter(function (l) { return l.trim(); });
-    if (!lines.length) return { imported: 0, unmatched: 0, errors: 1 };
-    var head = lines[0].split(",").map(function (h) { return h.trim().toLowerCase(); });
-    var imported = 0, unmatched = 0, errors = 0;
-    for (var i = 1; i < lines.length; i++) {
-      var cols = lines[i].split(",");
-      var row = {};
-      head.forEach(function (h, j) { row[h] = (cols[j] || "").trim(); });
-      try {
-        var r = upsertSnap(row.pu_prime_client_id || row.client_id, row.period, row.lots, row.balance === "" ? null : Number(row.balance), row.equity === "" ? null : Number(row.equity), row.deposit === "" ? null : row.deposit, "csv");
-        if (r.matched) imported++; else unmatched++;
-      } catch (e) { errors++; }
-    }
-    return { imported: imported, unmatched: unmatched, errors: errors };
+  function adminTree(){ return shell('<div class="page-head"><h1>'+t("full_tree")+'</h1></div><div class="card">'+treeHtml(1)+'</div>'); }
+  function adminImport(){
+    var rows=state.weekly.filter(function(w){return w.week===week();});
+    var h='<div class="page-head"><h1>'+t("import_data")+'</h1></div><div class="card"><p class="hint">'+t("csv_hint")+' '+(state.lang==="de"?"In dieser Offline-Demo sind die Beispielwochen bereits geladen (8,90 Lots / 92,67 $ Rebate). Keine echten Kundennamen.":"In this offline demo the example weeks are already loaded (8.90 lots / 92.67 $ rebate). No real client names.")+'</p>';
+    h+='<h2>'+t("snapshots")+' — '+week()+'</h2><div class="table-wrap"><table><thead><tr><th>'+t("client_id")+'</th><th>'+t("mapped")+'</th><th class="num">'+t("lots")+'</th><th class="num">'+t("rebate")+'</th></tr></thead><tbody>';
+    rows.forEach(function(r){ h+='<tr><td class="mono">'+esc(r.account)+'</td><td>'+(r.user_id?"✓":"—")+'</td><td class="num">'+lots(r.lots)+'</td><td class="num">'+money(r.rebate)+'</td></tr>'; });
+    h+='</tbody></table></div><p class="hint mt">'+t("unmapped")+': 0</p></div>';
+    return shell(h);
   }
-  function onClick(e) {
-    var a = e.target.closest("[data-act]");
-    if (!a) return;
-    var act = a.getAttribute("data-act");
-    if (act === "login") { e.preventDefault(); loginAs(Number(a.getAttribute("data-id"))); return; }
-    if (act === "logout") { e.preventDefault(); state.uid = null; state.impersonator = null; state.page = "login"; saveState(); render(); return; }
-    if (act === "lang") { e.preventDefault(); state.lang = a.getAttribute("data-lang"); saveState(); render(); return; }
-    if (act === "go") { e.preventDefault(); go(a.getAttribute("data-page")); return; }
-    if (act === "menu") { e.preventDefault(); state.navOpen = !state.navOpen; document.body.classList.toggle("nav-open", state.navOpen); return; }
-    if (act === "menu-close") { e.preventDefault(); state.navOpen = false; document.body.classList.remove("nav-open"); return; }
-    if (act === "copy") {
-      e.preventDefault();
-      var el = document.querySelector(a.getAttribute("data-target"));
-      var text = el ? el.value : "";
-      var done = function () { a.textContent = t("copied"); setTimeout(function () { a.textContent = t("copy"); }, 1400); };
-      if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text).then(done).catch(function () { try { el.select(); document.execCommand("copy"); } catch (err) {} done(); });
-      else { try { el.select(); document.execCommand("copy"); } catch (err) {} done(); }
-      return;
-    }
-    if (act === "impersonate") { e.preventDefault(); state.impersonator = state.uid; state.uid = Number(a.getAttribute("data-id")); state.page = "dashboard"; saveState(); render(); return; }
-    if (act === "stop-imp") { e.preventDefault(); if (state.impersonator) { state.uid = state.impersonator; state.impersonator = null; state.page = "admin-users"; saveState(); render(); } return; }
-    if (act === "reset") {
-      e.preventDefault();
-      try { localStorage.removeItem(STORE); } catch (err) {}
-      state = defaultState();
-      flash(t("reset_done"), "ok");
-      return;
-    }
-    if (act === "sample-csv") {
-      e.preventDefault();
-      var csv = "pu_prime_client_id,period,lots,balance,equity,deposit\nPU100001,2026-11,1.5,4100,4010,2500\n";
-      var blob = new Blob([csv], { type: "text/csv" });
-      var link = document.createElement("a");
-      link.href = URL.createObjectURL(blob);
-      link.download = "trading3-sample.csv";
-      document.body.appendChild(link); link.click(); document.body.removeChild(link);
-      return;
-    }
+  function adminCalc(){
+    var h='<div class="page-head"><h1>'+t("run_calc")+'</h1></div><div class="card narrow"><p class="hint">'+t("run_calc_hint")+'</p>';
+    h+='<p class="hint">'+t("cap_status")+': <strong>'+(state.settings.cap_enabled?t("on"):t("off"))+'</strong></p>';
+    h+='<button class="btn" data-recalc="'+week()+'">'+t("recalc")+' — '+week()+'</button> ';
+    h+='<button class="btn ghost" data-recalc="'+T3_SEED.PREV+'">'+t("recalc")+' — '+T3_SEED.PREV+'</button></div>';
+    h+='<div class="card"><h2>'+t("calc_runs")+'</h2>'+runsTable(state.runs)+'</div>';
+    return shell(h);
   }
-  function onSubmit(e) {
-    var form = e.target.closest("form[data-form]");
-    if (!form) return;
-    e.preventDefault();
-    var kind = form.getAttribute("data-form");
-    if (kind === "withdraw") {
-      var amount = Number(fd(form).amount || 0);
-      var u = currentUser();
-      var bal = availableBalance(state, u.id);
-      if (!u.usdtAddress || !(u.usdtNetwork === "TRC20" || u.usdtNetwork === "ERC20")) return flash(t("need_address"), "error");
-      if (!(amount >= state.settings.minWithdrawal)) return flash(t("invalid_amount"), "error");
-      if (amount > bal + 1e-9) return flash(t("insufficient"), "error");
-      state.withdrawals.push({ id: state.nextId++, userId: u.id, amount: round2(amount), usdtAddress: u.usdtAddress, usdtNetwork: u.usdtNetwork, status: "pending", adminNote: "", createdAt: nowStr() });
-      saveState(); flash(t("withdrawal_ok"), "ok"); return;
-    }
-    if (kind === "profile") {
-      var o = fd(form), u2 = currentUser();
-      var cid = (o.clientId || "").trim();
-      if (cid) {
-        var clash = false;
-        state.users.forEach(function (x) { if (x.clientId === cid && x.id !== u2.id) clash = true; });
-        if (clash) return flash(state.lang === "en" ? "Client ID already used." : "Client-ID bereits vergeben.", "error");
-      }
-      u2.clientId = cid || null;
-      u2.usdtAddress = (o.usdtAddress || "").trim() || null;
-      u2.usdtNetwork = (o.usdtNetwork === "TRC20" || o.usdtNetwork === "ERC20") ? o.usdtNetwork : null;
-      state.snapshots.forEach(function (sn) { if (sn.clientId === u2.clientId) sn.userId = u2.id; });
-      saveState(); flash(t("saved"), "ok"); return;
-    }
-    if (kind === "search") { state.search = fd(form).q || ""; saveState(); render(); return; }
-    if (kind === "csv") {
-      var text = (form.csv && form.csv.value) || "";
-      var file = form.file && form.file.files && form.file.files[0];
-      var apply = function (src) {
-        var r = parseCsv(src);
-        saveState();
-        flash(t("imported_ok", { imported: r.imported, unmatched: r.unmatched, errors: r.errors }), r.errors ? "error" : "ok");
-      };
-      if (file && !text.trim()) {
-        var reader = new FileReader();
-        reader.onload = function () { apply(String(reader.result || "")); };
-        reader.readAsText(file);
-        return;
-      }
-      if (!text.trim()) return flash(t("required"), "error");
-      apply(text); return;
-    }
-    if (kind === "manual") {
-      var o2 = fd(form), clientId = (o2.clientId || "").trim();
-      if (o2.userId && !clientId) {
-        var uu = userById(state, Number(o2.userId));
-        if (uu) clientId = uu.clientId || "";
-      }
-      try {
-        upsertSnap(clientId, o2.period, o2.lots, o2.balance === "" ? null : Number(o2.balance), o2.equity === "" ? null : Number(o2.equity), o2.deposit === "" ? null : o2.deposit, "manual");
-        saveState(); flash(t("saved"), "ok");
-      } catch (err) { flash(err.message || t("required"), "error"); }
-      return;
-    }
-    if (kind === "calc") {
-      var period = (fd(form).period || "").trim();
-      if (!period) return flash(t("required"), "error");
-      var r = runPeriod(state, period);
-      saveState();
-      if (!r.ok) flash(t("no_lots"), "error");
-      else flash(t("calc_done", { period: period, lines: r.lines, total: money(r.total) }), "ok");
-      return;
-    }
-    if (kind === "payout") {
-      var id = Number(form.getAttribute("data-id"));
-      var action = (e.submitter && e.submitter.value) || "";
-      if (!action) {
-        var btn = form.querySelector("button[name=action]:focus");
-        if (btn) action = btn.value;
-      }
-      var note = fd(form).adminNote;
-      state.withdrawals.forEach(function (w) {
-        if (w.id === id && (action === "approved" || action === "paid" || action === "rejected")) {
-          w.status = action; w.adminNote = note || w.adminNote; w.processedAt = nowStr();
-        }
-      });
-      saveState(); flash(t("saved"), "ok"); return;
-    }
-    if (kind === "settings") {
-      var o3 = fd(form);
-      var rates = {};
-      for (var i = 1; i <= 10; i++) rates[i] = Number(o3["rate_" + i] || 0);
-      state.settings = {
-        puPrimeIbLink: (o3.puPrimeIbLink || "").trim(),
-        minDeposit: Number(o3.minDeposit || 300),
-        minPartners: Number(o3.minPartners || 2),
-        houseRate: Number(o3.houseRate || 5),
-        minWithdrawal: Number(o3.minWithdrawal || 10),
-        rates: rates,
-        ineligibleToHouse: !!o3.ineligibleToHouse
-      };
-      saveState(); flash(t("saved"), "ok"); return;
-    }
+  function adminPayouts(){
+    var h='<div class="page-head"><h1>'+t("payout_requests")+'</h1></div><div class="card"><div class="table-wrap"><table><thead><tr><th>'+t("name")+'</th><th class="num">'+t("amount")+'</th><th>'+t("usdt_address")+'</th><th>'+t("status")+'</th><th>'+t("actions")+'</th></tr></thead><tbody>';
+    state.withdrawals.slice().reverse().forEach(function(r){
+      var u=userById(r.user_id);
+      h+='<tr><td>'+esc(u?u.name:"")+'</td><td class="num">'+money(r.amount)+'</td><td class="mono">'+esc(r.usdt_address)+'<div class="muted">'+esc(r.usdt_network)+'</div></td>';
+      h+='<td><span class="status '+r.status+' sm">'+t(r.status)+'</span></td><td class="actions">';
+      if(r.status==="pending") h+='<button class="btn sm" data-wd-act="approve" data-id="'+r.id+'">'+t("approve")+'</button> ';
+      if(r.status==="pending"||r.status==="approved") h+='<button class="btn sm" data-wd-act="paid" data-id="'+r.id+'">'+t("mark_paid")+'</button> ';
+      if(r.status!=="rejected"&&r.status!=="paid") h+='<button class="btn sm danger" data-wd-act="reject" data-id="'+r.id+'">'+t("reject")+'</button>';
+      h+='</td></tr>';
+    });
+    return shell(h+'</tbody></table></div></div>');
   }
-  function syncHash() {
-    var h = (location.hash || "").replace(/^#/, "");
-    if (!h) return;
-    if (/^\/r\//i.test(h)) return;
-    var page = h.replace(/^\//, "");
-    if (PAGES[page] && state.uid) { state.page = page; }
+  function adminSettings(){
+    var s=state.settings, h='<div class="page-head"><h1>'+t("settings")+'</h1></div><form data-settings>';
+    h+='<div class="card"><label>'+t("ib_link")+'<input name="ib" value="'+esc(s.pu_prime_ib_link)+'"></label>';
+    h+='<label>'+t("min_deposit")+'<input name="min_deposit" type="number" value="'+s.min_deposit+'"></label>';
+    h+='<label>'+t("min_partners")+'<input name="min_partners" type="number" value="'+s.min_partners+'"></label>';
+    h+='<label>'+t("min_withdrawal")+'<input name="min_withdrawal" type="number" value="'+s.min_withdrawal+'"></label></div>';
+    h+='<div class="card"><h2>'+t("level_rates")+'</h2><p class="hint">'+t("rate_per_lot")+' · '+t("pool_this_week")+' = '+money(s.network_per_lot)+' $</p><div class="rates">';
+    for(var i=1;i<=10;i++) h+='<label>L'+i+'<input name="rate_'+i+'" type="number" step="0.01" value="'+s.rates[i]+'"></label>';
+    h+='</div></div><div class="card"><label class="check"><input type="checkbox" name="cap_enabled"'+(s.cap_enabled?" checked":"")+'> '+t("cap_enabled")+'</label><p class="hint">'+t("cap_help")+'</p></div>';
+    h+='<button class="btn" type="submit">'+t("save")+'</button></form>';
+    return shell(h);
   }
-  document.getElementById("app").addEventListener("click", onClick);
-  document.getElementById("app").addEventListener("submit", onSubmit);
-  window.addEventListener("hashchange", function () { syncHash(); render(); });
-  syncHash();
-  render();
-  window.__trading3 = {
-    calculateLotCommissions: calculateLotCommissions,
-    walkUpline: walkUpline,
-    isEligible: isEligible,
-    DEFAULT_RATES: DEFAULT_RATES,
-    getState: function () { return state; },
-    loginAs: loginAs,
-    go: go,
-    runPeriod: function (p) { var r = runPeriod(state, p); saveState(); render(); return r; },
-    reset: function () { try { localStorage.removeItem(STORE); } catch (e) {} state = defaultState(); render(); }
+
+  var VIEWS={
+    login:loginView, dashboard:dashView, network:networkView, commissions:poolView,
+    statement:statementView, withdrawals:withdrawalsView, profile:profileView,
+    admin:adminHome, "admin-users":adminUsers, "admin-tree":adminTree,
+    "admin-import":adminImport, "admin-calculate":adminCalc, "admin-payouts":adminPayouts,
+    "admin-settings":adminSettings
   };
 
+  function render(){
+    if(!state.uid && state.view!=="login") state.view="login";
+    var fn=VIEWS[state.view]||dashView;
+    if(state.view==="login") document.body.innerHTML=loginView();
+    else document.body.innerHTML=fn();
+    bind();
+    enhance();
+  }
+  function enhance(){
+    // counters, bars, charts — from flask app.js logic, inlined
+    document.querySelectorAll("[data-count]").forEach(function(el){
+      var target=parseFloat(el.getAttribute("data-count")); if(isNaN(target)) return;
+      var decimals=parseInt(el.getAttribute("data-decimals")||"2",10);
+      var t0=performance.now(), dur=800;
+      function step(t){ var p=Math.min(1,(t-t0)/dur); var e=1-Math.pow(1-p,3); el.textContent= (target*e).toFixed(decimals); if(p<1) requestAnimationFrame(step); }
+      requestAnimationFrame(step);
+    });
+    document.querySelectorAll(".bar > i[data-width]").forEach(function(el){
+      var w=el.getAttribute("data-width");
+      requestAnimationFrame(function(){ el.style.width=w+"%"; });
+    });
+    document.querySelectorAll(".chart").forEach(function(canvas){
+      var pts; try{ pts=JSON.parse(canvas.getAttribute("data-points")||"[]"); }catch(e){return;}
+      if(!pts.length) return;
+      var ctx=canvas.getContext("2d"), dpr=window.devicePixelRatio||1;
+      var w=canvas.clientWidth||320, h=canvas.clientHeight||180;
+      canvas.width=w*dpr; canvas.height=h*dpr; ctx.scale(dpr,dpr);
+      var pad=28, max=Math.max.apply(null,pts.map(function(p){return p.y;}))||1;
+      ctx.clearRect(0,0,w,h); ctx.strokeStyle="rgba(255,255,255,.08)"; ctx.lineWidth=1;
+      for(var i=0;i<4;i++){ var y=pad+(h-pad*2)*i/3; ctx.beginPath(); ctx.moveTo(pad,y); ctx.lineTo(w-8,y); ctx.stroke(); }
+      ctx.beginPath();
+      pts.forEach(function(p,i){
+        var x=pad+(w-pad-8)*(pts.length===1?0.5:i/(pts.length-1));
+        var y=h-pad-(h-pad*2)*(p.y/max);
+        if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+      });
+      ctx.strokeStyle="#e0c078"; ctx.lineWidth=2.2; ctx.shadowColor="rgba(224,192,120,.45)"; ctx.shadowBlur=8; ctx.stroke(); ctx.shadowBlur=0;
+      ctx.fillStyle="#93a0b8"; ctx.font="11px system-ui";
+      pts.forEach(function(p,i){ var x=pad+(w-pad-8)*(pts.length===1?0.5:i/(pts.length-1)); ctx.fillText(p.l||"",x-18,h-8); });
+    });
+  }
+
+  function go(view){ state.view=view; save(); render(); location.hash="#/"+view; }
+
+  function bind(){
+    document.querySelectorAll("[data-lang]").forEach(function(b){
+      b.addEventListener("click", function(){ state.lang=b.getAttribute("data-lang"); save(); render(); });
+    });
+    document.querySelectorAll("[data-login]").forEach(function(b){
+      b.addEventListener("click", function(){ state.uid=+b.getAttribute("data-login"); state.impersonator=null; go("dashboard"); });
+    });
+    var reset=document.querySelector("[data-reset]");
+    if(reset) reset.addEventListener("click", function(){ localStorage.removeItem(KEY); state=T3_SEED.defaultState(); go("login"); });
+    var menu=document.querySelector("[data-menu]");
+    if(menu) menu.addEventListener("click", function(){ document.body.classList.toggle("nav-open"); });
+    var scrim=document.querySelector(".scrim");
+    if(scrim) scrim.addEventListener("click", function(){ document.body.classList.remove("nav-open"); });
+    document.querySelectorAll("[data-copy]").forEach(function(btn){
+      btn.addEventListener("click", function(){
+        var el=document.querySelector(btn.getAttribute("data-copy")); if(!el) return;
+        var text=el.value||el.textContent;
+        if(navigator.clipboard) navigator.clipboard.writeText(text).catch(function(){});
+        var prev=btn.textContent; btn.textContent=t("copied"); setTimeout(function(){ btn.textContent=prev; },1400);
+      });
+    });
+    document.querySelectorAll("[data-impersonate]").forEach(function(b){
+      b.addEventListener("click", function(){ state.impersonator=state.uid; state.uid=+b.getAttribute("data-impersonate"); go("dashboard"); });
+    });
+    document.querySelectorAll("[data-recalc]").forEach(function(b){
+      b.addEventListener("click", function(){
+        var r=T3.runWeek(state, b.getAttribute("data-recalc"));
+        state.flash={cat:r.warning?"warn":"ok", msg:t("calc_done",{period:r.period,lines:r.lines,payouts:money(r.total_payouts),rebate:money(r.total_rebate),net:money(r.house_net)})+(r.warning?(" — "+t("warning_over_rebate")):"")};
+        save(); render();
+      });
+    });
+    document.querySelectorAll("[data-wd-act]").forEach(function(b){
+      b.addEventListener("click", function(){
+        var id=+b.getAttribute("data-id"), act=b.getAttribute("data-wd-act");
+        var map={approve:"approved",paid:"paid",reject:"rejected"};
+        state.withdrawals.forEach(function(w){ if(w.id===id) w.status=map[act]; });
+        state.flash={cat:"ok",msg:t("saved")}; save(); render();
+      });
+    });
+    var wd=document.querySelector("form[data-wd]");
+    if(wd) wd.addEventListener("submit", function(e){
+      e.preventDefault();
+      var amt=parseFloat(wd.amount.value||"0");
+      var u=current(), bal=T3.available(state,u.id);
+      if(!u.usdt_address){ state.flash={cat:"error",msg:t("need_address")}; render(); return; }
+      if(isNaN(amt)||amt<state.settings.min_withdrawal){ state.flash={cat:"error",msg:t("invalid_amount")}; render(); return; }
+      if(amt>bal+1e-9){ state.flash={cat:"error",msg:t("insufficient")}; render(); return; }
+      var nid=state.withdrawals.reduce(function(m,w){return Math.max(m,w.id);},0)+1;
+      state.withdrawals.push({id:nid,user_id:u.id,amount:T3.r2(amt),usdt_address:u.usdt_address,usdt_network:u.usdt_network,status:"pending",created_at:"2026-11-14 15:00:00"});
+      state.flash={cat:"ok",msg:t("withdrawal_ok")}; save(); render();
+    });
+    var pf=document.querySelector("form[data-profile]");
+    if(pf) pf.addEventListener("submit", function(e){
+      e.preventDefault();
+      var u=current();
+      u.name=pf.name.value; u.client=pf.client.value; u.usdt_address=pf.usdt_address.value; u.usdt_network=pf.usdt_network.value;
+      state.flash={cat:"ok",msg:t("saved")}; save(); render();
+    });
+    var sf=document.querySelector("form[data-settings]");
+    if(sf) sf.addEventListener("submit", function(e){
+      e.preventDefault();
+      state.settings.pu_prime_ib_link=sf.ib.value;
+      state.settings.min_deposit=parseFloat(sf.min_deposit.value||300);
+      state.settings.min_partners=parseInt(sf.min_partners.value||2,10);
+      state.settings.min_withdrawal=parseFloat(sf.min_withdrawal.value||10);
+      state.settings.cap_enabled=!!sf.cap_enabled.checked;
+      var rates={}, sum=0;
+      for(var i=1;i<=10;i++){ rates[i]=parseFloat(sf["rate_"+i].value||T3.RATES[i]); sum+=rates[i]; }
+      state.settings.rates=rates; state.settings.network_per_lot=T3.r2(sum);
+      T3.runWeek(state, T3_SEED.PREV); T3.runWeek(state, T3_SEED.WEEK);
+      state.flash={cat:overRebate()?"warn":"ok", msg:t("saved")+(overRebate()?(" — "+t("warning_over_rebate")):"")};
+      save(); render();
+    });
+  }
+
+  function onHash(){
+    var h=(location.hash||"").replace(/^#\/?/,"");
+    if(h==="logout"){ state.uid=null; state.impersonator=null; go("login"); return; }
+    if(h==="stop-impersonate"){ if(state.impersonator){ state.uid=state.impersonator; state.impersonator=null; go("admin"); } return; }
+    if(h.indexOf("r/")===0){ /* referral deep link — stay on login */ state.view="login"; render(); return; }
+    if(VIEWS[h]) { state.view=h; if(h!=="login" && !state.uid) state.view="login"; save(); render(); }
+    else render();
+  }
+  window.addEventListener("hashchange", onHash);
+  if(location.hash && location.hash.length>2) onHash();
+  else render();
 })();
-</script>
+
+  </script>
 </body>
 </html>
