@@ -1,4 +1,4 @@
-const CACHE = "rebate-share-demo-v2";
+const CACHE = "rebate-share-demo-v3";
 const PRECACHE = ["./","index.html","trading3-demo.html","icons/icon-192.png","icons/icon-512.png"];
 self.addEventListener("install", function (event) {
   event.waitUntil(caches.open(CACHE).then(function (c) { return c.addAll(PRECACHE); }).then(function () { return self.skipWaiting(); }));
