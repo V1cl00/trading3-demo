@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+Allow: /de/
+Allow: /en/
+Allow: /p/
+Disallow: /admin
+Sitemap: https://v1cl00.github.io/trading3-demo/sitemap.xml
