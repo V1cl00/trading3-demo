@@ -1,0 +1,980 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="dark">
+<title>trading3 · Demo</title>
+<style>
+:root {
+  --bg: #0b1020;
+  --card: #151d33;
+  --line: #253049;
+  --text: #e8eef8;
+  --muted: #8b9bb4;
+  --gold: #d4b36a;
+  --gold-2: #f0d59a;
+  --green: #3dd68c;
+  --red: #f07178;
+  --blue: #7aa2ff;
+  --warn: #e6b84d;
+  --radius: 16px;
+  --shadow: 0 10px 40px rgba(0,0,0,.35);
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+body {
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  background:
+    radial-gradient(1200px 600px at 10% -10%, #1a2748 0%, transparent 55%),
+    radial-gradient(900px 500px at 100% 0%, #1b1630 0%, transparent 50%),
+    var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+}
+a { color: var(--gold); text-decoration: none; cursor: pointer; }
+a:hover { color: var(--gold-2); }
+button { font: inherit; }
+.banner {
+  background: #2a2310; color: #f0d59a; text-align: center;
+  padding: 8px 16px; font-size: 13px; border-bottom: 1px solid #4a3c1a;
+}
+.banner.impersonate { background: #1a2a20; color: var(--green); border-color: #2a4a38; }
+.banner.impersonate a { color: var(--green); }
+.topbar {
+  display: none; align-items: center; gap: 10px;
+  padding: 10px 16px; border-bottom: 1px solid var(--line);
+  background: rgba(12,16,30,.92);
+}
+.menu-btn {
+  background: #1c2640; color: var(--text); border: 1px solid var(--line);
+  border-radius: 8px; padding: 8px 10px; font-weight: 700;
+}
+.shell { display: grid; grid-template-columns: 250px 1fr; min-height: calc(100vh - 36px); }
+.sidebar {
+  background: rgba(12, 16, 30, .92);
+  border-right: 1px solid var(--line);
+  padding: 20px 16px;
+  display: flex; flex-direction: column;
+  position: sticky; top: 0; height: calc(100vh - 36px);
+}
+.brand { display: flex; gap: 10px; align-items: center; color: var(--text); margin-bottom: 24px; }
+.brand small { display: block; color: var(--muted); font-size: 11px; font-weight: 400; }
+.logo {
+  width: 36px; height: 36px; border-radius: 10px;
+  background: linear-gradient(135deg, #d4b36a, #8a6a2e);
+  color: #1a1408; font-weight: 700; display: grid; place-items: center; flex-shrink: 0;
+}
+nav { display: flex; flex-direction: column; gap: 2px; flex: 1; overflow: auto; }
+nav a { color: var(--muted); padding: 8px 10px; border-radius: 8px; font-weight: 500; }
+nav a:hover, nav a.on { background: #1c2640; color: var(--text); }
+nav a.on { box-shadow: inset 2px 0 0 var(--gold); }
+.nav-label {
+  margin: 18px 10px 6px; font-size: 11px; letter-spacing: .12em;
+  text-transform: uppercase; color: var(--muted);
+}
+.side-foot { border-top: 1px solid var(--line); padding-top: 14px; }
+.who { display: flex; gap: 8px; align-items: center; margin-bottom: 10px; }
+.avatar {
+  width: 32px; height: 32px; border-radius: 50%; background: #243050;
+  display: grid; place-items: center; font-weight: 600;
+}
+.lang { display: flex; gap: 6px; margin: 8px 0; }
+.lang a, .lang button {
+  color: var(--muted); border: 1px solid var(--line); border-radius: 6px;
+  padding: 2px 8px; font-size: 12px; background: transparent; cursor: pointer;
+}
+.lang a.on, .lang button.on { border-color: var(--gold); color: var(--gold); }
+.logout { color: var(--muted); font-size: 13px; background: none; border: 0; padding: 0; cursor: pointer; }
+.main { padding: 28px 32px 48px; max-width: 1200px; }
+.page-head { display: flex; align-items: center; gap: 12px; margin-bottom: 22px; flex-wrap: wrap; }
+.page-head h1 { margin: 0; font-size: 28px; letter-spacing: -.02em; }
+h2 { font-size: 16px; margin: 0 0 14px; font-weight: 600; }
+.card {
+  background: var(--card); border: 1px solid var(--line); border-radius: var(--radius);
+  padding: 20px; box-shadow: var(--shadow); margin-bottom: 18px;
+}
+.card.narrow { max-width: 640px; }
+.kpis { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 18px; }
+.kpi span { color: var(--muted); font-size: 13px; display: block; }
+.kpi strong { font-size: 24px; display: block; margin-top: 6px; letter-spacing: -.02em; }
+.kpi small { font-size: 13px; color: var(--gold); font-weight: 500; }
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.muted { color: var(--muted); }
+.hint { color: var(--muted); font-size: 13px; line-height: 1.5; }
+.mt { margin-top: 12px; }
+.tag {
+  display: inline-block; font-style: normal; font-size: 10px; letter-spacing: .08em;
+  border: 1px solid var(--gold); color: var(--gold); padding: 2px 6px; border-radius: 999px;
+  vertical-align: middle;
+}
+.tag.sm { font-size: 9px; padding: 1px 5px; }
+.tag.gold { background: #2a2310; }
+.pill { display: inline-block; background: #1c2640; border: 1px solid var(--line); padding: 6px 12px; border-radius: 999px; }
+.copy-row { display: flex; gap: 8px; }
+.copy-row input { flex: 1; }
+input, select, button, textarea { font: inherit; color: var(--text); }
+input, select, textarea {
+  width: 100%; background: #0e1526; border: 1px solid var(--line);
+  border-radius: 10px; padding: 10px 12px;
+}
+input:focus, select:focus, textarea:focus { outline: 1px solid var(--gold); border-color: var(--gold); }
+label { display: block; margin-bottom: 12px; color: var(--muted); font-size: 13px; }
+label input, label select, label textarea { margin-top: 6px; }
+.btn, button.btn, .stack > button, form.stack button[type=submit] {
+  background: linear-gradient(180deg, #e0c17a, #c9a04e);
+  color: #1a1408; border: 0; border-radius: 10px; padding: 10px 16px;
+  font-weight: 600; cursor: pointer; display: inline-block;
+}
+.btn.ghost, button.ghost {
+  background: transparent; color: var(--text); border: 1px solid var(--line);
+}
+.btn.sm, button.sm { padding: 6px 10px; font-size: 12px; border-radius: 8px; }
+.btn.danger, button.danger { color: var(--red); border-color: #5a3038; background: transparent; }
+.actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.flash { border-radius: 10px; padding: 10px 14px; margin-bottom: 14px; border: 1px solid var(--line); background: #1c2640; }
+.flash.ok { border-color: #1e4a36; background: #10281c; color: var(--green); }
+.flash.error { border-color: #5a3038; background: #2a1518; color: var(--red); }
+.flash.warn { border-color: #5a4a20; background: #2a2310; color: var(--warn); }
+.status { display: inline-block; padding: 6px 10px; border-radius: 999px; font-weight: 600; }
+.status.ok { background: #10281c; color: var(--green); }
+.status.no { background: #2a1518; color: var(--red); }
+.status.sm { font-size: 12px; padding: 3px 8px; font-weight: 500; }
+.status.pending { background: #2a2310; color: var(--warn); }
+.status.approved { background: #1a2748; color: var(--blue); }
+.status.paid { background: #10281c; color: var(--green); }
+.status.rejected { background: #2a1518; color: var(--red); }
+.table-wrap { overflow: auto; -webkit-overflow-scrolling: touch; }
+table { width: 100%; border-collapse: collapse; font-size: 14px; }
+th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { color: var(--muted); font-weight: 500; font-size: 12px; text-transform: uppercase; letter-spacing: .04em; }
+.num { text-align: right; font-variant-numeric: tabular-nums; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+.mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 12px; }
+.facts { padding-left: 18px; }
+.tree { list-style: none; margin: 0; padding-left: 18px; border-left: 1px dashed var(--line); }
+.tree-node { padding: 6px 0; display: flex; flex-wrap: wrap; gap: 8px; align-items: baseline; }
+.tree-node.root { margin-bottom: 8px; }
+.search { display: flex; gap: 8px; margin-bottom: 14px; max-width: 480px; }
+.rates { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; }
+fieldset { border: 1px solid var(--line); border-radius: 12px; padding: 12px; margin: 0 0 12px; }
+legend { color: var(--muted); padding: 0 6px; }
+.check { display: flex; align-items: center; gap: 8px; color: var(--text); }
+.check input { width: auto; }
+.inline-actions { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.inline-actions input[type=text] { width: 140px; padding: 6px 8px; }
+.auth-wrap { max-width: 460px; margin: 40px auto 80px; padding: 0 16px; }
+.auth-top { display: flex; align-items: center; gap: 10px; margin-bottom: 20px; }
+.auth-top .lang { margin-left: auto; }
+.auth-card h1 { margin: 0 0 6px; }
+.roles { display: grid; gap: 10px; margin-top: 16px; }
+.role {
+  text-align: left; width: 100%; background: #0e1526; border: 1px solid var(--line);
+  color: var(--text); padding: 14px 16px; border-radius: 12px; cursor: pointer;
+}
+.role:hover { border-color: var(--gold); }
+.role strong { display: block; font-size: 15px; }
+.role span { color: var(--muted); font-size: 13px; font-weight: 400; }
+.demo-box {
+  margin-top: 18px; padding: 12px; border-radius: 10px; background: #0e1526;
+  border: 1px dashed var(--line); font-size: 13px; color: var(--muted); line-height: 1.6;
+}
+.demo-box strong { color: var(--gold); display: block; margin-bottom: 4px; }
+.footer { text-align: center; color: var(--muted); font-size: 12px; margin-top: 24px; }
+.scrim { display: none; }
+@media (max-width: 980px) {
+  .shell { grid-template-columns: 1fr; }
+  .topbar { display: flex; }
+  .sidebar {
+    display: none; position: fixed; top: 0; left: 0; bottom: 0;
+    width: min(280px, 90vw); height: 100%; z-index: 30;
+  }
+  body.nav-open .sidebar { display: flex; }
+  body.nav-open .scrim { display: block; position: fixed; inset: 0; background: rgba(0,0,0,.5); z-index: 25; }
+  .kpis, .grid-2, .rates { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 640px) {
+  .main { padding: 16px; }
+  .kpis, .grid-2, .rates { grid-template-columns: 1fr; }
+  .page-head h1 { font-size: 22px; }
+  .auth-wrap { margin: 20px auto 40px; }
+}
+
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script>
+(function () {
+  "use strict";
+  var I18N = {"de": {"portal": "trading3", "tagline": "IB-Portal · Testdaten", "test_banner": "TESTVERSION mit Beispieldaten. Keine echten Auszahlungen, kein echter PU-Prime-Zugang. Offline-Demo.", "login": "Anmelden", "logout": "Abmelden", "pick_role": "Als Beispielnutzer öffnen — kein Passwort nötig.", "role_admin": "Admin — sieht alles, berechnet Provisionen, gibt Auszahlungen frei", "role_anna": "Berechtigt — Einzahlung und 2+ Partner erfüllt", "role_georg": "Nicht berechtigt — nur 1 direkter Partner", "role_rita": "Tiefe Kette — 10 Ebenen über ihr", "email": "E-Mail", "name": "Name", "referred_by": "Geworben von", "dashboard": "Dashboard", "network": "Netzwerk", "commissions": "Provisionen", "withdrawals": "Auszahlungen", "profile": "Profil", "admin": "Admin", "users": "Nutzer", "tree": "Struktur", "import_data": "Datenimport", "calculate": "Berechnung", "payouts": "Auszahlungen", "settings": "Einstellungen", "welcome": "Willkommen", "commission_balance": "Provisionsguthaben", "pu_balance": "PU Prime Guthaben", "pu_equity": "PU Prime Equity", "lots": "Lots", "lots_period": "Lots (letzte Periode)", "no_pu_data": "Noch keine PU-Prime-Daten für dieses Konto.", "ref_link": "Dein Empfehlungslink", "copy": "Kopieren", "copied": "Kopiert", "open_pu": "Bei PU Prime registrieren (IB-Link)", "enter_client_id": "Trage deine PU-Prime-Client-ID in deinem Profil ein, damit Lots zugeordnet werden können.", "direct_partners": "Direkte Partner", "eligible": "Berechtigt", "not_eligible": "Nicht berechtigt", "eligibility_hint": "Provisionen erhältst du ab {deposit} Einzahlung (USD-Äquivalent) und mindestens {partners} direkten Partnern. Nicht erfüllte Stufen fließen an das Haus (Kevin).", "deposit": "Einzahlung", "example": "BEISPIEL", "recent_commissions": "Letzte Provisionen", "no_commissions": "Noch keine Provisionen.", "level": "Ebene", "amount": "Betrag", "period": "Periode", "reason": "Grund", "trader": "Trader", "reason_house": "Hausanteil", "reason_level": "Netzwerk-Ebene", "reason_unused_level": "Ungenutzte Ebene (an Haus)", "reason_ineligible": "Upline nicht berechtigt (an Haus)", "network_title": "Dein Netzwerk", "level_overview": "Ebenen-Übersicht", "people": "Personen", "volume": "Volumen (Lots)", "no_downline": "Noch keine Partner in deinem Netzwerk.", "downline_tree": "Struktur unter dir", "request_withdrawal": "USDT-Auszahlung anfordern", "available": "Verfügbar", "usdt_address": "USDT-Adresse", "network_chain": "Netzwerk", "trc20": "TRC20 (Tron)", "erc20": "ERC20 (Ethereum)", "request": "Anfordern", "withdrawal_history": "Auszahlungshistorie", "status": "Status", "pending": "Ausstehend", "approved": "Freigegeben", "paid": "Ausgezahlt", "rejected": "Abgelehnt", "min_withdrawal": "Mindestbetrag", "insufficient": "Nicht genug Guthaben.", "need_address": "Bitte zuerst USDT-Adresse und Netzwerk im Profil hinterlegen.", "withdrawal_ok": "Auszahlung wurde angefordert.", "save": "Speichern", "saved": "Gespeichert.", "client_id": "PU-Prime-Client-ID", "profile_hint": "Nach der Registrierung bei PU Prime über den IB-Link trägst du hier deine Client-ID ein.", "admin_overview": "Admin-Übersicht", "all_users": "Alle Nutzer", "full_tree": "Gesamte Struktur", "run_calc": "Provisionen berechnen", "run_calc_hint": "Berechnet die Verteilung für alle importierten Lots einer Periode. Eine erneute Berechnung ersetzt die vorherige dieser Periode.", "run": "Berechnen", "recalc": "Erneut berechnen", "calc_done": "Berechnung für {period} abgeschlossen: {lines} Buchungen, {total} USDT.", "no_lots": "Keine Lots für diese Periode gefunden.", "csv_upload": "CSV einfügen oder Datei wählen", "csv_hint": "Spalten: pu_prime_client_id, period, lots, balance, equity, deposit (optional).", "download_sample": "Beispiel-CSV", "manual_entry": "Manuelle Eingabe", "balance": "Kontostand", "equity": "Equity", "source": "Quelle", "imported_ok": "Import: {imported} zugeordnet, {unmatched} ohne Portal-Nutzer, {errors} Fehler.", "snapshots": "Importierte Perioden", "payout_requests": "Auszahlungsanträge", "approve": "Freigeben", "mark_paid": "Als ausgezahlt markieren", "reject": "Ablehnen", "ib_link": "PU-Prime-IB-Link", "min_deposit": "Mindesteinzahlung (USD-Äquivalent)", "min_partners": "Min. direkte Partner", "house_rate": "Hausanteil je Lot (USD)", "level_rates": "Sätze je Ebene (USD / Lot)", "ineligible_to_house": "Nicht berechtigte / ungenutzte Ebenen an das Haus (Kevin) auszahlen", "ineligible_to_house_help": "Wenn aktiv, fließen Beträge von Uplines ohne Berechtigung und von fehlenden Ebenen an Kevin. Wenn inaktiv, werden nur berechtigte Ebenen gutgeschrieben, der Rest bleibt unverteilt.", "actions": "Aktionen", "login_as": "Als Nutzer öffnen", "back_to_admin": "Zurück zum Admin", "partners": "Partner", "house": "Haus (Kevin)", "impersonating": "Du siehst das Portal als", "no_withdrawals": "Keine Anträge.", "period_placeholder": "z. B. 2026-11", "invalid_amount": "Ungültiger Betrag.", "required": "Bitte alle Pflichtfelder ausfüllen.", "footer": "trading3 · Testportal · Keine Anlageberatung.", "admin_note": "Notiz", "date": "Datum", "total_users": "Nutzer", "pending_payouts": "Offene Auszahlungen", "paid_out": "Ausgezahlt", "unmatched_clients": "Nicht zugeordnet", "search": "Suchen", "self_trade_note": "Du erhältst keine Provision auf dein eigenes Handelsvolumen.", "calc_runs": "Bisherige Läufe", "lines": "Buchungen", "upload": "Importieren", "add": "Hinzufügen", "select_user": "Nutzer wählen", "reset_demo": "Demo zurücksetzen", "reset_done": "Demo-Daten wurden zurückgesetzt.", "menu": "Menü"}, "en": {"portal": "trading3", "tagline": "IB portal · sample data", "test_banner": "TEST VERSION with example data. No real payouts, no live PU Prime access. Offline demo.", "login": "Log in", "logout": "Log out", "pick_role": "Open as an example user — no password needed.", "role_admin": "Admin — sees everything, runs commissions, approves payouts", "role_anna": "Eligible — deposit and 2+ partners met", "role_georg": "Not eligible — only 1 direct partner", "role_rita": "Deep chain — 10 levels above her", "email": "Email", "name": "Name", "referred_by": "Referred by", "dashboard": "Dashboard", "network": "Network", "commissions": "Commissions", "withdrawals": "Withdrawals", "profile": "Profile", "admin": "Admin", "users": "Users", "tree": "Tree", "import_data": "Data import", "calculate": "Calculation", "payouts": "Payouts", "settings": "Settings", "welcome": "Welcome", "commission_balance": "Commission balance", "pu_balance": "PU Prime balance", "pu_equity": "PU Prime equity", "lots": "Lots", "lots_period": "Lots (latest period)", "no_pu_data": "No PU Prime data for this account yet.", "ref_link": "Your referral link", "copy": "Copy", "copied": "Copied", "open_pu": "Register at PU Prime (IB link)", "enter_client_id": "Enter your PU Prime client ID in your profile so lots can be matched.", "direct_partners": "Direct partners", "eligible": "Eligible", "not_eligible": "Not eligible", "eligibility_hint": "You earn commissions once your deposit is at least {deposit} (USD equivalent) and you have at least {partners} direct partners. Amounts for ineligible or missing levels go to the house (Kevin).", "deposit": "Deposit", "example": "EXAMPLE", "recent_commissions": "Recent commissions", "no_commissions": "No commissions yet.", "level": "Level", "amount": "Amount", "period": "Period", "reason": "Reason", "trader": "Trader", "reason_house": "House share", "reason_level": "Network level", "reason_unused_level": "Unused level (to house)", "reason_ineligible": "Upline not eligible (to house)", "network_title": "Your network", "level_overview": "Level overview", "people": "People", "volume": "Volume (lots)", "no_downline": "No partners in your network yet.", "downline_tree": "Structure below you", "request_withdrawal": "Request USDT withdrawal", "available": "Available", "usdt_address": "USDT address", "network_chain": "Network", "trc20": "TRC20 (Tron)", "erc20": "ERC20 (Ethereum)", "request": "Request", "withdrawal_history": "Withdrawal history", "status": "Status", "pending": "Pending", "approved": "Approved", "paid": "Paid", "rejected": "Rejected", "min_withdrawal": "Minimum amount", "insufficient": "Insufficient balance.", "need_address": "Please add a USDT address and network in your profile first.", "withdrawal_ok": "Withdrawal requested.", "save": "Save", "saved": "Saved.", "client_id": "PU Prime client ID", "profile_hint": "After registering at PU Prime with the IB link, enter your client ID here.", "admin_overview": "Admin overview", "all_users": "All users", "full_tree": "Full tree", "run_calc": "Calculate commissions", "run_calc_hint": "Distributes all imported lots for a period. Re-running replaces the previous calculation for that period.", "run": "Calculate", "recalc": "Recalculate", "calc_done": "Calculation for {period} finished: {lines} entries, {total} USDT.", "no_lots": "No lots found for this period.", "csv_upload": "Paste CSV or choose a file", "csv_hint": "Columns: pu_prime_client_id, period, lots, balance, equity, deposit (optional).", "download_sample": "Sample CSV", "manual_entry": "Manual entry", "balance": "Balance", "equity": "Equity", "source": "Source", "imported_ok": "Import: {imported} matched, {unmatched} unmatched, {errors} errors.", "snapshots": "Imported periods", "payout_requests": "Payout requests", "approve": "Approve", "mark_paid": "Mark paid", "reject": "Reject", "ib_link": "PU Prime IB link", "min_deposit": "Minimum deposit (USD equivalent)", "min_partners": "Min. direct partners", "house_rate": "House share per lot (USD)", "level_rates": "Rates per level (USD / lot)", "ineligible_to_house": "Pay unused / ineligible levels to the house (Kevin)", "ineligible_to_house_help": "When on, amounts for ineligible uplines and missing levels go to Kevin. When off, only eligible levels are credited and the rest is left unallocated.", "actions": "Actions", "login_as": "Open as user", "back_to_admin": "Back to admin", "partners": "Partners", "house": "House (Kevin)", "impersonating": "You are viewing the portal as", "no_withdrawals": "No requests.", "period_placeholder": "e.g. 2026-11", "invalid_amount": "Invalid amount.", "required": "Please fill in all required fields.", "footer": "trading3 · Test portal · Not investment advice.", "admin_note": "Note", "date": "Date", "total_users": "Users", "pending_payouts": "Open payouts", "paid_out": "Paid out", "unmatched_clients": "Unmatched", "search": "Search", "self_trade_note": "You do not earn commission on your own trading volume.", "calc_runs": "Previous runs", "lines": "Entries", "upload": "Import", "add": "Add", "select_user": "Select user", "reset_demo": "Reset demo", "reset_done": "Demo data has been reset.", "menu": "Menu"}};
+  var DEFAULT_RATES = {1:5,2:2.5,3:1.5,4:1,5:0.5,6:0.5,7:0.5,8:0.5,9:0.5,10:0.5};
+  var HOUSE_RATE = 5, MAX_LEVELS = 10, STORE = "trading3-demo-v1";
+
+  var SEED_USERS = [
+    [1,"Kevin Müller","kevin@trading3.local",1,null,"KEVIN","PU100000",10000,"TXkevinHouseWalletPlaceholder"],
+    [2,"Anna Weber","anna@example.com",0,1,"ANNA4X","PU100001",2500,"TXexampleAddressForDemoOnly123456"],
+    [3,"Ben Hoffmann","ben@example.com",0,2,"BEN8K","PU100002",1800,"TXexampleAddressForDemoOnly123456"],
+    [4,"Clara Schmidt","clara@example.com",0,3,"CLARA1","PU100003",400,"TXexampleAddressForDemoOnly123456"],
+    [5,"David Bauer","david@example.com",0,3,"DAVID2","PU100004",120,"TXexampleAddressForDemoOnly123456"],
+    [6,"Eva Klein","eva@example.com",0,2,"EVA3C","PU100005",900,"TXexampleAddressForDemoOnly123456"],
+    [7,"Felix Wagner","felix@example.com",0,2,"FELIX7","PU100006",750,"TXexampleAddressForDemoOnly123456"],
+    [8,"Georg Fischer","georg@example.com",0,1,"GEORG9","PU100007",500,"TXexampleAddressForDemoOnly123456"],
+    [9,"Hanna Becker","hanna@example.com",0,8,"HANNA5","PU100008",350,"TXexampleAddressForDemoOnly123456"],
+    [10,"Ines Schäfer","ines@example.com",0,1,"INES2R","PU100009",2000,"TXexampleAddressForDemoOnly123456"],
+    [11,"Jonas Koch","jonas@example.com",0,10,"JONAS3","PU100010",600,"TXexampleAddressForDemoOnly123456"],
+    [12,"Klara Wolf","klara@example.com",0,11,"KLARA4","PU100011",450,"TXexampleAddressForDemoOnly123456"],
+    [13,"Leon Neumann","leon@example.com",0,12,"LEON8M","PU100012",800,"TXexampleAddressForDemoOnly123456"],
+    [14,"Mia Schwarz","mia@example.com",0,13,"MIA6T","PU100013",320,"TXexampleAddressForDemoOnly123456"],
+    [15,"Nico Krüger","nico@example.com",0,14,"NICO1P","PU100014",150,"TXexampleAddressForDemoOnly123456"],
+    [16,"Olga Hartmann","olga@example.com",0,15,"OLGA2W","PU100015",700,"TXexampleAddressForDemoOnly123456"],
+    [17,"Paul Werner","paul@example.com",0,16,"PAUL9X","PU100016",410,"TXexampleAddressForDemoOnly123456"],
+    [18,"Quinn Lorenz","quinn@example.com",0,17,"QUINN5","PU100017",550,"TXexampleAddressForDemoOnly123456"],
+    [19,"Rita Vogel","rita@example.com",0,18,"RITA3Z","PU100018",380,"TXexampleAddressForDemoOnly123456"],
+    [20,"Sara Albrecht","sara@example.com",0,10,"SARA8B","PU100019",220,"TXexampleAddressForDemoOnly123456"],
+    [21,"Tom Seidel","tom@example.com",0,1,"TOM4D","PU100020",100,"TXexampleAddressForDemoOnly123456"],
+    [22,"Uma Brandt","uma@example.com",0,1,"UMA7E","PU100021",800,"TXexampleAddressForDemoOnly123456"],
+    [23,"Viktor Graf","viktor@example.com",0,6,"VIKTOR","PU100022",340,"TXexampleAddressForDemoOnly123456"],
+    [24,"Wendy Lang","wendy@example.com",0,6,"WENDY2","PU100023",0,"TXexampleAddressForDemoOnly123456"],
+    [25,"Yara Sommer","yara@example.com",0,7,"YARA9K","PU100024",610,"TXexampleAddressForDemoOnly123456"],
+    [26,"Zara Jung","zara@example.com",0,7,"ZARA1L","PU100025",290,"TXexampleAddressForDemoOnly123456"]
+  ];
+
+  var SEED_SNAPS = [
+    ["PU100001","2026-10",12.4,4200,4380],["PU100002","2026-10",8.0,2100,2050],
+    ["PU100003","2026-10",3.5,680,710],["PU100004","2026-10",2.0,90,70],
+    ["PU100005","2026-10",6.2,1500,1620],["PU100006","2026-10",4.0,980,1010],
+    ["PU100007","2026-10",5.5,800,760],["PU100008","2026-10",1.2,400,390],
+    ["PU100009","2026-10",10.0,3100,3250],["PU100010","2026-10",2.5,700,690],
+    ["PU100018","2026-10",7.0,520,545],["PU100019","2026-10",1.8,250,240],
+    ["PU100020","2026-10",4.0,80,60],["PU100021","2026-10",3.0,900,940],
+    ["PU100022","2026-10",1.5,360,355],["PU100024","2026-10",2.2,700,715],
+    ["PU100025","2026-10",0.8,300,280],
+    ["PU100001","2026-11",4.0,4100,4010],["PU100002","2026-11",3.0,2000,2150],
+    ["PU100003","2026-11",1.0,720,700],["PU100005","2026-11",2.5,1600,1580],
+    ["PU100009","2026-11",3.5,3300,3410],["PU100018","2026-11",2.0,560,590],
+    ["PU100021","2026-11",1.5,950,970]
+  ];
+
+  function t(key, vars) {
+    var pack = I18N[state.lang] || I18N.de;
+    var text = pack[key] || I18N.de[key] || key;
+    if (vars) text = text.replace(/\{(\w+)\}/g, function (_, k) { return vars[k] != null ? vars[k] : ""; });
+    return text;
+  }
+  function esc(s) {
+    return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) {
+      return ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c];
+    });
+  }
+  function money(n) { return (Number(n) || 0).toFixed(2); }
+  function round2(n) { return Math.round(Number(n) * 100) / 100; }
+  function nowStr() {
+    try { return new Date().toLocaleString("sv-SE", { timeZone: "Europe/Berlin" }).slice(0, 16); }
+    catch (e) { return new Date().toISOString().slice(0, 16).replace("T", " "); }
+  }
+  function isEligible(deposit, partners, minDeposit, minPartners, always) {
+    if (always) return true;
+    return deposit >= minDeposit && partners >= minPartners;
+  }
+  function walkUpline(startId, getRef, maxLevels) {
+    maxLevels = maxLevels || MAX_LEVELS;
+    var chain = [], seen = {}, current = startId;
+    seen[startId] = true;
+    for (var i = 0; i < maxLevels; i++) {
+      var ref = getRef(current);
+      if (ref == null || seen[ref]) break;
+      chain.push(ref);
+      seen[ref] = true;
+      current = ref;
+    }
+    return chain;
+  }
+  function calculateLotCommissions(opts) {
+    var lots = opts.lots, upline = (opts.uplineIds || []).slice(0, opts.maxLevels || MAX_LEVELS);
+    var eligibility = opts.eligibility || {};
+    var rates = opts.rates || DEFAULT_RATES;
+    var houseRate = opts.houseRate != null ? opts.houseRate : HOUSE_RATE;
+    var houseId = opts.houseUserId;
+    var ineligToHouse = opts.ineligibleToHouse !== false;
+    var maxLevels = opts.maxLevels || MAX_LEVELS;
+    var sourceId = opts.sourceUserId;
+    var lines = [];
+    if (lots <= 0) return { lines: lines, total: 0 };
+    var houseAmount = round2(houseRate * lots);
+    if (houseAmount) {
+      lines.push({ recipientId: houseId, level: 0, amount: houseAmount, lots: lots, reason: "house", sourceUserId: sourceId, intendedUserId: null });
+    }
+    for (var level = 1; level <= maxLevels; level++) {
+      var rate = Number(rates[level] || 0);
+      var amount = round2(rate * lots);
+      if (!amount) continue;
+      var idx = level - 1;
+      if (idx >= upline.length) {
+        lines.push({ recipientId: houseId, level: level, amount: amount, lots: lots, reason: "unused_level", sourceUserId: sourceId, intendedUserId: null });
+        continue;
+      }
+      var uid = upline[idx];
+      if (eligibility[uid]) {
+        lines.push({ recipientId: uid, level: level, amount: amount, lots: lots, reason: "level", sourceUserId: sourceId, intendedUserId: uid });
+      } else if (ineligToHouse) {
+        lines.push({ recipientId: houseId, level: level, amount: amount, lots: lots, reason: "ineligible", sourceUserId: sourceId, intendedUserId: uid });
+      }
+    }
+    var total = 0;
+    for (var i = 0; i < lines.length; i++) total += lines[i].amount;
+    return { lines: lines, total: round2(total) };
+  }
+  function defaultSettings() {
+    return {
+      puPrimeIbLink: "https://www.puprime.com/register?ib=PLACEHOLDER",
+      minDeposit: 300, minPartners: 2, houseRate: HOUSE_RATE,
+      rates: Object.assign({}, DEFAULT_RATES), ineligibleToHouse: true, minWithdrawal: 10
+    };
+  }
+  function seedUsers() {
+    return SEED_USERS.map(function (u) {
+      return {
+        id: u[0], name: u[1], email: u[2], isAdmin: !!u[3], referrerId: u[4],
+        referralCode: u[5], clientId: u[6], deposit: u[7], usdtAddress: u[8],
+        usdtNetwork: "TRC20", isExample: true
+      };
+    });
+  }
+  function seedSnaps() {
+    var users = seedUsers();
+    var byClient = {};
+    users.forEach(function (u) { byClient[u.clientId] = u.id; });
+    return SEED_SNAPS.map(function (s, i) {
+      return { id: i + 1, clientId: s[0], period: s[1], lots: s[2], balance: s[3], equity: s[4], userId: byClient[s[0]] || null, source: "seed" };
+    });
+  }
+  function defaultState() {
+    var s = {
+      version: 1, lang: "de", uid: null, impersonator: null, page: "login",
+      search: "", flash: null, navOpen: false, nextId: 100,
+      users: seedUsers(), snapshots: seedSnaps(), commissions: [], withdrawals: [],
+      runs: [], settings: defaultSettings()
+    };
+    s.withdrawals.push({
+      id: 1, userId: 2, amount: 50, usdtAddress: "TXexampleAddressForDemoOnly123456",
+      usdtNetwork: "TRC20", status: "pending", adminNote: "", createdAt: "2026-11-14 11:44"
+    });
+    runPeriod(s, "2026-10");
+    return s;
+  }
+  function userById(s, id) {
+    for (var i = 0; i < s.users.length; i++) if (s.users[i].id === id) return s.users[i];
+    return null;
+  }
+  function partnerCount(s, uid) {
+    var n = 0;
+    for (var i = 0; i < s.users.length; i++) if (s.users[i].referrerId === uid) n++;
+    return n;
+  }
+  function userEligible(s, u) {
+    if (!u) return false;
+    return isEligible(u.deposit, partnerCount(s, u.id), s.settings.minDeposit, s.settings.minPartners, !!u.isAdmin);
+  }
+  function availableBalance(s, uid) {
+    var earned = 0, reserved = 0;
+    for (var i = 0; i < s.commissions.length; i++) if (s.commissions[i].recipientId === uid) earned += s.commissions[i].amount;
+    for (var j = 0; j < s.withdrawals.length; j++) {
+      var w = s.withdrawals[j];
+      if (w.userId === uid && (w.status === "pending" || w.status === "approved" || w.status === "paid")) reserved += w.amount;
+    }
+    return round2(earned - reserved);
+  }
+  function latestSnap(s, uid) {
+    var best = null;
+    for (var i = 0; i < s.snapshots.length; i++) {
+      var sn = s.snapshots[i];
+      if (sn.userId !== uid) continue;
+      if (!best || sn.period > best.period || (sn.period === best.period && sn.id > best.id)) best = sn;
+    }
+    return best;
+  }
+  function houseId(s) {
+    for (var i = 0; i < s.users.length; i++) if (s.users[i].isAdmin) return s.users[i].id;
+    return 1;
+  }
+  function runPeriod(s, period) {
+    s.commissions = s.commissions.filter(function (c) { return c.period !== period; });
+    s.runs = s.runs.filter(function (r) { return r.period !== period; });
+    var hid = houseId(s);
+    var refs = {};
+    s.users.forEach(function (u) { refs[u.id] = u.referrerId; });
+    var elig = {};
+    s.users.forEach(function (u) { elig[u.id] = userEligible(s, u); });
+    var linesN = 0, total = 0, created = nowStr();
+    var runId = s.nextId++;
+    for (var i = 0; i < s.snapshots.length; i++) {
+      var sn = s.snapshots[i];
+      if (sn.period !== period || !sn.userId || !(sn.lots > 0)) continue;
+      var res = calculateLotCommissions({
+        sourceUserId: sn.userId, lots: sn.lots,
+        uplineIds: walkUpline(sn.userId, function (id) { return refs[id]; }),
+        eligibility: elig, rates: s.settings.rates, houseRate: s.settings.houseRate,
+        houseUserId: hid, ineligibleToHouse: s.settings.ineligibleToHouse
+      });
+      for (var j = 0; j < res.lines.length; j++) {
+        var L = res.lines[j];
+        s.commissions.push({
+          id: s.nextId++, runId: runId, period: period, sourceUserId: L.sourceUserId,
+          recipientId: L.recipientId, intendedUserId: L.intendedUserId, level: L.level,
+          lots: L.lots, amount: L.amount, reason: L.reason, createdAt: created
+        });
+        linesN++; total += L.amount;
+      }
+    }
+    if (linesN) s.runs.unshift({ id: runId, period: period, createdAt: created, lines: linesN, total: round2(total) });
+    return { ok: linesN > 0, lines: linesN, total: round2(total), period: period };
+  }
+  function loadState() {
+    try {
+      var raw = localStorage.getItem(STORE);
+      if (!raw) return defaultState();
+      var s = JSON.parse(raw);
+      if (!s || s.version !== 1 || !s.users || !s.users.length) return defaultState();
+      s.navOpen = false; s.flash = null;
+      return s;
+    } catch (e) { return defaultState(); }
+  }
+  function saveState() {
+    try {
+      var copy = Object.assign({}, state, { flash: null, navOpen: false });
+      localStorage.setItem(STORE, JSON.stringify(copy));
+    } catch (e) {}
+  }
+
+  var state = loadState();
+  function currentUser() { return state.uid ? userById(state, state.uid) : null; }
+  function go(page) {
+    state.page = page; state.navOpen = false; state.flash = null;
+    try { location.hash = "#/" + page; } catch (e) {}
+    saveState(); render();
+  }
+  function flash(msg, cat) { state.flash = { msg: msg, cat: cat || "ok" }; render(); }
+  function loginAs(id) {
+    state.uid = id; state.impersonator = null; state.page = "dashboard";
+    state.navOpen = false; saveState(); render();
+  }
+  function collectDownline(s, rootId) {
+    var levelOf = {}, current = [rootId];
+    for (var level = 1; level <= 10; level++) {
+      var next = [];
+      for (var i = 0; i < current.length; i++) {
+        for (var j = 0; j < s.users.length; j++) {
+          var u = s.users[j];
+          if (u.referrerId === current[i] && !levelOf[u.id] && u.id !== rootId) {
+            levelOf[u.id] = level; next.push(u.id);
+          }
+        }
+      }
+      current = next;
+      if (!current.length) break;
+    }
+    return levelOf;
+  }
+  function levelStats(s, rootId) {
+    var levelOf = collectDownline(s, rootId);
+    var lotsBy = {};
+    s.snapshots.forEach(function (sn) {
+      if (sn.userId) lotsBy[sn.userId] = (lotsBy[sn.userId] || 0) + sn.lots;
+    });
+    var rows = [];
+    for (var lv = 1; lv <= 10; lv++) {
+      var ids = Object.keys(levelOf).filter(function (id) { return levelOf[id] === lv; }).map(Number);
+      var vol = 0;
+      ids.forEach(function (id) { vol += lotsBy[id] || 0; });
+      rows.push({ level: lv, count: ids.length, lots: round2(vol) });
+    }
+    return rows;
+  }
+  function childrenOf(s, uid) {
+    return s.users.filter(function (u) { return u.referrerId === uid; });
+  }
+  function renderTree(s, nodes, depth) {
+    if (!nodes || !nodes.length) return "";
+    var html = '<ul class="tree">';
+    nodes.forEach(function (u) {
+      html += '<li><div class="tree-node"><strong>' + esc(u.name) + '</strong>';
+      if (u.isExample) html += ' <em class="tag sm">' + esc(t("example")) + '</em>';
+      html += ' <span class="muted">' + partnerCount(s, u.id) + " " + esc(t("partners")) + " · " + esc(t("deposit")) + " " + Math.round(u.deposit) + "</span></div>";
+      if (depth < 12) html += renderTree(s, childrenOf(s, u.id), depth + 1);
+      html += "</li>";
+    });
+    return html + "</ul>";
+  }
+  function reasonLabel(r) { return t("reason_" + r); }
+  function commRows(s, uid, limit) {
+    var rows = s.commissions.filter(function (c) { return c.recipientId === uid; });
+    rows.sort(function (a, b) { return b.id - a.id; });
+    if (limit) rows = rows.slice(0, limit);
+    return rows;
+  }
+  function commTable(rows) {
+    if (!rows.length) return '<p class="muted">' + esc(t("no_commissions")) + "</p>";
+    var html = '<div class="table-wrap"><table><thead><tr><th>' + esc(t("period")) + "</th><th>" + esc(t("date")) + "</th><th>" + esc(t("trader")) + "</th><th>" + esc(t("level")) + "</th><th>" + esc(t("lots")) + "</th><th>" + esc(t("reason")) + '</th><th class="num">' + esc(t("amount")) + "</th></tr></thead><tbody>";
+    rows.forEach(function (r) {
+      var src = userById(state, r.sourceUserId);
+      html += "<tr><td>" + esc(r.period) + "</td><td>" + esc(r.createdAt) + "</td><td>" + esc(src ? src.name : r.sourceUserId) + "</td><td>" + (r.level === 0 ? esc(t("house")) : "L" + r.level) + "</td><td>" + money(r.lots) + "</td><td>" + esc(reasonLabel(r.reason)) + '</td><td class="num">' + money(r.amount) + " USDT</td></tr>";
+    });
+    return html + "</tbody></table></div>";
+  }
+  function langBtns() {
+    return '<div class="lang"><button type="button" data-act="lang" data-lang="de" class="' + (state.lang === "de" ? "on" : "") + '">DE</button><button type="button" data-act="lang" data-lang="en" class="' + (state.lang === "en" ? "on" : "") + '">EN</button></div>';
+  }
+  function refUrl(code) {
+    var base = "trading3-demo.html";
+    try { base = location.href.split("#")[0]; } catch (e) {}
+    return base + "#/r/" + code;
+  }
+  function roleBtn(id, name, hint) {
+    return '<button type="button" class="role" data-act="login" data-id="' + id + '"><strong>' + esc(name) + ' <em class="tag sm">' + esc(t("example")) + "</em></strong><span>" + esc(hint) + "</span></button>";
+  }
+  function renderLogin() {
+    var ref = null;
+    var m = (location.hash || "").match(/#\/r\/([^/]+)/i);
+    if (m) {
+      var code = m[1].toUpperCase();
+      state.users.forEach(function (u) { if (u.referralCode === code) ref = u; });
+    }
+    return '<div class="auth-wrap"><header class="auth-top"><span class="logo">t3</span><strong>trading3</strong>' + langBtns() + "</header>" +
+      '<div class="card auth-card"><h1>' + esc(t("login")) + '</h1><p class="muted">' + esc(t("tagline")) + "</p>" +
+      (ref ? '<p class="pill">' + esc(t("referred_by")) + ": <strong>" + esc(ref.name) + "</strong></p>" : "") +
+      '<p class="hint">' + esc(t("pick_role")) + "</p>" +
+      '<div class="roles">' +
+      roleBtn(1, "Kevin Müller", t("role_admin")) +
+      roleBtn(2, "Anna Weber", t("role_anna")) +
+      roleBtn(8, "Georg Fischer", t("role_georg")) +
+      roleBtn(19, "Rita Vogel", t("role_rita")) +
+      "</div>" +
+      '<div class="demo-box"><strong>' + esc(t("example")) + "</strong>" +
+      (state.lang === "en" ? "26 sample users, 10-level plan, October already calculated. November is imported — run it in Admin." : "26 Beispielnutzer, 10-Ebenen-Plan, Oktober bereits berechnet. November ist importiert — im Admin anstoßen.") +
+      "</div></div>" +
+      '<p class="footer">' + esc(t("footer")) + ' · <a href="#" data-act="reset">' + esc(t("reset_demo")) + "</a></p></div>";
+  }
+  function navLink(page, label) {
+    return '<a href="#/' + page + '" data-act="go" data-page="' + page + '" class="' + (state.page === page ? "on" : "") + '">' + esc(label) + "</a>";
+  }
+  function renderShell(inner) {
+    var u = currentUser();
+    var admin = u && u.isAdmin && !state.impersonator;
+    var html = '<div class="banner">' + esc(t("test_banner")) + "</div>";
+    if (state.impersonator) {
+      html += '<div class="banner impersonate">' + esc(t("impersonating")) + " <strong>" + esc(u.name) + '</strong> · <a href="#/admin-users" data-act="stop-imp">' + esc(t("back_to_admin")) + "</a></div>";
+    }
+    html += '<div class="topbar"><button type="button" class="menu-btn" data-act="menu">' + esc(t("menu")) + '</button><span class="logo">t3</span><strong>trading3</strong></div>';
+    html += '<div class="scrim" data-act="menu-close"></div><div class="shell"><aside class="sidebar">';
+    html += '<a class="brand" href="#/dashboard" data-act="go" data-page="dashboard"><span class="logo">t3</span><span><strong>trading3</strong><small>' + esc(t("tagline")) + "</small></span></a><nav>";
+    html += navLink("dashboard", t("dashboard")) + navLink("network", t("network")) + navLink("commissions", t("commissions")) + navLink("withdrawals", t("withdrawals")) + navLink("profile", t("profile"));
+    if (admin) {
+      html += '<div class="nav-label">' + esc(t("admin")) + "</div>";
+      html += navLink("admin", t("admin_overview")) + navLink("admin-users", t("users")) + navLink("admin-tree", t("tree")) + navLink("admin-import", t("import_data")) + navLink("admin-calculate", t("calculate")) + navLink("admin-payouts", t("payouts")) + navLink("admin-settings", t("settings"));
+    }
+    html += '</nav><div class="side-foot"><div class="who"><span class="avatar">' + esc((u.name || "?").charAt(0)) + "</span><span><strong>" + esc(u.name) + "</strong> ";
+    if (u.isExample) html += '<em class="tag">' + esc(t("example")) + "</em>";
+    html += "</span></div>" + langBtns() + '<button type="button" class="logout" data-act="logout">' + esc(t("logout")) + "</button></div></aside>";
+    html += '<main class="main">';
+    if (state.flash) html += '<div class="flash ' + esc(state.flash.cat) + '">' + esc(state.flash.msg) + "</div>";
+    html += inner + "</main></div>";
+    return html;
+  }
+  function renderDashboard() {
+    var u = currentUser(), s = state, snap = latestSnap(s, u.id), bal = availableBalance(s, u.id);
+    var partners = partnerCount(s, u.id), elig = userEligible(s, u);
+    var html = '<div class="page-head"><h1>' + esc(t("welcome")) + ", " + esc(u.name.split(" ")[0]) + "</h1>";
+    if (u.isExample) html += '<span class="tag">' + esc(t("example")) + "</span></div>"; else html += "</div>";
+    html += '<div class="kpis"><div class="card kpi"><span>' + esc(t("commission_balance")) + "</span><strong>" + money(bal) + " <small>USDT</small></strong></div>";
+    html += '<div class="card kpi"><span>' + esc(t("pu_balance")) + "</span><strong>" + (snap && snap.balance != null ? money(snap.balance) : "—") + "</strong></div>";
+    html += '<div class="card kpi"><span>' + esc(t("pu_equity")) + "</span><strong>" + (snap && snap.equity != null ? money(snap.equity) : "—") + "</strong></div>";
+    html += '<div class="card kpi"><span>' + esc(t("lots_period")) + (snap ? " · " + esc(snap.period) : "") + "</span><strong>" + (snap ? money(snap.lots) : "—") + "</strong></div></div>";
+    if (!u.clientId) html += '<div class="flash warn">' + esc(t("enter_client_id")) + ' <a href="#/profile" data-act="go" data-page="profile">' + esc(t("profile")) + " →</a></div>";
+    if (!snap) html += '<p class="muted">' + esc(t("no_pu_data")) + "</p>";
+    html += '<div class="grid-2"><section class="card"><h2>' + esc(t("ref_link")) + '</h2><div class="copy-row"><input id="refurl" readonly value="' + esc(refUrl(u.referralCode)) + '"><button type="button" class="btn" data-act="copy" data-target="#refurl">' + esc(t("copy")) + "</button></div>";
+    if (s.settings.puPrimeIbLink) html += '<p class="mt"><a class="btn ghost" href="' + esc(s.settings.puPrimeIbLink) + '" target="_blank" rel="noopener">' + esc(t("open_pu")) + "</a></p>";
+    html += '<p class="hint">' + esc(t("self_trade_note")) + "</p></section>";
+    html += '<section class="card"><h2>' + esc(elig ? t("eligible") : t("not_eligible")) + '</h2><div class="status ' + (elig ? "ok" : "no") + '">' + esc(elig ? t("eligible") : t("not_eligible")) + '</div><ul class="facts">';
+    html += "<li>" + esc(t("deposit")) + ": <strong>" + money(u.deposit) + "</strong> / " + s.settings.minDeposit + "</li>";
+    html += "<li>" + esc(t("direct_partners")) + ": <strong>" + partners + "</strong> / " + s.settings.minPartners + "</li></ul>";
+    html += '<p class="hint">' + esc(t("eligibility_hint", { deposit: s.settings.minDeposit, partners: s.settings.minPartners })) + "</p></section></div>";
+    html += '<section class="card"><h2>' + esc(t("recent_commissions")) + "</h2>" + commTable(commRows(s, u.id, 8));
+    if (commRows(s, u.id).length) html += '<p><a href="#/commissions" data-act="go" data-page="commissions">' + esc(t("commissions")) + " →</a></p>";
+    html += "</section>";
+    return html;
+  }
+  function renderNetwork() {
+    var u = currentUser(), levels = levelStats(state, u.id), kids = childrenOf(state, u.id);
+    var html = '<div class="page-head"><h1>' + esc(t("network_title")) + '</h1></div><section class="card"><h2>' + esc(t("level_overview")) + '</h2><div class="table-wrap"><table><thead><tr><th>' + esc(t("level")) + "</th><th>" + esc(t("people")) + '</th><th class="num">' + esc(t("volume")) + "</th></tr></thead><tbody>";
+    levels.forEach(function (lv) {
+      html += "<tr><td>L" + lv.level + "</td><td>" + lv.count + '</td><td class="num">' + money(lv.lots) + "</td></tr>";
+    });
+    html += '</tbody></table></div></section><section class="card"><h2>' + esc(t("downline_tree")) + "</h2>";
+    html += kids.length ? renderTree(state, kids, 0) : '<p class="muted">' + esc(t("no_downline")) + "</p>";
+    return html + "</section>";
+  }
+  function renderCommissions() {
+    var rows = commRows(state, state.uid);
+    var total = 0; rows.forEach(function (r) { total += r.amount; });
+    return '<div class="page-head"><h1>' + esc(t("commissions")) + '</h1><span class="pill">' + money(total) + ' USDT</span></div><section class="card">' + commTable(rows) + "</section>";
+  }
+  function renderWithdrawals() {
+    var u = currentUser(), bal = availableBalance(state, u.id), minW = state.settings.minWithdrawal;
+    var html = '<div class="page-head"><h1>' + esc(t("withdrawals")) + '</h1></div><div class="grid-2"><section class="card"><h2>' + esc(t("request_withdrawal")) + "</h2>";
+    html += "<p>" + esc(t("available")) + ": <strong>" + money(bal) + " USDT</strong> · " + esc(t("min_withdrawal")) + " " + minW + " USDT</p>";
+    if (u.usdtAddress && (u.usdtNetwork === "TRC20" || u.usdtNetwork === "ERC20")) {
+      html += '<p class="muted">' + esc(u.usdtNetwork) + " · " + esc(u.usdtAddress) + '</p><form class="stack" data-form="withdraw"><label>' + esc(t("amount")) + ' (USDT)<input type="number" name="amount" step="0.01" min="' + minW + '" max="' + bal + '" required></label><button type="submit">' + esc(t("request")) + "</button></form>";
+    } else {
+      html += '<p class="hint">' + esc(t("need_address")) + ' <a href="#/profile" data-act="go" data-page="profile">' + esc(t("profile")) + " →</a></p>";
+    }
+    html += '</section><section class="card"><h2>' + esc(t("withdrawal_history")) + "</h2>";
+    var rows = state.withdrawals.filter(function (w) { return w.userId === u.id; }).slice().reverse();
+    if (!rows.length) html += '<p class="muted">' + esc(t("no_withdrawals")) + "</p>";
+    else {
+      html += '<div class="table-wrap"><table><thead><tr><th>' + esc(t("date")) + '</th><th class="num">' + esc(t("amount")) + "</th><th>" + esc(t("network_chain")) + "</th><th>" + esc(t("status")) + "</th></tr></thead><tbody>";
+      rows.forEach(function (r) {
+        html += "<tr><td>" + esc(r.createdAt) + '</td><td class="num">' + money(r.amount) + "</td><td>" + esc(r.usdtNetwork) + '</td><td><span class="status sm ' + esc(r.status) + '">' + esc(t(r.status)) + "</span></td></tr>";
+      });
+      html += "</tbody></table></div>";
+    }
+    return html + "</section></div>";
+  }
+  function renderProfile() {
+    var u = currentUser();
+    return '<div class="page-head"><h1>' + esc(t("profile")) + '</h1></div><section class="card narrow"><p class="hint">' + esc(t("profile_hint")) + '</p><form class="stack" data-form="profile"><label>' + esc(t("client_id")) + '<input type="text" name="clientId" value="' + esc(u.clientId || "") + '" placeholder="PU100001"></label><label>' + esc(t("usdt_address")) + '<input type="text" name="usdtAddress" value="' + esc(u.usdtAddress || "") + '"></label><label>' + esc(t("network_chain")) + '<select name="usdtNetwork"><option value="">—</option><option value="TRC20"' + (u.usdtNetwork === "TRC20" ? " selected" : "") + ">" + esc(t("trc20")) + '</option><option value="ERC20"' + (u.usdtNetwork === "ERC20" ? " selected" : "") + ">" + esc(t("erc20")) + '</option></select></label><p class="muted">' + esc(t("deposit")) + ": " + money(u.deposit) + " (Admin / Import)</p><button type=\"submit\">" + esc(t("save")) + "</button></form></section>";
+  }
+
+  function renderAdminHome() {
+    var pending = { c: 0, s: 0 }, paid = 0, unmatched = 0;
+    state.withdrawals.forEach(function (w) {
+      if (w.status === "pending") { pending.c++; pending.s += w.amount; }
+      if (w.status === "paid") paid += w.amount;
+    });
+    state.snapshots.forEach(function (sn) { if (!sn.userId) unmatched++; });
+    var hid = houseId(state);
+    return '<div class="page-head"><h1>' + esc(t("admin_overview")) + '</h1></div><div class="kpis">' +
+      '<div class="card kpi"><span>' + esc(t("total_users")) + "</span><strong>" + state.users.length + "</strong></div>" +
+      '<div class="card kpi"><span>' + esc(t("house")) + "</span><strong>" + money(availableBalance(state, hid)) + " <small>USDT</small></strong></div>" +
+      '<div class="card kpi"><span>' + esc(t("pending_payouts")) + "</span><strong>" + pending.c + " · " + money(pending.s) + "</strong></div>" +
+      '<div class="card kpi"><span>' + esc(t("paid_out")) + "</span><strong>" + money(paid) + "</strong></div></div>" +
+      '<p class="muted">' + esc(t("unmatched_clients")) + ": " + unmatched + '</p><div class="actions">' +
+      '<a class="btn" href="#/admin-users" data-act="go" data-page="admin-users">' + esc(t("users")) + "</a>" +
+      '<a class="btn ghost" href="#/admin-tree" data-act="go" data-page="admin-tree">' + esc(t("tree")) + "</a>" +
+      '<a class="btn ghost" href="#/admin-import" data-act="go" data-page="admin-import">' + esc(t("import_data")) + "</a>" +
+      '<a class="btn ghost" href="#/admin-calculate" data-act="go" data-page="admin-calculate">' + esc(t("calculate")) + "</a>" +
+      '<a class="btn ghost" href="#/admin-payouts" data-act="go" data-page="admin-payouts">' + esc(t("payouts")) + "</a></div>";
+  }
+  function renderAdminUsers() {
+    var q = (state.search || "").toLowerCase();
+    var html = '<div class="page-head"><h1>' + esc(t("all_users")) + '</h1></div><form class="search" data-form="search"><input type="search" name="q" value="' + esc(state.search || "") + '" placeholder="' + esc(t("search")) + '"><button class="btn" type="submit">' + esc(t("search")) + '</button></form><section class="card"><div class="table-wrap"><table><thead><tr><th>ID</th><th>' + esc(t("name")) + "</th><th>" + esc(t("email")) + "</th><th>" + esc(t("client_id")) + "</th><th>" + esc(t("deposit")) + "</th><th>" + esc(t("partners")) + "</th><th>USDT</th><th></th><th>" + esc(t("actions")) + "</th></tr></thead><tbody>";
+    state.users.forEach(function (u) {
+      if (q && [u.name, u.email, u.clientId, u.referralCode].join(" ").toLowerCase().indexOf(q) < 0) return;
+      var elig = userEligible(state, u);
+      html += "<tr><td>" + u.id + "</td><td>" + esc(u.name) + (u.isExample ? ' <em class="tag sm">' + esc(t("example")) + "</em>" : "") + (u.isAdmin ? ' <em class="tag sm gold">Admin</em>' : "") + "</td><td>" + esc(u.email) + '</td><td class="mono">' + esc(u.clientId || "—") + "</td><td>" + Math.round(u.deposit) + "</td><td>" + partnerCount(state, u.id) + '</td><td class="num">' + money(availableBalance(state, u.id)) + '</td><td><span class="status sm ' + (elig ? "ok" : "no") + '">' + esc(elig ? t("eligible") : t("not_eligible")) + "</span></td><td>";
+      if (!u.isAdmin) html += '<button class="btn sm ghost" type="button" data-act="impersonate" data-id="' + u.id + '">' + esc(t("login_as")) + "</button>";
+      html += "</td></tr>";
+    });
+    return html + "</tbody></table></div></section>";
+  }
+  function renderAdminTree() {
+    var root = userById(state, houseId(state));
+    var html = '<div class="page-head"><h1>' + esc(t("full_tree")) + '</h1></div><section class="card">';
+    if (root) {
+      html += '<div class="tree-node root"><strong>' + esc(root.name) + '</strong> <span class="muted">' + partnerCount(state, root.id) + " " + esc(t("partners")) + "</span></div>";
+      html += renderTree(state, childrenOf(state, root.id), 0);
+    }
+    return html + "</section>";
+  }
+  function renderAdminImport() {
+    var html = '<div class="page-head"><h1>' + esc(t("import_data")) + '</h1></div><div class="grid-2"><section class="card"><h2>' + esc(t("csv_upload")) + '</h2><p class="hint">' + esc(t("csv_hint")) + ' <a href="#" data-act="sample-csv">' + esc(t("download_sample")) + "</a></p>";
+    html += '<form class="stack" data-form="csv"><textarea name="csv" rows="6" placeholder="pu_prime_client_id,period,lots,balance,equity,deposit"></textarea><input type="file" name="file" accept=".csv,text/csv"><button type="submit">' + esc(t("upload")) + "</button></form></section>";
+    html += '<section class="card"><h2>' + esc(t("manual_entry")) + '</h2><form class="stack" data-form="manual"><label>' + esc(t("select_user")) + '<select name="userId"><option value="">—</option>';
+    state.users.forEach(function (u) {
+      html += '<option value="' + u.id + '">' + esc(u.name) + " (" + esc(u.clientId || "—") + ")</option>";
+    });
+    html += '</select></label><label>' + esc(t("client_id")) + '<input type="text" name="clientId" placeholder="PU100001"></label><label>' + esc(t("period")) + '<input type="text" name="period" required placeholder="' + esc(t("period_placeholder")) + '" value="2026-11"></label><label>' + esc(t("lots")) + '<input type="number" name="lots" step="0.01" min="0" required value="1"></label><label>' + esc(t("balance")) + '<input type="number" name="balance" step="0.01"></label><label>' + esc(t("equity")) + '<input type="number" name="equity" step="0.01"></label><label>' + esc(t("deposit")) + '<input type="number" name="deposit" step="0.01"></label><button type="submit">' + esc(t("add")) + "</button></form></section></div>";
+    html += '<section class="card"><h2>' + esc(t("snapshots")) + '</h2><div class="table-wrap"><table><thead><tr><th>' + esc(t("period")) + "</th><th>" + esc(t("client_id")) + "</th><th>" + esc(t("name")) + '</th><th class="num">' + esc(t("lots")) + '</th><th class="num">' + esc(t("balance")) + '</th><th class="num">' + esc(t("equity")) + "</th><th>" + esc(t("source")) + "</th></tr></thead><tbody>";
+    var snaps = state.snapshots.slice().sort(function (a, b) { return a.period === b.period ? b.id - a.id : (a.period < b.period ? 1 : -1); });
+    snaps.forEach(function (sn) {
+      var u = sn.userId ? userById(state, sn.userId) : null;
+      html += "<tr><td>" + esc(sn.period) + '</td><td class="mono">' + esc(sn.clientId) + "</td><td>" + esc(u ? u.name : "—") + '</td><td class="num">' + money(sn.lots) + '</td><td class="num">' + (sn.balance != null ? money(sn.balance) : "—") + '</td><td class="num">' + (sn.equity != null ? money(sn.equity) : "—") + "</td><td>" + esc(sn.source) + "</td></tr>";
+    });
+    return html + "</tbody></table></div></section>";
+  }
+  function renderAdminCalculate() {
+    var periods = [];
+    state.snapshots.forEach(function (sn) { if (periods.indexOf(sn.period) < 0) periods.push(sn.period); });
+    periods.sort().reverse();
+    var html = '<div class="page-head"><h1>' + esc(t("run_calc")) + '</h1></div><section class="card narrow"><p class="hint">' + esc(t("run_calc_hint")) + '</p><form class="stack" data-form="calc"><label>' + esc(t("period"));
+    if (periods.length) {
+      html += '<select name="period">';
+      periods.forEach(function (p) { html += '<option value="' + esc(p) + '">' + esc(p) + "</option>"; });
+      html += "</select>";
+    } else html += '<input type="text" name="period" required placeholder="' + esc(t("period_placeholder")) + '">';
+    html += "</label><button type=\"submit\">" + esc(t("run")) + " / " + esc(t("recalc")) + "</button></form></section>";
+    html += '<section class="card"><h2>' + esc(t("calc_runs")) + "</h2>";
+    if (state.runs.length) {
+      html += '<div class="table-wrap"><table><thead><tr><th>' + esc(t("period")) + "</th><th>" + esc(t("date")) + "</th><th>" + esc(t("lines")) + '</th><th class="num">' + esc(t("amount")) + "</th></tr></thead><tbody>";
+      state.runs.forEach(function (r) {
+        html += "<tr><td>" + esc(r.period) + "</td><td>" + esc(r.createdAt) + "</td><td>" + r.lines + '</td><td class="num">' + money(r.total) + " USDT</td></tr>";
+      });
+      html += "</tbody></table></div>";
+    }
+    return html + "</section>";
+  }
+  function renderAdminPayouts() {
+    var rows = state.withdrawals.slice().sort(function (a, b) {
+      var o = { pending: 0, approved: 1, paid: 2, rejected: 3 };
+      return (o[a.status] - o[b.status]) || (b.id - a.id);
+    });
+    var html = '<div class="page-head"><h1>' + esc(t("payout_requests")) + '</h1></div><section class="card">';
+    if (!rows.length) return html + '<p class="muted">' + esc(t("no_withdrawals")) + "</p></section>";
+    html += '<div class="table-wrap"><table><thead><tr><th>#</th><th>' + esc(t("date")) + "</th><th>" + esc(t("name")) + '</th><th class="num">' + esc(t("amount")) + "</th><th>" + esc(t("network_chain")) + "</th><th>" + esc(t("usdt_address")) + "</th><th>" + esc(t("status")) + "</th><th>" + esc(t("actions")) + "</th></tr></thead><tbody>";
+    rows.forEach(function (r) {
+      var u = userById(state, r.userId);
+      html += "<tr><td>" + r.id + "</td><td>" + esc(r.createdAt) + "</td><td>" + esc(u ? u.name : "") + "<br><span class=\"muted\">" + esc(u ? u.email : "") + '</span></td><td class="num">' + money(r.amount) + ' USDT</td><td>' + esc(r.usdtNetwork) + '</td><td class="mono">' + esc(r.usdtAddress) + '</td><td><span class="status sm ' + esc(r.status) + '">' + esc(t(r.status)) + '</span></td><td><form class="inline-actions" data-form="payout" data-id="' + r.id + '"><input type="text" name="adminNote" placeholder="' + esc(t("admin_note")) + '" value="' + esc(r.adminNote || "") + '">';
+      if (r.status === "pending") html += '<button class="btn sm" type="submit" name="action" value="approved">' + esc(t("approve")) + '</button><button class="btn sm ghost danger" type="submit" name="action" value="rejected">' + esc(t("reject")) + "</button>";
+      if (r.status === "approved") html += '<button class="btn sm" type="submit" name="action" value="paid">' + esc(t("mark_paid")) + "</button>";
+      html += "</form></td></tr>";
+    });
+    return html + "</tbody></table></div></section>";
+  }
+  function renderAdminSettings() {
+    var st = state.settings;
+    var html = '<div class="page-head"><h1>' + esc(t("settings")) + '</h1></div><section class="card narrow"><form class="stack" data-form="settings"><label>' + esc(t("ib_link")) + '<input type="url" name="puPrimeIbLink" value="' + esc(st.puPrimeIbLink) + '"></label><label>' + esc(t("min_deposit")) + '<input type="number" name="minDeposit" step="0.01" value="' + st.minDeposit + '"></label><label>' + esc(t("min_partners")) + '<input type="number" name="minPartners" step="1" min="0" value="' + st.minPartners + '"></label><label>' + esc(t("house_rate")) + '<input type="number" name="houseRate" step="0.01" value="' + st.houseRate + '"></label><label>' + esc(t("min_withdrawal")) + '<input type="number" name="minWithdrawal" step="0.01" value="' + st.minWithdrawal + '"></label><fieldset><legend>' + esc(t("level_rates")) + '</legend><div class="rates">';
+    for (var i = 1; i <= 10; i++) {
+      html += "<label>L" + i + '<input type="number" name="rate_' + i + '" step="0.01" value="' + st.rates[i] + '"></label>';
+    }
+    html += '</div></fieldset><label class="check"><input type="checkbox" name="ineligibleToHouse"' + (st.ineligibleToHouse ? " checked" : "") + "> " + esc(t("ineligible_to_house")) + '</label><p class="hint">' + esc(t("ineligible_to_house_help")) + '</p><button type="submit">' + esc(t("save")) + "</button></form>";
+    html += '<p class="mt"><button type="button" class="btn ghost" data-act="reset">' + esc(t("reset_demo")) + "</button></p></section>";
+    return html;
+  }
+
+  var PAGES = {
+    login: renderLogin, dashboard: renderDashboard, network: renderNetwork,
+    commissions: renderCommissions, withdrawals: renderWithdrawals, profile: renderProfile,
+    admin: renderAdminHome, "admin-users": renderAdminUsers, "admin-tree": renderAdminTree,
+    "admin-import": renderAdminImport, "admin-calculate": renderAdminCalculate,
+    "admin-payouts": renderAdminPayouts, "admin-settings": renderAdminSettings
+  };
+  function render() {
+    document.documentElement.lang = state.lang;
+    document.body.classList.toggle("nav-open", !!state.navOpen);
+    var u = currentUser();
+    var page = state.page || "login";
+    if (!u) page = "login";
+    else if (page === "login") page = "dashboard";
+    if (page.indexOf("admin") === 0 && u && (!u.isAdmin || state.impersonator)) page = "dashboard";
+    state.page = page;
+    var fn = PAGES[page] || renderDashboard;
+    document.getElementById("app").innerHTML = (page === "login") ? fn() : renderShell(fn());
+  }
+  function fd(form) {
+    var o = {};
+    Array.prototype.forEach.call(form.elements, function (el) {
+      if (!el.name || el.disabled) return;
+      if (el.type === "checkbox") o[el.name] = el.checked;
+      else if (el.type === "submit") return;
+      else o[el.name] = el.value;
+    });
+    return o;
+  }
+  function upsertSnap(clientId, period, lots, balance, equity, deposit, source) {
+    clientId = (clientId || "").trim(); period = (period || "").trim();
+    if (!clientId || !period) throw new Error(t("required"));
+    var uid = null;
+    state.users.forEach(function (u) { if (u.clientId === clientId) uid = u.id; });
+    var found = null;
+    state.snapshots.forEach(function (sn) { if (sn.clientId === clientId && sn.period === period) found = sn; });
+    if (found) {
+      found.userId = uid; found.lots = Number(lots) || 0; found.balance = balance; found.equity = equity; found.source = source;
+    } else {
+      state.snapshots.push({ id: state.nextId++, clientId: clientId, period: period, lots: Number(lots) || 0, balance: balance, equity: equity, userId: uid, source: source });
+    }
+    if (deposit != null && deposit !== "" && uid) {
+      var u = userById(state, uid); if (u) u.deposit = Number(deposit);
+    }
+    return { matched: !!uid };
+  }
+  function parseCsv(text) {
+    var lines = text.replace(/^\uFEFF/, "").split(/\r?\n/).filter(function (l) { return l.trim(); });
+    if (!lines.length) return { imported: 0, unmatched: 0, errors: 1 };
+    var head = lines[0].split(",").map(function (h) { return h.trim().toLowerCase(); });
+    var imported = 0, unmatched = 0, errors = 0;
+    for (var i = 1; i < lines.length; i++) {
+      var cols = lines[i].split(",");
+      var row = {};
+      head.forEach(function (h, j) { row[h] = (cols[j] || "").trim(); });
+      try {
+        var r = upsertSnap(row.pu_prime_client_id || row.client_id, row.period, row.lots, row.balance === "" ? null : Number(row.balance), row.equity === "" ? null : Number(row.equity), row.deposit === "" ? null : row.deposit, "csv");
+        if (r.matched) imported++; else unmatched++;
+      } catch (e) { errors++; }
+    }
+    return { imported: imported, unmatched: unmatched, errors: errors };
+  }
+  function onClick(e) {
+    var a = e.target.closest("[data-act]");
+    if (!a) return;
+    var act = a.getAttribute("data-act");
+    if (act === "login") { e.preventDefault(); loginAs(Number(a.getAttribute("data-id"))); return; }
+    if (act === "logout") { e.preventDefault(); state.uid = null; state.impersonator = null; state.page = "login"; saveState(); render(); return; }
+    if (act === "lang") { e.preventDefault(); state.lang = a.getAttribute("data-lang"); saveState(); render(); return; }
+    if (act === "go") { e.preventDefault(); go(a.getAttribute("data-page")); return; }
+    if (act === "menu") { e.preventDefault(); state.navOpen = !state.navOpen; document.body.classList.toggle("nav-open", state.navOpen); return; }
+    if (act === "menu-close") { e.preventDefault(); state.navOpen = false; document.body.classList.remove("nav-open"); return; }
+    if (act === "copy") {
+      e.preventDefault();
+      var el = document.querySelector(a.getAttribute("data-target"));
+      var text = el ? el.value : "";
+      var done = function () { a.textContent = t("copied"); setTimeout(function () { a.textContent = t("copy"); }, 1400); };
+      if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text).then(done).catch(function () { try { el.select(); document.execCommand("copy"); } catch (err) {} done(); });
+      else { try { el.select(); document.execCommand("copy"); } catch (err) {} done(); }
+      return;
+    }
+    if (act === "impersonate") { e.preventDefault(); state.impersonator = state.uid; state.uid = Number(a.getAttribute("data-id")); state.page = "dashboard"; saveState(); render(); return; }
+    if (act === "stop-imp") { e.preventDefault(); if (state.impersonator) { state.uid = state.impersonator; state.impersonator = null; state.page = "admin-users"; saveState(); render(); } return; }
+    if (act === "reset") {
+      e.preventDefault();
+      try { localStorage.removeItem(STORE); } catch (err) {}
+      state = defaultState();
+      flash(t("reset_done"), "ok");
+      return;
+    }
+    if (act === "sample-csv") {
+      e.preventDefault();
+      var csv = "pu_prime_client_id,period,lots,balance,equity,deposit\nPU100001,2026-11,1.5,4100,4010,2500\n";
+      var blob = new Blob([csv], { type: "text/csv" });
+      var link = document.createElement("a");
+      link.href = URL.createObjectURL(blob);
+      link.download = "trading3-sample.csv";
+      document.body.appendChild(link); link.click(); document.body.removeChild(link);
+      return;
+    }
+  }
+  function onSubmit(e) {
+    var form = e.target.closest("form[data-form]");
+    if (!form) return;
+    e.preventDefault();
+    var kind = form.getAttribute("data-form");
+    if (kind === "withdraw") {
+      var amount = Number(fd(form).amount || 0);
+      var u = currentUser();
+      var bal = availableBalance(state, u.id);
+      if (!u.usdtAddress || !(u.usdtNetwork === "TRC20" || u.usdtNetwork === "ERC20")) return flash(t("need_address"), "error");
+      if (!(amount >= state.settings.minWithdrawal)) return flash(t("invalid_amount"), "error");
+      if (amount > bal + 1e-9) return flash(t("insufficient"), "error");
+      state.withdrawals.push({ id: state.nextId++, userId: u.id, amount: round2(amount), usdtAddress: u.usdtAddress, usdtNetwork: u.usdtNetwork, status: "pending", adminNote: "", createdAt: nowStr() });
+      saveState(); flash(t("withdrawal_ok"), "ok"); return;
+    }
+    if (kind === "profile") {
+      var o = fd(form), u2 = currentUser();
+      var cid = (o.clientId || "").trim();
+      if (cid) {
+        var clash = false;
+        state.users.forEach(function (x) { if (x.clientId === cid && x.id !== u2.id) clash = true; });
+        if (clash) return flash(state.lang === "en" ? "Client ID already used." : "Client-ID bereits vergeben.", "error");
+      }
+      u2.clientId = cid || null;
+      u2.usdtAddress = (o.usdtAddress || "").trim() || null;
+      u2.usdtNetwork = (o.usdtNetwork === "TRC20" || o.usdtNetwork === "ERC20") ? o.usdtNetwork : null;
+      state.snapshots.forEach(function (sn) { if (sn.clientId === u2.clientId) sn.userId = u2.id; });
+      saveState(); flash(t("saved"), "ok"); return;
+    }
+    if (kind === "search") { state.search = fd(form).q || ""; saveState(); render(); return; }
+    if (kind === "csv") {
+      var text = (form.csv && form.csv.value) || "";
+      var file = form.file && form.file.files && form.file.files[0];
+      var apply = function (src) {
+        var r = parseCsv(src);
+        saveState();
+        flash(t("imported_ok", { imported: r.imported, unmatched: r.unmatched, errors: r.errors }), r.errors ? "error" : "ok");
+      };
+      if (file && !text.trim()) {
+        var reader = new FileReader();
+        reader.onload = function () { apply(String(reader.result || "")); };
+        reader.readAsText(file);
+        return;
+      }
+      if (!text.trim()) return flash(t("required"), "error");
+      apply(text); return;
+    }
+    if (kind === "manual") {
+      var o2 = fd(form), clientId = (o2.clientId || "").trim();
+      if (o2.userId && !clientId) {
+        var uu = userById(state, Number(o2.userId));
+        if (uu) clientId = uu.clientId || "";
+      }
+      try {
+        upsertSnap(clientId, o2.period, o2.lots, o2.balance === "" ? null : Number(o2.balance), o2.equity === "" ? null : Number(o2.equity), o2.deposit === "" ? null : o2.deposit, "manual");
+        saveState(); flash(t("saved"), "ok");
+      } catch (err) { flash(err.message || t("required"), "error"); }
+      return;
+    }
+    if (kind === "calc") {
+      var period = (fd(form).period || "").trim();
+      if (!period) return flash(t("required"), "error");
+      var r = runPeriod(state, period);
+      saveState();
+      if (!r.ok) flash(t("no_lots"), "error");
+      else flash(t("calc_done", { period: period, lines: r.lines, total: money(r.total) }), "ok");
+      return;
+    }
+    if (kind === "payout") {
+      var id = Number(form.getAttribute("data-id"));
+      var action = (e.submitter && e.submitter.value) || "";
+      if (!action) {
+        var btn = form.querySelector("button[name=action]:focus");
+        if (btn) action = btn.value;
+      }
+      var note = fd(form).adminNote;
+      state.withdrawals.forEach(function (w) {
+        if (w.id === id && (action === "approved" || action === "paid" || action === "rejected")) {
+          w.status = action; w.adminNote = note || w.adminNote; w.processedAt = nowStr();
+        }
+      });
+      saveState(); flash(t("saved"), "ok"); return;
+    }
+    if (kind === "settings") {
+      var o3 = fd(form);
+      var rates = {};
+      for (var i = 1; i <= 10; i++) rates[i] = Number(o3["rate_" + i] || 0);
+      state.settings = {
+        puPrimeIbLink: (o3.puPrimeIbLink || "").trim(),
+        minDeposit: Number(o3.minDeposit || 300),
+        minPartners: Number(o3.minPartners || 2),
+        houseRate: Number(o3.houseRate || 5),
+        minWithdrawal: Number(o3.minWithdrawal || 10),
+        rates: rates,
+        ineligibleToHouse: !!o3.ineligibleToHouse
+      };
+      saveState(); flash(t("saved"), "ok"); return;
+    }
+  }
+  function syncHash() {
+    var h = (location.hash || "").replace(/^#/, "");
+    if (!h) return;
+    if (/^\/r\//i.test(h)) return;
+    var page = h.replace(/^\//, "");
+    if (PAGES[page] && state.uid) { state.page = page; }
+  }
+  document.getElementById("app").addEventListener("click", onClick);
+  document.getElementById("app").addEventListener("submit", onSubmit);
+  window.addEventListener("hashchange", function () { syncHash(); render(); });
+  syncHash();
+  render();
+  window.__trading3 = {
+    calculateLotCommissions: calculateLotCommissions,
+    walkUpline: walkUpline,
+    isEligible: isEligible,
+    DEFAULT_RATES: DEFAULT_RATES,
+    getState: function () { return state; },
+    loginAs: loginAs,
+    go: go,
+    runPeriod: function (p) { var r = runPeriod(state, p); saveState(); render(); return r; },
+    reset: function () { try { localStorage.removeItem(STORE); } catch (e) {} state = defaultState(); render(); }
+  };
+
+})();
+</script>
+</body>
+</html>
