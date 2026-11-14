@@ -4,7 +4,10 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="referrer" content="no-referrer">
+  <meta name="theme-color" content="#0b1020">
   <title>Rebate-Share · Demo</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="apple-touch-icon" href="icons/apple-touch.png">
   <style>
 :root {
   --bg: #06080f;
@@ -187,9 +190,10 @@ label input, label select, label textarea { margin-top: 6px; }
 .status.ok { background: var(--emerald-dim); color: var(--emerald); }
 .status.no { background: rgba(255,122,130,.12); color: var(--red); }
 .status.sm { font-size: 12px; padding: 3px 8px; font-weight: 500; }
-.status.pending { background: rgba(255,200,87,.12); color: var(--warn); }
+.status.pending, .status.requested { background: rgba(255,200,87,.12); color: var(--warn); }
 .status.approved { background: rgba(139,180,255,.12); color: var(--blue); }
-.status.paid { background: var(--emerald-dim); color: var(--emerald); }
+.status.paid, .status.sent, .status.approved { background: var(--emerald-dim); color: var(--emerald); }
+.status.failed { background: rgba(255,80,80,.15); color: #ff8a8a; }
 .status.rejected { background: rgba(255,122,130,.12); color: var(--red); }
 .table-wrap { overflow: auto; -webkit-overflow-scrolling: touch; }
 table { width: 100%; border-collapse: collapse; font-size: 14px; }
@@ -396,12 +400,64 @@ legend { color: var(--muted); padding: 0 6px; }
   background:linear-gradient(135deg, rgba(224,192,120,.22), rgba(62,224,160,.12));
   border-color:rgba(224,192,120,.55); color:var(--gold-2);
 }
+
+/* setup, share, help, 2FA, payouts — mobile-first */
+.setup-card .bar { height:8px; background:rgba(255,255,255,.08); border-radius:99px; overflow:hidden; margin:10px 0 14px; }
+.setup-card .bar > i { display:block; height:100%; background:linear-gradient(90deg,#e0c078,#3ee0a0); width:0; }
+.setup-steps { list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:8px; }
+.setup-steps li { display:flex; align-items:center; gap:10px; font-size:14px; }
+.setup-steps .dot { width:22px; height:22px; border-radius:50%; display:grid; place-items:center; font-size:11px; font-weight:700;
+  border:1px solid var(--line); color:var(--muted); flex:0 0 auto; }
+.setup-steps li.done .dot { background:rgba(62,224,160,.2); border-color:#3ee0a0; color:#3ee0a0; }
+.setup-steps li.next .dot { border-color:var(--gold); color:var(--gold-2); }
+.goal-banner { margin:0 0 16px; padding:12px 16px; border-radius:14px; border:1px solid rgba(224,192,120,.35);
+  background:linear-gradient(135deg, rgba(224,192,120,.12), rgba(62,224,160,.06)); font-weight:700; }
+.share-actions { display:flex; flex-wrap:wrap; gap:8px; margin:12px 0; }
+.share-texts textarea { width:100%; min-height:72px; background:rgba(16,24,42,.75); color:var(--text);
+  border:1px solid var(--line); border-radius:12px; padding:10px 12px; font:inherit; resize:vertical; }
+.share-card-preview { width:100%; max-width:420px; border-radius:16px; border:1px solid var(--line); display:block; margin-top:8px; }
+.qr-box { display:inline-block; padding:10px; background:#fff; border-radius:12px; }
+.qr-box img { display:block; width:160px; height:160px; }
+.calc-grid { display:grid; grid-template-columns:repeat(5,1fr); gap:8px; }
+@media (max-width:700px){ .calc-grid { grid-template-columns:repeat(2,1fr); } }
+.calc-grid label { display:flex; flex-direction:column; gap:4px; font-size:12px; color:var(--muted); }
+.calc-result { font-size:22px; color:var(--gold-2); margin:8px 0 0; }
+.example-tag { font-size:11px; letter-spacing:.04em; text-transform:uppercase; color:var(--muted); }
+.help-search { width:100%; margin:0 0 16px; }
+.faq-item { border-bottom:1px solid var(--line); padding:12px 0; }
+.faq-item h3 { margin:0 0 6px; font-size:16px; }
+.video-ph { aspect-ratio:16/9; border:1px dashed rgba(224,192,120,.35); border-radius:16px;
+  display:grid; place-items:center; color:var(--muted); background:rgba(16,24,42,.5); text-align:center; padding:16px; }
+.dry-run-banner { margin:0 0 16px; padding:10px 14px; border-radius:12px; border:1px solid rgba(224,192,120,.4);
+  background:rgba(224,192,120,.1); font-size:13px; }
+.code-row { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+@media (max-width:600px){ .code-row { grid-template-columns:1fr; } }
+.recovery-list { display:grid; grid-template-columns:repeat(2,1fr); gap:8px; font-family:ui-monospace,monospace; }
+.recovery-list span { background:rgba(16,24,42,.8); border:1px solid var(--line); border-radius:10px; padding:8px; text-align:center; }
+.twofa-box { max-width:420px; }
+.inline-totp { max-width:140px; }
+
+/* partner landing — mobile-first */
+.partner-page { max-width:960px; margin:0 auto; padding:24px 20px 48px; }
+.partner-hero { text-align:center; padding:28px 12px 8px; }
+.partner-avatar { width:96px; height:96px; margin:0 auto 14px; border-radius:50%;
+  display:grid; place-items:center; font-size:32px; font-weight:800; color:#0b1020;
+  background:linear-gradient(135deg,#e0c078,#f5e2b0); border:3px solid rgba(224,192,120,.45); }
+.partner-hero h1 { font-size:clamp(28px,6vw,48px); margin:0 0 8px; letter-spacing:-.03em; }
+.partner-grid { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin:22px 0; }
+@media (max-width:700px){ .partner-grid { grid-template-columns:1fr; } }
+.media-frame { position:relative; aspect-ratio:16/9; border-radius:16px; overflow:hidden; background:#06080f; border:1px solid var(--line); }
+.media-frame iframe, .media-frame video { position:absolute; inset:0; width:100%; height:100%; border:0; }
+.how-list { margin:0; padding-left:1.2em; color:var(--text); line-height:1.55; }
+.how-list li { margin:0 0 8px; }
+.partner-risk { text-align:left; max-width:720px; margin:24px auto 0; }
+
   </style>
 </head>
 <body>
   <noscript>Bitte JavaScript aktivieren / Please enable JavaScript to view this offline demo.</noscript>
   <script>
-window.T3_I18N = {"de": {"portal": "Rebate-Share", "tagline": "Wöchentlicher Netzwerk-Pool", "test_banner": "TESTVERSION mit Beispieldaten. Keine echten Auszahlungen. Provisionen stammen aus Handelsvolumen (Rebates), nicht aus Handelsgewinnen. Keine Renditezusage.", "fine_print": "Provisionen werden aus dem Handelsvolumen (PU-Prime-Rebates) berechnet, nicht aus Handelsgewinnen. Es gibt keine Renditezusage. Auszahlung des Netzwerk-Pools jeweils samstags in USDT.", "login": "Anmelden", "logout": "Abmelden", "register": "Registrieren", "email": "E-Mail", "password": "Passwort", "name": "Name", "confirm_password": "Passwort bestätigen", "no_account": "Noch kein Konto?", "have_account": "Schon registriert?", "login_failed": "E-Mail oder Passwort ist falsch.", "email_taken": "Diese E-Mail ist bereits registriert.", "password_mismatch": "Passwörter stimmen nicht überein.", "password_short": "Passwort muss mindestens 6 Zeichen haben.", "referred_by": "Geworben von", "dashboard": "Dashboard", "network": "Netzwerk", "commissions": "Pool", "statement": "Wochenausweis", "withdrawals": "Auszahlungen", "profile": "Profil", "admin": "Admin", "users": "Nutzer", "tree": "Struktur", "import_data": "Datenimport", "calculate": "Wochenlauf", "payouts": "Auszahlungen", "settings": "Einstellungen", "welcome": "Willkommen", "commission_balance": "USDT-Guthaben", "pool_this_week": "Netzwerk-Pool diese Woche", "pu_balance": "PU Prime Guthaben", "pu_equity": "PU Prime Equity", "lots": "Lots", "lots_period": "Lots (diese Woche)", "rebate": "Rebate", "no_pu_data": "Noch keine PU-Prime-Daten für dieses Konto.", "ref_link": "Dein Empfehlungslink", "copy": "Kopieren", "copied": "Kopiert", "open_pu": "Bei PU Prime registrieren (IB-Link)", "enter_client_id": "Trage deine PU-Prime-Client-ID oder User-ID im Profil ein, damit Lots zugeordnet werden können.", "direct_partners": "Direkte Partner", "eligible": "Berechtigt", "not_eligible": "Nicht berechtigt", "eligibility_hint": "Berechtigt ab {partners} direkten Partnern — dann sind alle 10 Ebenen freigeschaltet. Nicht berechtigte oder ungenutzte Stufen bleiben im Haus-Anteil (Kevin), außer die dynamische Kompression ist aktiv.", "deposit": "Einzahlung", "example": "BEISPIEL", "recent_commissions": "Letzte Gutschriften", "no_commissions": "Noch keine Gutschriften.", "level": "Ebene", "amount": "Betrag", "period": "Woche", "reason": "Grund", "trader": "Konto", "reason_house": "Haus-Residual (Rebate minus Auszahlungen)", "reason_level": "Netzwerk-Ebene", "reason_unused_level": "Ungenutzte Ebene (im Residual)", "reason_ineligible": "Upline nicht berechtigt (im Residual)", "reason_compressed": "Komprimiert (an nächste berechtigte Upline)", "rate_per_lot": "$ pro Lot", "network_title": "Dein Netzwerk", "level_overview": "Ebenen-Übersicht", "people": "Personen", "volume": "Volumen (Lots)", "no_downline": "Noch keine Partner in deinem Netzwerk.", "downline_tree": "Struktur unter dir", "request_withdrawal": "USDT-Auszahlung anfordern", "available": "Verfügbar", "usdt_address": "USDT-Adresse", "network_chain": "Netzwerk", "trc20": "TRC20 (Tron)", "erc20": "ERC20 (Ethereum)", "request": "Anfordern", "withdrawal_history": "Auszahlungshistorie", "status": "Status", "pending": "Ausstehend", "approved": "Freigegeben", "paid": "Ausgezahlt", "rejected": "Abgelehnt", "min_withdrawal": "Mindestbetrag", "insufficient": "Nicht genug Guthaben.", "need_address": "Bitte zuerst USDT-Adresse und Netzwerk im Profil hinterlegen.", "withdrawal_ok": "Auszahlung wurde angefordert. Auszahlung des Pools jeweils samstags.", "save": "Speichern", "saved": "Gespeichert.", "client_id": "PU-Prime-Account", "pu_user_id": "PU-Prime-User-ID", "language": "Sprache", "profile_hint": "Nach der Registrierung bei PU Prime über den IB-Link trägst du hier Account- und User-ID ein.", "admin_overview": "Admin-Übersicht", "all_users": "Alle Nutzer", "full_tree": "Gesamte Struktur", "run_calc": "Netzwerk-Pool berechnen", "run_calc_hint": "Verteilt die Rebates der gewählten Woche nach $ pro Lot. Ein erneuter Lauf ersetzt die vorherige Berechnung dieser Woche. Der Sicherheitsdeckel (optional) skaliert Auszahlungen, falls sie den tatsächlichen PU-Prime-Rebate übersteigen — standardmäßig AUS.", "run": "Berechnen", "recalc": "Erneut berechnen", "calc_done": "Lauf für {period}: {lines} Buchungen, Auszahlungen {payouts} USDT, Rebate {rebate} USDT, Kevin netto {net} USDT.", "no_lots": "Keine zugeordneten Lots für diese Woche gefunden.", "csv_upload": "CSV / XLSX hochladen", "csv_hint": "PU-Prime-Exporte: Rebate Report (Account-Ansicht), Funds Report, Account Report. Oder CSV mit pu_prime_client_id, period, lots, rebate, balance, equity.", "download_sample": "Beispiel-CSV", "manual_entry": "Manuelle Eingabe", "balance": "Kontostand", "equity": "Equity", "source": "Quelle", "imported_ok": "Import {kind}: {rows} Zeilen, {matched} zugeordnet, {unmapped} offen.", "snapshots": "Wochenwerte", "payout_requests": "Auszahlungsanträge", "approve": "Freigeben", "mark_paid": "Als ausgezahlt markieren", "reject": "Ablehnen", "ib_link": "PU-Prime-IB-Link", "min_deposit": "Einzahlung", "min_partners": "Min. direkte Partner", "level_rates": "Sätze je Ebene (USD / Lot)", "cap_enabled": "Sicherheitsdeckel: Auszahlungen je Konto auf den tatsächlichen PU-Prime-Rebate begrenzen", "cap_help": "Standardmäßig AUS. Wenn aktiv, werden die Ebenen proportional gekürzt, sobald die Summe den Rebate dieses Kontos übersteigt. Kevin behält jeweils Rebate minus ausgezahlte Beträge.", "ineligible_to_house": "Nicht berechtigte oder ungenutzte Ebenen bleiben im Haus-Anteil (Kevin)", "actions": "Aktionen", "login_as": "Als Nutzer öffnen", "back_to_admin": "Zurück zum Admin", "partners": "Partner", "house": "Haus (Kevin)", "impersonating": "Du siehst das Portal als", "no_withdrawals": "Keine Anträge.", "period_placeholder": "z. B. 2026-11-07", "invalid_amount": "Ungültiger Betrag.", "required": "Bitte alle Pflichtfelder ausfüllen.", "footer": "Rebate-Share · Netzwerk-Pool · Keine Anlageberatung.", "admin_note": "Notiz", "date": "Datum", "total_users": "Nutzer", "pending_payouts": "Offene Auszahlungen", "paid_out": "Ausgezahlt", "unmatched_clients": "Nicht zugeordnet", "search": "Suchen", "calc_runs": "Bisherige Läufe", "lines": "Buchungen", "upload": "Importieren", "add": "Hinzufügen", "select_user": "Nutzer wählen", "network_lots": "Netzwerk-Lots (Woche)", "week_earnings": "Diese Woche", "paid_saturday": "Auszahlung samstags in USDT", "warning_over_rebate": "Achtung: Netzwerk-Auszahlungen übersteigen den tatsächlichen PU-Prime-Rebate. Kevins Netto ist negativ.", "house_net": "Kevin netto", "total_rebate": "PU-Prime-Rebate", "total_payouts": "Netzwerk-Auszahlungen", "cap_status": "Sicherheitsdeckel", "on": "AN", "off": "AUS", "statement_title": "Wochenausweis", "statement_hint": "Vergleichbar mit deiner eigenen PU-Prime-Handelshistorie. Partner sind anonymisiert (Initialen / letzte 3 Stellen der Account-Nummer).", "per_level": "Nach Ebene", "per_partner": "Nach Partner", "pct": "Anteil", "anonymized": "Anonymisiert", "pnl_approx": "Ungefähres P/L (nur Info)", "pnl_hint": "Equity-Veränderung minus Netto-Einzahlungen. Nur Orientierung, keine Provisionsgrundlage.", "unmapped": "Nicht zugeordnete Accounts", "map_to": "Zuordnen zu", "map": "Zuordnen", "import_folder": "Ordner-Import (Rebate + Funds + Accounts)", "folder_hint": "Wähle die drei PU-Prime-xlsx-Dateien einer Woche, oder nutze weekly_run.py auf dem Server.", "ticker_live": "Netzwerk diese Woche", "mapped": "Zugeordnet", "credits": "Gutschriften", "credits_hint": "Wöchentliche Samstags-Gutschriften auf dein Portal-Guthaben. Keine Blockchain-Transaktionen — Auszahlungen in USDT (BEP20) findest du unter Wallet.", "credits_empty": "Noch keine Gutschriften.", "per_level_short": "Nach Ebene", "download_csv": "CSV herunterladen", "all_periods": "Alle Wochen", "income_mix": "Zusammensetzung", "wallet": "Wallet", "wallet_hint": "Auszahlungen nur in USDT auf BNB Smart Chain (BEP20). Die Transaktions-ID (Tx-Hash) erscheint, sobald Kevin die Auszahlung als bezahlt markiert hat.", "bep20": "BEP20 (BNB Smart Chain)", "bep20_only": "Nur BEP20 (USDT auf BNB Smart Chain).", "invalid_address": "Bitte eine gültige BEP20-Adresse eingeben (0x und 40 Hex-Zeichen).", "invalid_tx": "Bitte einen gültigen BEP20-Transaktions-Hash eingeben (0x und 64 Hex-Zeichen).", "tx_hash": "Tx-Hash (BEP20)", "tx_required": "Zum Markieren als ausgezahlt ist ein BEP20-Transaktions-Hash nötig.", "view_on_bscscan": "Auf BscScan öffnen", "onboarding": "PU-Prime-Start", "onboarding_title": "So wirst du PU-Prime-Kunde", "onboarding_hint": "Diese Schritte sind einmalig. Danach können Lots und Rebates zugeordnet werden.", "step_link": "PU-Prime-Link öffnen", "step_register": "Bei PU Prime registrieren", "step_kyc": "Identität und Wohnsitz nachweisen (ID / Proof of Address)", "step_account": "Konto eröffnen", "step_deposit": "Einzahlung tätigen", "step_ids": "PU-Prime-User-ID und Kontonummer hier eintragen", "step_verify": "Freigabe durch den Admin (über den Import)", "mark_done": "Als erledigt markieren", "open_link": "Link öffnen", "continue_dashboard": "Zum Dashboard", "verify_pending": "Prüfung ausstehend", "verify_verified": "Freigegeben", "show_name_to_upline": "Meinen Namen der Upline zeigen", "show_name_help": "Wenn aus, sieht deine Upline nur deine User-ID, nicht deinen Namen. Admin sieht immer den Namen.", "my_team": "Mein Team", "team_list": "Liste", "team_tree": "Struktur", "active": "Aktiv", "qualified": "Qualifiziert", "inactive": "Inaktiv", "unqualified": "Nicht qualifiziert", "compression": "Dynamische Kompression: nicht berechtigte Upline überspringen, Betrag an die nächste berechtigte Upline", "compression_help": "Standardmäßig AUS. Wenn aktiv, wird die Ebene einer nicht berechtigten Upline nicht an Kevin (Haus) gezahlt, sondern an die nächste berechtigte Person in der Kette weitergereicht.", "pu_account_type": "PU-Prime-Kontotyp", "smtp_section": "E-Mail (Double-Opt-in / Passwort)", "smtp_host": "SMTP-Host (leer = Link nur in der Konsole)", "smtp_port": "SMTP-Port", "smtp_user": "SMTP-Benutzer", "smtp_password": "SMTP-Passwort", "smtp_from": "Absenderadresse", "smtp_tls": "TLS verwenden", "confirm_email": "E-Mail bestätigen", "confirm_sent": "Wir haben dir einen Bestätigungslink geschickt. Bitte prüfe dein Postfach. (Im Test ohne SMTP steht der Link in der Server-Konsole.)", "confirm_ok": "E-Mail bestätigt. Du kannst dich jetzt anmelden.", "confirm_bad": "Dieser Bestätigungslink ist ungültig oder abgelaufen.", "email_unverified": "Bitte zuerst deine E-Mail bestätigen. Wir können den Link erneut senden.", "resend_confirm": "Bestätigungslink erneut senden", "forgot": "Passwort vergessen", "forgot_hint": "Wir senden dir einen Link zum Zurücksetzen.", "forgot_sent": "Falls ein Konto mit dieser E-Mail existiert, wurde ein Link verschickt (ohne SMTP steht er in der Konsole).", "reset_password": "Neues Passwort setzen", "reset_ok": "Passwort gespeichert. Bitte anmelden.", "reset_bad": "Dieser Link ist ungültig oder abgelaufen.", "consent_terms": "Ich akzeptiere die Nutzungsbedingungen", "consent_privacy": "Ich habe die Datenschutzerklärung gelesen", "consent_risk": "Ich habe den Risiko-Hinweis gelesen (CFDs/Hebel können zu Verlusten über die Einlage hinaus führen; Provisionen stammen aus Volumen, nicht aus Gewinn; keine Renditezusage).", "need_consent": "Bitte bestätige alle Einwilligungen.", "need_ref": "Empfehlungscode fehlt — Kevin wird als Empfehlender gesetzt.", "ref_code": "Empfehlungscode", "hero_slogan": "Dein Anteil am Volumen.", "hero_signal": "Jeden Samstag in USDT", "hero_sub": "Rebate-Share verteilt den wöchentlichen Netzwerk-Pool klar und nachvollziehbar — aus gehandelten Lots, nicht aus Gewinnversprechen.", "cta_login": "Login", "cta_register": "Registrieren", "how_title": "So funktioniert’s", "how_1_t": "Registrieren", "how_1": "Mit Empfehlungscode anmelden, E-Mail bestätigen und den Risiko-Hinweis akzeptieren.", "how_2_t": "PU Prime eröffnen", "how_2": "Über den IB-Link Kunde werden, Konto eröffnen, einzahlen und deine IDs im Portal hinterlegen.", "how_3_t": "Anteil erhalten", "how_3": "Der Netzwerk-Pool wird wöchentlich berechnet und samstags als Gutschrift ins Guthaben gebucht. Auszahlung in USDT (BEP20).", "levels_title": "Netzwerk-Pool — $ pro Lot", "faq_title": "Häufige Fragen", "faq_1_q": "Ist das eine Gewinnbeteiligung?", "faq_1_a": "Nein. Es werden Rebates aus dem Handelsvolumen (Lots) geteilt, nicht der Handelsgewinn oder -verlust.", "faq_2_q": "Wann werde ich berechtigt?", "faq_2_a": "Sobald du mindestens zwei direkte Partner in deinem Netzwerk hast. Dann sind alle 10 Ebenen freigeschaltet.", "faq_3_q": "Wie wird ausgezahlt?", "faq_3_a": "Gutschriften landen samstags auf deinem Portal-Guthaben. Die Auszahlung erfolgt in USDT auf BNB Smart Chain (BEP20). Den Tx-Hash findest du im Wallet, sobald die Überweisung erfolgt ist.", "faq_4_q": "Was passiert, wenn jemand in der Upline nicht berechtigt ist?", "faq_4_a": "Standardmäßig bleibt dieser Ebenen-Betrag im Haus-Anteil (Kevin). Optional kann der Admin die dynamische Kompression einschalten: Dann wandert der Betrag zur nächsten berechtigten Upline.", "risk_title": "Risiko-Hinweis", "risk_body": "CFDs und Hebelprodukte können zum Verlust der gesamten Einlage und darüber hinaus führen. Provisionen im Netzwerk-Pool werden ausschließlich aus dem Handelsvolumen (PU-Prime-Rebates) berechnet, nicht aus dem Handelsgewinn. Es gibt keine Renditezusage und keine Anlageberatung. Rebate-Share ist ein privates Provisionsmodell von Kevin; rechtliche und steuerliche Fragen klärst du selbst.", "guide_title": "Anleitung — von der Registrierung bis zur ersten Auszahlung", "guide_intro": "Schritt für Schritt: Portal-Konto, PU Prime, erste Gutschrift, Auszahlung in USDT.", "glossary": "Glossar", "gl_lot": "Lot: Handelsvolumen-Einheit. Die Provision wird in USD je Lot berechnet.", "gl_rebate": "Rebate: Rückvergütung von PU Prime auf das Handelsvolumen, Grundlage des Netzwerk-Pools.", "gl_level": "Ebene: Position in der Empfehlungskette (L1 = dein direkter Partner, L2 = Partner deines Partners, …).", "gl_usdt": "USDT BEP20: Tether auf der BNB Smart Chain. Auszahlungen nur auf eine 0x-Adresse in diesem Netzwerk.", "legal_terms": "Nutzungsbedingungen", "legal_privacy": "Datenschutz", "legal_risk": "Risiko-Hinweis", "anleitung": "Anleitung", "avg_per_lot": "Ø $ / Lot", "deal_history": "Geschäftshistorie (Lots)", "lot_page_hint": "Alle Lot-Gutschriften im Detail. Die wöchentliche Samstags-Summe findest du unter Gutschriften. Auszahlungen (on-chain) stehen im Wallet.", "you": "Du", "expand_all": "Alle aufklappen", "collapse_all": "Zusammenklappen", "zoom_reset": "Einpassen", "tree_hint": "Ziehen zum Verschieben, scrollen oder kneifen zum Zoomen. +/− am Knoten klappt Ebenen auf und zu.", "all_levels": "Alle", "credits_wallet": "Gutschriften & Wallet", "need_email": "Bitte eine gültige E-Mail angeben."}, "en": {"portal": "Rebate-Share", "tagline": "Weekly network pool", "test_banner": "TEST VERSION with example data. No real payouts. Commissions are calculated from trading volume (rebates), not from trading profits. No return promise.", "fine_print": "Commissions are calculated from trading volume (PU Prime rebates), not from trading profits. There is no return promise. The network pool is paid every Saturday in USDT.", "login": "Log in", "logout": "Log out", "register": "Sign up", "email": "Email", "password": "Password", "name": "Name", "confirm_password": "Confirm password", "no_account": "No account yet?", "have_account": "Already registered?", "login_failed": "Email or password is incorrect.", "email_taken": "This email is already registered.", "password_mismatch": "Passwords do not match.", "password_short": "Password must be at least 6 characters.", "referred_by": "Referred by", "dashboard": "Dashboard", "network": "Network", "commissions": "Pool", "statement": "Weekly statement", "withdrawals": "Withdrawals", "profile": "Profile", "admin": "Admin", "users": "Users", "tree": "Tree", "import_data": "Data import", "calculate": "Weekly run", "payouts": "Payouts", "settings": "Settings", "welcome": "Welcome", "commission_balance": "USDT balance", "pool_this_week": "Network pool this week", "pu_balance": "PU Prime balance", "pu_equity": "PU Prime equity", "lots": "Lots", "lots_period": "Lots (this week)", "rebate": "Rebate", "no_pu_data": "No PU Prime data for this account yet.", "ref_link": "Your referral link", "copy": "Copy", "copied": "Copied", "open_pu": "Register at PU Prime (IB link)", "enter_client_id": "Enter your PU Prime account or user ID in your profile so lots can be matched.", "direct_partners": "Direct partners", "eligible": "Eligible", "not_eligible": "Not eligible", "eligibility_hint": "Eligible once you have {partners} direct partners — all 10 levels are then unlocked. Ineligible or unused levels stay in the house residual (Kevin), unless dynamic compression is on.", "deposit": "Deposit", "example": "EXAMPLE", "recent_commissions": "Recent credits", "no_commissions": "No credits yet.", "level": "Level", "amount": "Amount", "period": "Week", "reason": "Reason", "trader": "Account", "reason_house": "House residual (rebate minus payouts)", "reason_level": "Network level", "reason_unused_level": "Unused level (in residual)", "reason_ineligible": "Upline not eligible (in residual)", "reason_compressed": "Compressed (passed to the next eligible upline)", "rate_per_lot": "$ per lot", "network_title": "Your network", "level_overview": "Level overview", "people": "People", "volume": "Volume (lots)", "no_downline": "No partners in your network yet.", "downline_tree": "Structure below you", "request_withdrawal": "Request USDT withdrawal", "available": "Available", "usdt_address": "USDT address", "network_chain": "Network", "trc20": "TRC20 (Tron)", "erc20": "ERC20 (Ethereum)", "request": "Request", "withdrawal_history": "Withdrawal history", "status": "Status", "pending": "Pending", "approved": "Approved", "paid": "Paid", "rejected": "Rejected", "min_withdrawal": "Minimum amount", "insufficient": "Insufficient balance.", "need_address": "Please add a USDT address and network in your profile first.", "withdrawal_ok": "Withdrawal requested. The pool is paid every Saturday.", "save": "Save", "saved": "Saved.", "client_id": "PU Prime account", "pu_user_id": "PU Prime user ID", "language": "Language", "profile_hint": "After registering at PU Prime with the IB link, enter your account and user ID here.", "admin_overview": "Admin overview", "all_users": "All users", "full_tree": "Full tree", "run_calc": "Calculate the network pool", "run_calc_hint": "Distributes the selected week's rebates at $ per lot. Re-running replaces that week's calculation. The optional safety cap scales payouts if they exceed the actual PU Prime rebate — OFF by default.", "run": "Calculate", "recalc": "Recalculate", "calc_done": "Run for {period}: {lines} entries, payouts {payouts} USDT, rebate {rebate} USDT, Kevin net {net} USDT.", "no_lots": "No mapped lots found for this week.", "csv_upload": "Upload CSV / XLSX", "csv_hint": "PU Prime exports: Rebate Report (account view), Funds Report, Account Report. Or CSV with pu_prime_client_id, period, lots, rebate, balance, equity.", "download_sample": "Sample CSV", "manual_entry": "Manual entry", "balance": "Balance", "equity": "Equity", "source": "Source", "imported_ok": "Import {kind}: {rows} rows, {matched} mapped, {unmapped} unmapped.", "snapshots": "Weekly figures", "payout_requests": "Payout requests", "approve": "Approve", "mark_paid": "Mark paid", "reject": "Reject", "ib_link": "PU Prime IB link", "min_deposit": "Deposit", "min_partners": "Min. direct partners", "level_rates": "Rates per level (USD / lot)", "cap_enabled": "Safety cap: limit per-account payouts to the actual PU Prime rebate", "cap_help": "OFF by default. When on, levels are scaled down proportionally if their total would exceed that account's rebate. Kevin always keeps rebate minus amounts paid out.", "ineligible_to_house": "Unused or ineligible levels stay in the house residual (Kevin)", "actions": "Actions", "login_as": "Open as user", "back_to_admin": "Back to admin", "partners": "Partners", "house": "House (Kevin)", "impersonating": "You are viewing the portal as", "no_withdrawals": "No requests.", "period_placeholder": "e.g. 2026-11-07", "invalid_amount": "Invalid amount.", "required": "Please fill in all required fields.", "footer": "Rebate-Share · Network pool · Not investment advice.", "admin_note": "Note", "date": "Date", "total_users": "Users", "pending_payouts": "Open payouts", "paid_out": "Paid out", "unmatched_clients": "Unmapped", "search": "Search", "calc_runs": "Previous runs", "lines": "Entries", "upload": "Import", "add": "Add", "select_user": "Select user", "network_lots": "Network lots (week)", "week_earnings": "This week", "paid_saturday": "Paid every Saturday in USDT", "warning_over_rebate": "Warning: network payouts exceed the actual PU Prime rebate. Kevin's net is negative.", "house_net": "Kevin net", "total_rebate": "PU Prime rebate", "total_payouts": "Network payouts", "cap_status": "Safety cap", "on": "ON", "off": "OFF", "statement_title": "Weekly statement", "statement_hint": "Compare with your own PU Prime trade history. Partners are anonymized (initials / last 3 digits of the account number).", "per_level": "By level", "per_partner": "By partner", "pct": "Share", "anonymized": "Anonymized", "pnl_approx": "Approximate P/L (info only)", "pnl_hint": "Equity change minus net deposits. For orientation only — not a basis for commissions.", "unmapped": "Unmapped accounts", "map_to": "Map to", "map": "Map", "import_folder": "Folder import (rebate + funds + accounts)", "folder_hint": "Upload the three PU Prime xlsx files for a week, or run weekly_run.py on the server.", "ticker_live": "Network this week", "mapped": "Mapped", "credits": "Credits", "credits_hint": "Weekly Saturday credits to your portal balance. These are not blockchain transfers — USDT (BEP20) withdrawals are in the Wallet.", "credits_empty": "No credits yet.", "per_level_short": "By level", "download_csv": "Download CSV", "all_periods": "All weeks", "income_mix": "Income mix", "wallet": "Wallet", "wallet_hint": "Withdrawals in USDT on BNB Smart Chain (BEP20) only. The transaction ID (tx hash) appears once Kevin marks the payout as paid.", "bep20": "BEP20 (BNB Smart Chain)", "bep20_only": "BEP20 only (USDT on BNB Smart Chain).", "invalid_address": "Please enter a valid BEP20 address (0x and 40 hex characters).", "invalid_tx": "Please enter a valid BEP20 transaction hash (0x and 64 hex characters).", "tx_hash": "Tx hash (BEP20)", "tx_required": "A BEP20 transaction hash is required to mark a payout as paid.", "view_on_bscscan": "View on BscScan", "onboarding": "PU Prime start", "onboarding_title": "Become a PU Prime client", "onboarding_hint": "Complete these steps once so lots and rebates can be matched.", "step_link": "Open the PU Prime link", "step_register": "Register at PU Prime", "step_kyc": "Verify your identity and address (ID / proof of address)", "step_account": "Open an account", "step_deposit": "Make a deposit", "step_ids": "Enter your PU Prime user ID and account number here", "step_verify": "Admin verification (via the import)", "mark_done": "Mark as done", "open_link": "Open link", "continue_dashboard": "Go to dashboard", "verify_pending": "Pending review", "verify_verified": "Verified", "show_name_to_upline": "Show my name to my upline", "show_name_help": "If off, your upline only sees your user ID, not your name. Admin always sees names.", "my_team": "My Team", "team_list": "List", "team_tree": "Tree", "active": "Active", "qualified": "Qualified", "inactive": "Inactive", "unqualified": "Not qualified", "compression": "Dynamic compression: skip an ineligible upline and pass that level's amount to the next eligible upline", "compression_help": "OFF by default. When on, an ineligible upline's level is not kept by the house (Kevin); it is paid to the next eligible person in the chain.", "pu_account_type": "PU Prime account type", "smtp_section": "Email (double opt-in / password reset)", "smtp_host": "SMTP host (empty = log the link to the console only)", "smtp_port": "SMTP port", "smtp_user": "SMTP user", "smtp_password": "SMTP password", "smtp_from": "From address", "smtp_tls": "Use TLS", "confirm_email": "Confirm email", "confirm_sent": "We sent you a confirmation link. Please check your inbox. (In this test setup without SMTP, the link is printed in the server console.)", "confirm_ok": "Email confirmed. You can log in now.", "confirm_bad": "This confirmation link is invalid or has expired.", "email_unverified": "Please confirm your email first. We can send the link again.", "resend_confirm": "Resend confirmation link", "forgot": "Forgot password", "forgot_hint": "We will send you a reset link.", "forgot_sent": "If an account exists for this email, a link was sent (without SMTP it is printed in the console).", "reset_password": "Set a new password", "reset_ok": "Password saved. Please log in.", "reset_bad": "This link is invalid or has expired.", "consent_terms": "I accept the terms of use", "consent_privacy": "I have read the privacy notice", "consent_risk": "I have read the risk notice (CFDs/leverage can lose more than your deposit; commissions come from volume, not profit; no return promise).", "need_consent": "Please accept all consents.", "need_ref": "No referral code — Kevin will be set as your referrer.", "ref_code": "Referral code", "hero_slogan": "Your share of the volume.", "hero_signal": "Paid every Saturday in USDT", "hero_sub": "Rebate-Share distributes the weekly network pool clearly and traceably — from traded lots, not from profit promises.", "cta_login": "Log in", "cta_register": "Sign up", "how_title": "How it works", "how_1_t": "Sign up", "how_1": "Register with a referral code, confirm your email and accept the risk notice.", "how_2_t": "Open PU Prime", "how_2": "Become a client via the IB link, open an account, deposit and enter your IDs in the portal.", "how_3_t": "Receive your share", "how_3": "The network pool is calculated weekly and credited to your balance on Saturday. Withdraw in USDT (BEP20).", "levels_title": "Network pool — $ per lot", "faq_title": "FAQ", "faq_1_q": "Is this a share of trading profits?", "faq_1_a": "No. Rebates from trading volume (lots) are shared, not trading profit or loss.", "faq_2_q": "When do I become eligible?", "faq_2_a": "Once you have at least two direct partners in your network. All 10 levels are then unlocked.", "faq_3_q": "How do payouts work?", "faq_3_a": "Credits hit your portal balance on Saturday. Withdrawals are USDT on BNB Smart Chain (BEP20). The tx hash appears in the Wallet once the transfer is sent.", "faq_4_q": "What if someone in my upline is not eligible?", "faq_4_a": "By default that level stays in the house residual (Kevin). The admin can optionally turn on dynamic compression, which passes the amount to the next eligible upline.", "risk_title": "Risk notice", "risk_body": "CFDs and leveraged products can result in the loss of your entire deposit and more. Network-pool commissions are calculated only from trading volume (PU Prime rebates), not from trading profit. There is no return promise and no investment advice. Rebate-Share is Kevin's private commission model; legal and tax questions are yours to check.", "guide_title": "Guide — from sign-up to your first withdrawal", "guide_intro": "Step by step: portal account, PU Prime, first credit, USDT withdrawal.", "glossary": "Glossary", "gl_lot": "Lot: unit of trading volume. Commission is calculated in USD per lot.", "gl_rebate": "Rebate: PU Prime's volume refund, the basis of the network pool.", "gl_level": "Level: position in the referral chain (L1 = your direct partner, L2 = their partner, …).", "gl_usdt": "USDT BEP20: Tether on BNB Smart Chain. Withdrawals only to a 0x address on this network.", "legal_terms": "Terms of use", "legal_privacy": "Privacy", "legal_risk": "Risk notice", "anleitung": "Guide", "avg_per_lot": "Avg $ / lot", "deal_history": "Deal history (lots)", "lot_page_hint": "Every lot credit in detail. Weekly Saturday totals are under Credits. On-chain withdrawals are in the Wallet.", "you": "You", "expand_all": "Expand all", "collapse_all": "Collapse", "zoom_reset": "Fit", "tree_hint": "Drag to move, scroll or pinch to zoom. Use +/− on a node to expand or collapse levels.", "all_levels": "All", "credits_wallet": "Credits & Wallet", "need_email": "Please enter a valid email."}};
+window.T3_I18N = {"de": {"portal": "Rebate-Share", "tagline": "Wöchentlicher Netzwerk-Pool", "test_banner": "TESTVERSION mit Beispieldaten. Keine echten Auszahlungen. Provisionen stammen aus Handelsvolumen (Rebates), nicht aus Handelsgewinnen. Keine Renditezusage.", "fine_print": "Provisionen werden aus dem Handelsvolumen (PU-Prime-Rebates) berechnet, nicht aus Handelsgewinnen. Es gibt keine Renditezusage. Auszahlung des Netzwerk-Pools jeweils samstags in USDT.", "login": "Anmelden", "logout": "Abmelden", "register": "Registrieren", "email": "E-Mail", "password": "Passwort", "name": "Name", "confirm_password": "Passwort bestätigen", "no_account": "Noch kein Konto?", "have_account": "Schon registriert?", "login_failed": "E-Mail oder Passwort ist falsch.", "email_taken": "Diese E-Mail ist bereits registriert.", "password_mismatch": "Passwörter stimmen nicht überein.", "password_short": "Passwort muss mindestens 6 Zeichen haben.", "referred_by": "Geworben von", "dashboard": "Dashboard", "network": "Netzwerk", "commissions": "Pool", "statement": "Wochenausweis", "withdrawals": "Auszahlungen", "profile": "Profil", "admin": "Admin", "users": "Nutzer", "tree": "Struktur", "import_data": "Datenimport", "calculate": "Wochenlauf", "payouts": "Auszahlungen", "settings": "Einstellungen", "welcome": "Willkommen", "commission_balance": "USDT-Guthaben", "pool_this_week": "Netzwerk-Pool diese Woche", "pu_balance": "PU Prime Guthaben", "pu_equity": "PU Prime Equity", "lots": "Lots", "lots_period": "Lots (diese Woche)", "rebate": "Rebate", "no_pu_data": "Noch keine PU-Prime-Daten für dieses Konto.", "ref_link": "Dein Empfehlungslink", "copy": "Kopieren", "copied": "Kopiert", "open_pu": "Bei PU Prime registrieren (IB-Link)", "enter_client_id": "Trage deine PU-Prime-Client-ID oder User-ID im Profil ein, damit Lots zugeordnet werden können.", "direct_partners": "Direkte Partner", "eligible": "Berechtigt", "not_eligible": "Nicht berechtigt", "eligibility_hint": "Berechtigt ab {partners} direkten Partnern — dann sind alle 10 Ebenen freigeschaltet. Nicht berechtigte oder ungenutzte Stufen bleiben im Haus-Anteil (Kevin), außer die dynamische Kompression ist aktiv.", "deposit": "Einzahlung", "example": "BEISPIEL", "recent_commissions": "Letzte Gutschriften", "no_commissions": "Noch keine Gutschriften.", "level": "Ebene", "amount": "Betrag", "period": "Woche", "reason": "Grund", "trader": "Konto", "reason_house": "Haus-Residual (Rebate minus Auszahlungen)", "reason_level": "Netzwerk-Ebene", "reason_unused_level": "Ungenutzte Ebene (im Residual)", "reason_ineligible": "Upline nicht berechtigt (im Residual)", "reason_compressed": "Komprimiert (an nächste berechtigte Upline)", "rate_per_lot": "$ pro Lot", "network_title": "Dein Netzwerk", "level_overview": "Ebenen-Übersicht", "people": "Personen", "volume": "Volumen (Lots)", "no_downline": "Noch keine Partner in deinem Netzwerk.", "downline_tree": "Struktur unter dir", "request_withdrawal": "USDT-Auszahlung anfordern", "available": "Verfügbar", "usdt_address": "USDT-Adresse", "network_chain": "Netzwerk", "trc20": "TRC20 (Tron)", "erc20": "ERC20 (Ethereum)", "request": "Anfordern", "withdrawal_history": "Auszahlungshistorie", "status": "Status", "pending": "Ausstehend", "approved": "Freigegeben", "paid": "Ausgezahlt", "rejected": "Abgelehnt", "min_withdrawal": "Mindestbetrag", "insufficient": "Nicht genug Guthaben.", "need_address": "Bitte zuerst USDT-Adresse und Netzwerk im Profil hinterlegen.", "withdrawal_ok": "Auszahlung wurde angefordert. Auszahlung des Pools jeweils samstags.", "save": "Speichern", "saved": "Gespeichert.", "client_id": "PU-Prime-Account", "pu_user_id": "PU-Prime-User-ID", "language": "Sprache", "profile_hint": "Nach der Registrierung bei PU Prime über den IB-Link trägst du hier Account- und User-ID ein.", "admin_overview": "Admin-Übersicht", "all_users": "Alle Nutzer", "full_tree": "Gesamte Struktur", "run_calc": "Netzwerk-Pool berechnen", "run_calc_hint": "Verteilt die Rebates der gewählten Woche nach $ pro Lot. Ein erneuter Lauf ersetzt die vorherige Berechnung dieser Woche. Der Sicherheitsdeckel (optional) skaliert Auszahlungen, falls sie den tatsächlichen PU-Prime-Rebate übersteigen — standardmäßig AUS.", "run": "Berechnen", "recalc": "Erneut berechnen", "calc_done": "Lauf für {period}: {lines} Buchungen, Auszahlungen {payouts} USDT, Rebate {rebate} USDT, Kevin netto {net} USDT.", "no_lots": "Keine zugeordneten Lots für diese Woche gefunden.", "csv_upload": "CSV / XLSX hochladen", "csv_hint": "PU-Prime-Exporte: Rebate Report (Account-Ansicht), Funds Report, Account Report. Oder CSV mit pu_prime_client_id, period, lots, rebate, balance, equity.", "download_sample": "Beispiel-CSV", "manual_entry": "Manuelle Eingabe", "balance": "Kontostand", "equity": "Equity", "source": "Quelle", "imported_ok": "Import {kind}: {rows} Zeilen, {matched} zugeordnet, {unmapped} offen.", "snapshots": "Wochenwerte", "payout_requests": "Auszahlungsanträge", "approve": "Freigeben", "mark_paid": "Als ausgezahlt markieren", "reject": "Ablehnen", "ib_link": "PU-Prime-IB-Link", "min_deposit": "Einzahlung", "min_partners": "Min. direkte Partner", "level_rates": "Sätze je Ebene (USD / Lot)", "cap_enabled": "Sicherheitsdeckel: Auszahlungen je Konto auf den tatsächlichen PU-Prime-Rebate begrenzen", "cap_help": "Standardmäßig AUS. Wenn aktiv, werden die Ebenen proportional gekürzt, sobald die Summe den Rebate dieses Kontos übersteigt. Kevin behält jeweils Rebate minus ausgezahlte Beträge.", "ineligible_to_house": "Nicht berechtigte oder ungenutzte Ebenen bleiben im Haus-Anteil (Kevin)", "actions": "Aktionen", "login_as": "Als Nutzer öffnen", "back_to_admin": "Zurück zum Admin", "partners": "Partner", "house": "Haus (Kevin)", "impersonating": "Du siehst das Portal als", "no_withdrawals": "Keine Anträge.", "period_placeholder": "z. B. 2026-11-07", "invalid_amount": "Ungültiger Betrag.", "required": "Bitte alle Pflichtfelder ausfüllen.", "footer": "Rebate-Share · Netzwerk-Pool · Keine Anlageberatung.", "admin_note": "Notiz", "date": "Datum", "total_users": "Nutzer", "pending_payouts": "Offene Auszahlungen", "paid_out": "Ausgezahlt", "unmatched_clients": "Nicht zugeordnet", "search": "Suchen", "calc_runs": "Bisherige Läufe", "lines": "Buchungen", "upload": "Importieren", "add": "Hinzufügen", "select_user": "Nutzer wählen", "network_lots": "Netzwerk-Lots (Woche)", "week_earnings": "Diese Woche", "paid_saturday": "Auszahlung samstags in USDT", "warning_over_rebate": "Achtung: Netzwerk-Auszahlungen übersteigen den tatsächlichen PU-Prime-Rebate. Kevins Netto ist negativ.", "house_net": "Kevin netto", "total_rebate": "PU-Prime-Rebate", "total_payouts": "Netzwerk-Auszahlungen", "cap_status": "Sicherheitsdeckel", "on": "AN", "off": "AUS", "statement_title": "Wochenausweis", "statement_hint": "Vergleichbar mit deiner eigenen PU-Prime-Handelshistorie. Partner sind anonymisiert (Initialen / letzte 3 Stellen der Account-Nummer).", "per_level": "Nach Ebene", "per_partner": "Nach Partner", "pct": "Anteil", "anonymized": "Anonymisiert", "pnl_approx": "Ungefähres P/L (nur Info)", "pnl_hint": "Equity-Veränderung minus Netto-Einzahlungen. Nur Orientierung, keine Provisionsgrundlage.", "unmapped": "Nicht zugeordnet", "map_to": "Zuordnen zu", "map": "Zuordnen", "import_folder": "Ordner-Import (Rebate + Funds + Accounts)", "folder_hint": "Wähle die drei PU-Prime-xlsx-Dateien einer Woche, oder nutze weekly_run.py auf dem Server.", "ticker_live": "Netzwerk diese Woche", "mapped": "Zugeordnet", "credits": "Gutschriften", "credits_hint": "Wöchentliche Samstags-Gutschriften auf dein Portal-Guthaben. Keine Blockchain-Transaktionen — Auszahlungen in USDT (BEP20) findest du unter Wallet.", "credits_empty": "Noch keine Gutschriften.", "per_level_short": "Nach Ebene", "download_csv": "CSV herunterladen", "all_periods": "Alle Wochen", "income_mix": "Zusammensetzung", "wallet": "Wallet", "wallet_hint": "Auszahlungen nur in USDT auf BNB Smart Chain (BEP20). Jede Auszahlung erfordert den E-Mail-Code und den 2FA-Code. Die Transaktions-ID erscheint, sobald die Auszahlung gesendet wurde.", "bep20": "BEP20 (BNB Smart Chain)", "bep20_only": "Nur BEP20 (USDT auf BNB Smart Chain).", "invalid_address": "Bitte eine gültige BEP20-Adresse eingeben (0x und 40 Hex-Zeichen).", "invalid_tx": "Bitte einen gültigen BEP20-Transaktions-Hash eingeben (0x und 64 Hex-Zeichen).", "tx_hash": "Tx-Hash (BEP20)", "tx_required": "Zum Markieren als ausgezahlt ist ein BEP20-Transaktions-Hash nötig.", "view_on_bscscan": "Auf BscScan öffnen", "onboarding": "PU-Prime-Start", "onboarding_title": "So wirst du PU-Prime-Kunde", "onboarding_hint": "Diese Schritte sind einmalig. Danach können Lots und Rebates zugeordnet werden.", "step_link": "PU-Prime-Link öffnen", "step_register": "Bei PU Prime registrieren", "step_kyc": "Identität und Wohnsitz nachweisen (ID / Proof of Address)", "step_account": "Konto eröffnen", "step_deposit": "Einzahlung tätigen", "step_ids": "PU-Prime-User-ID und Kontonummer hier eintragen", "step_verify": "Freigabe durch den Admin (über den Import)", "mark_done": "Als erledigt markieren", "open_link": "Link öffnen", "continue_dashboard": "Zum Dashboard", "verify_pending": "Prüfung ausstehend", "verify_verified": "Freigegeben", "show_name_to_upline": "Meinen Namen der Upline zeigen", "show_name_help": "Wenn aus, sieht deine Upline nur deine User-ID, nicht deinen Namen. Admin sieht immer den Namen.", "my_team": "Mein Team", "team_list": "Liste", "team_tree": "Struktur", "active": "Aktiv", "qualified": "Qualifiziert", "inactive": "Inaktiv", "unqualified": "Nicht qualifiziert", "compression": "Dynamische Kompression: nicht berechtigte Upline überspringen, Betrag an die nächste berechtigte Upline", "compression_help": "Standardmäßig AUS. Wenn aktiv, wird die Ebene einer nicht berechtigten Upline nicht an Kevin (Haus) gezahlt, sondern an die nächste berechtigte Person in der Kette weitergereicht.", "pu_account_type": "PU-Prime-Kontotyp", "smtp_section": "E-Mail (Double-Opt-in / Passwort)", "smtp_host": "SMTP-Host (leer = Link nur in der Konsole)", "smtp_port": "SMTP-Port", "smtp_user": "SMTP-Benutzer", "smtp_password": "SMTP-Passwort", "smtp_from": "Absenderadresse", "smtp_tls": "TLS verwenden", "confirm_email": "E-Mail bestätigen", "confirm_sent": "Wir haben dir einen Bestätigungslink geschickt. Bitte prüfe dein Postfach. (Im Test ohne SMTP steht der Link in der Server-Konsole.)", "confirm_ok": "E-Mail bestätigt. Du kannst dich jetzt anmelden.", "confirm_bad": "Dieser Bestätigungslink ist ungültig oder abgelaufen.", "email_unverified": "Bitte zuerst deine E-Mail bestätigen. Wir können den Link erneut senden.", "resend_confirm": "Bestätigungslink erneut senden", "forgot": "Passwort vergessen", "forgot_hint": "Wir senden dir einen Link zum Zurücksetzen.", "forgot_sent": "Falls ein Konto mit dieser E-Mail existiert, wurde ein Link verschickt (ohne SMTP steht er in der Konsole).", "reset_password": "Neues Passwort setzen", "reset_ok": "Passwort gespeichert. Bitte anmelden.", "reset_bad": "Dieser Link ist ungültig oder abgelaufen.", "consent_terms": "Ich akzeptiere die Nutzungsbedingungen", "consent_privacy": "Ich habe die Datenschutzerklärung gelesen", "consent_risk": "Ich habe den Risiko-Hinweis gelesen (CFDs/Hebel können zu Verlusten über die Einlage hinaus führen; Provisionen stammen aus Volumen, nicht aus Gewinn; keine Renditezusage).", "need_consent": "Bitte bestätige alle Einwilligungen.", "need_ref": "Empfehlungscode fehlt — Kevin wird als Empfehlender gesetzt.", "ref_code": "Empfehlungscode", "hero_slogan": "Dein Anteil am Volumen.", "hero_signal": "Jeden Samstag in USDT", "hero_sub": "Rebate-Share verteilt den wöchentlichen Netzwerk-Pool klar und nachvollziehbar — aus gehandelten Lots, nicht aus Gewinnversprechen.", "cta_login": "Login", "cta_register": "Registrieren", "how_title": "So funktioniert’s", "how_1_t": "Registrieren", "how_1": "Mit Empfehlungscode anmelden, E-Mail bestätigen und den Risiko-Hinweis akzeptieren.", "how_2_t": "PU Prime eröffnen", "how_2": "Über den IB-Link Kunde werden, Konto eröffnen, einzahlen und deine IDs im Portal hinterlegen.", "how_3_t": "Anteil erhalten", "how_3": "Der Netzwerk-Pool wird wöchentlich berechnet und samstags als Gutschrift ins Guthaben gebucht. Auszahlung in USDT (BEP20).", "levels_title": "Netzwerk-Pool — $ pro Lot", "faq_title": "Häufige Fragen", "faq_1_q": "Ist das eine Gewinnbeteiligung?", "faq_1_a": "Nein. Es werden Rebates aus dem Handelsvolumen (Lots) geteilt, nicht der Handelsgewinn oder -verlust.", "faq_2_q": "Wann werde ich berechtigt?", "faq_2_a": "Sobald du mindestens zwei direkte Partner in deinem Netzwerk hast. Dann sind alle 10 Ebenen freigeschaltet.", "faq_3_q": "Wie wird ausgezahlt?", "faq_3_a": "Gutschriften landen samstags auf deinem Portal-Guthaben. Die Auszahlung erfolgt in USDT auf BNB Smart Chain (BEP20). Den Tx-Hash findest du im Wallet, sobald die Überweisung erfolgt ist.", "faq_4_q": "Was passiert, wenn jemand in der Upline nicht berechtigt ist?", "faq_4_a": "Standardmäßig bleibt dieser Ebenen-Betrag im Haus-Anteil (Kevin). Optional kann der Admin die dynamische Kompression einschalten: Dann wandert der Betrag zur nächsten berechtigten Upline.", "risk_title": "Risiko-Hinweis", "risk_body": "CFDs und Hebelprodukte können zum Verlust der gesamten Einlage und darüber hinaus führen. Provisionen im Netzwerk-Pool werden ausschließlich aus dem Handelsvolumen (PU-Prime-Rebates) berechnet, nicht aus dem Handelsgewinn. Es gibt keine Renditezusage und keine Anlageberatung. Rebate-Share ist ein privates Provisionsmodell von Kevin; rechtliche und steuerliche Fragen klärst du selbst.", "guide_title": "Anleitung — von der Registrierung bis zur ersten Auszahlung", "guide_intro": "Schritt für Schritt: Portal-Konto, PU Prime, erste Gutschrift, Auszahlung in USDT.", "glossary": "Glossar", "gl_lot": "Lot: Handelsvolumen-Einheit. Die Provision wird in USD je Lot berechnet.", "gl_rebate": "Rebate: Rückvergütung von PU Prime auf das Handelsvolumen, Grundlage des Netzwerk-Pools.", "gl_level": "Ebene: Position in der Empfehlungskette (L1 = dein direkter Partner, L2 = Partner deines Partners, …).", "gl_usdt": "USDT BEP20: Tether auf der BNB Smart Chain. Auszahlungen nur auf eine 0x-Adresse in diesem Netzwerk.", "legal_terms": "Nutzungsbedingungen", "legal_privacy": "Datenschutz", "legal_risk": "Risiko-Hinweis", "anleitung": "Anleitung", "avg_per_lot": "Ø $ / Lot", "deal_history": "Geschäftshistorie (Lots)", "lot_page_hint": "Alle Lot-Gutschriften im Detail. Die wöchentliche Samstags-Summe findest du unter Gutschriften. Auszahlungen (on-chain) stehen im Wallet.", "you": "Du", "expand_all": "Alle aufklappen", "collapse_all": "Zusammenklappen", "zoom_reset": "Einpassen", "tree_hint": "Ziehen zum Verschieben, scrollen oder kneifen zum Zoomen. +/− am Knoten klappt Ebenen auf und zu.", "all_levels": "Alle", "credits_wallet": "Gutschriften & Wallet", "need_email": "Bitte eine gültige E-Mail angeben.", "requested": "Beantragt", "sent": "Gesendet", "failed": "Fehlgeschlagen", "twofa": "2FA", "twofa_setup": "2FA einrichten", "twofa_required": "2FA ist für Admins Pflicht.", "twofa_code": "Authenticator-Code", "email_code": "E-Mail-Code", "send_email_code": "Code per E-Mail senden", "email_code_sent": "Ein 6-stelliger Code wurde an deine E-Mail gesendet (10 Minuten gültig, nur einmal nutzbar).", "otp_rate": "Bitte warte, bevor du einen neuen Code anforderst.", "otp_invalid": "E-Mail-Code oder 2FA-Code ist ungültig.", "need_twofa": "Bitte zuerst 2FA einrichten.", "recovery_codes": "Wiederherstellungscodes", "recovery_hint": "Diese Codes sicher aufbewahren. Jeder gilt nur einmal.", "enable_2fa": "2FA aktivieren", "scan_qr": "QR-Code mit einer Authenticator-App scannen.", "totp_secret_manual": "Oder Schlüssel manuell eingeben", "confirm_code": "Code bestätigen", "recovery_code": "Wiederherstellungscode", "twofa_ok": "2FA ist aktiv.", "twofa_mandatory": "Für Admin-Konten ist 2FA Pflicht.", "login_2fa": "2FA-Bestätigung", "locked_out": "Zu viele Fehlversuche. Bitte später erneut versuchen.", "address_cooldown": "Neue Wallet-Adresse ist erst nach {hours} Stunden freigeschaltet.", "security_cooldown": "Nach einer Passwort- oder 2FA-Änderung sind Auszahlungen {hours} Stunden lang gesperrt.", "daily_limit": "Tageslimit für Auszahlungen erreicht.", "whitelist_only": "Auszahlungen nur an die hinterlegte, freigeschaltete BEP20-Adresse.", "approve_all": "Alle freigeben", "payout_provider": "Auszahlungs-Provider", "payout_dry_run": "TEST / Dry-Run — keine echte USDT-Überweisung.", "auto_approve": "Automatisch freigeben", "auto_approve_help": "Optional, standardmäßig AUS. Unter X USDT für verifizierte Nutzer mit freigeschalteter Adresse.", "auto_approve_max": "Limit für Auto-Freigabe (USDT)", "address_cooldown_hours": "Wartezeit nach Adresswechsel (Stunden)", "max_withdrawal_per_day": "Max. Auszahlung pro Tag (USDT)", "security_cooldown_hours": "Wartezeit nach Passwort/2FA (Stunden)", "admin_ip_allowlist": "Admin-IP-Freigabeliste (leer = aus)", "mapping": "Zuordnung", "assign": "Zuordnen", "duplicate_id": "Diese Client-ID ist bereits einem anderen Konto zugeordnet.", "help": "Hilfe", "help_title": "Hilfe & Support", "faq_search": "FAQ durchsuchen", "explainer_videos": "Kurze Erklärvideos", "video_placeholder": "Video folgt in Kürze.", "support_contact": "Support kontaktieren", "support_sent": "Nachricht wurde gespeichert. Wir melden uns.", "support_messages": "Support-Nachrichten", "support_body": "Nachricht", "onboarding_progress": "Einrichtung", "steps_of": "{done} von {total} Schritten", "step_pu_account": "PU-Prime-Konto", "step_client_id": "Client-ID hinterlegt", "step_twofa": "2FA aktiv", "step_wallet": "Wallet-Adresse gespeichert", "step_partners": "2 direkte Partner", "next_step": "Nächster Schritt", "partners_needed": "Noch {n} Partner bis zur Freischaltung", "partners_unlocked": "Alle 10 Ebenen sind freigeschaltet.", "calc_title": "Beispiel-Rechner", "calc_hint": "Schätzung auf Basis des 13-$-pro-Lot-Modells. Keine Zusage, nur ein Beispiel.", "calc_lots": "Lots im Team je Ebene", "calc_result": "Geschätzte Wochen-Gutschrift", "share_ref": "Empfehlungslink teilen", "share_whatsapp": "Per WhatsApp teilen", "share_telegram": "Per Telegram teilen", "share_texts": "Fertige Teilen-Texte", "share_images": "Teilen-Grafiken", "share_text_1": "Ich nutze Rebate-Share — wöchentlicher Netzwerk-Pool aus PU-Prime-Rebates, Auszahlung samstags in USDT. Hier ist mein Link: {url}", "share_text_2": "Mit meinem Link bei PU Prime registrieren und im Rebate-Share-Portal durchstarten: {url}", "download_card": "Karte herunterladen", "qr_code": "QR-Code", "security_page": "Sicherheit", "payouts_queue": "Auszahlungs-Warteschlange", "wd_need_codes": "Jede Auszahlung braucht den 6-stelligen E-Mail-Code und deinen Authenticator-Code.", "my_landing": "Meine Landingpage", "partner_cta": "Jetzt starten", "partner_hero_sub": "Wöchentlicher Netzwerk-Pool aus PU-Prime-Rebates — Auszahlung samstags in USDT.", "partner_how": "So funktioniert’s", "partner_how_1": "Über den Button startest du die Registrierung mit diesem Empfehlungslink.", "partner_how_2": "Eröffne dein PU-Prime-Konto über den IB-Link und hinterlege deine Client-ID.", "partner_how_3": "Berechtigt ab 2 direkten Partnern — dann sind alle 10 Ebenen freigeschaltet.", "partner_risk": "Vergangene Ergebnisse sind keine Garantie für die Zukunft. Der Handel mit CFDs und Hebelprodukten kann zum Totalverlust führen. Provisionen kommen aus dem Handelsvolumen (Rebates), nicht aus Handelsgewinnen. Es gibt keine Renditezusage.", "partner_video": "Vorstellung", "partner_perf": "Verifizierte Performance (Myfxbook)", "myfxbook_placeholder": "Myfxbook-Link folgt, sobald hinterlegt.", "open_myfxbook": "Auf Myfxbook ansehen", "myfxbook_strategy": "Gold Evolution by Robot FX", "myfxbook_live": "Live-Auswertung auf Myfxbook — keine fest hinterlegten Kennzahlen.", "landing_video_url": "Landingpage-Video (global, YouTube/Vimeo-URL)", "myfxbook_url": "Myfxbook-URL (global)", "video_override": "Video-URL (nur dieser Partner)", "invited_by": "Eingeladen von"}, "en": {"portal": "Rebate-Share", "tagline": "Weekly network pool", "test_banner": "TEST VERSION with example data. No real payouts. Commissions are calculated from trading volume (rebates), not from trading profits. No return promise.", "fine_print": "Commissions are calculated from trading volume (PU Prime rebates), not from trading profits. There is no return promise. The network pool is paid every Saturday in USDT.", "login": "Log in", "logout": "Log out", "register": "Sign up", "email": "Email", "password": "Password", "name": "Name", "confirm_password": "Confirm password", "no_account": "No account yet?", "have_account": "Already registered?", "login_failed": "Email or password is incorrect.", "email_taken": "This email is already registered.", "password_mismatch": "Passwords do not match.", "password_short": "Password must be at least 6 characters.", "referred_by": "Referred by", "dashboard": "Dashboard", "network": "Network", "commissions": "Pool", "statement": "Weekly statement", "withdrawals": "Withdrawals", "profile": "Profile", "admin": "Admin", "users": "Users", "tree": "Tree", "import_data": "Data import", "calculate": "Weekly run", "payouts": "Payouts", "settings": "Settings", "welcome": "Welcome", "commission_balance": "USDT balance", "pool_this_week": "Network pool this week", "pu_balance": "PU Prime balance", "pu_equity": "PU Prime equity", "lots": "Lots", "lots_period": "Lots (this week)", "rebate": "Rebate", "no_pu_data": "No PU Prime data for this account yet.", "ref_link": "Your referral link", "copy": "Copy", "copied": "Copied", "open_pu": "Register at PU Prime (IB link)", "enter_client_id": "Enter your PU Prime account or user ID in your profile so lots can be matched.", "direct_partners": "Direct partners", "eligible": "Eligible", "not_eligible": "Not eligible", "eligibility_hint": "Eligible once you have {partners} direct partners — all 10 levels are then unlocked. Ineligible or unused levels stay in the house residual (Kevin), unless dynamic compression is on.", "deposit": "Deposit", "example": "EXAMPLE", "recent_commissions": "Recent credits", "no_commissions": "No credits yet.", "level": "Level", "amount": "Amount", "period": "Week", "reason": "Reason", "trader": "Account", "reason_house": "House residual (rebate minus payouts)", "reason_level": "Network level", "reason_unused_level": "Unused level (in residual)", "reason_ineligible": "Upline not eligible (in residual)", "reason_compressed": "Compressed (passed to the next eligible upline)", "rate_per_lot": "$ per lot", "network_title": "Your network", "level_overview": "Level overview", "people": "People", "volume": "Volume (lots)", "no_downline": "No partners in your network yet.", "downline_tree": "Structure below you", "request_withdrawal": "Request USDT withdrawal", "available": "Available", "usdt_address": "USDT address", "network_chain": "Network", "trc20": "TRC20 (Tron)", "erc20": "ERC20 (Ethereum)", "request": "Request", "withdrawal_history": "Withdrawal history", "status": "Status", "pending": "Pending", "approved": "Approved", "paid": "Paid", "rejected": "Rejected", "min_withdrawal": "Minimum amount", "insufficient": "Insufficient balance.", "need_address": "Please add a USDT address and network in your profile first.", "withdrawal_ok": "Withdrawal requested. The pool is paid every Saturday.", "save": "Save", "saved": "Saved.", "client_id": "PU Prime account", "pu_user_id": "PU Prime user ID", "language": "Language", "profile_hint": "After registering at PU Prime with the IB link, enter your account and user ID here.", "admin_overview": "Admin overview", "all_users": "All users", "full_tree": "Full tree", "run_calc": "Calculate the network pool", "run_calc_hint": "Distributes the selected week's rebates at $ per lot. Re-running replaces that week's calculation. The optional safety cap scales payouts if they exceed the actual PU Prime rebate — OFF by default.", "run": "Calculate", "recalc": "Recalculate", "calc_done": "Run for {period}: {lines} entries, payouts {payouts} USDT, rebate {rebate} USDT, Kevin net {net} USDT.", "no_lots": "No mapped lots found for this week.", "csv_upload": "Upload CSV / XLSX", "csv_hint": "PU Prime exports: Rebate Report (account view), Funds Report, Account Report. Or CSV with pu_prime_client_id, period, lots, rebate, balance, equity.", "download_sample": "Sample CSV", "manual_entry": "Manual entry", "balance": "Balance", "equity": "Equity", "source": "Source", "imported_ok": "Import {kind}: {rows} rows, {matched} mapped, {unmapped} unmapped.", "snapshots": "Weekly figures", "payout_requests": "Payout requests", "approve": "Approve", "mark_paid": "Mark paid", "reject": "Reject", "ib_link": "PU Prime IB link", "min_deposit": "Deposit", "min_partners": "Min. direct partners", "level_rates": "Rates per level (USD / lot)", "cap_enabled": "Safety cap: limit per-account payouts to the actual PU Prime rebate", "cap_help": "OFF by default. When on, levels are scaled down proportionally if their total would exceed that account's rebate. Kevin always keeps rebate minus amounts paid out.", "ineligible_to_house": "Unused or ineligible levels stay in the house residual (Kevin)", "actions": "Actions", "login_as": "Open as user", "back_to_admin": "Back to admin", "partners": "Partners", "house": "House (Kevin)", "impersonating": "You are viewing the portal as", "no_withdrawals": "No requests.", "period_placeholder": "e.g. 2026-11-07", "invalid_amount": "Invalid amount.", "required": "Please fill in all required fields.", "footer": "Rebate-Share · Network pool · Not investment advice.", "admin_note": "Note", "date": "Date", "total_users": "Users", "pending_payouts": "Open payouts", "paid_out": "Paid out", "unmatched_clients": "Unmapped", "search": "Search", "calc_runs": "Previous runs", "lines": "Entries", "upload": "Import", "add": "Add", "select_user": "Select user", "network_lots": "Network lots (week)", "week_earnings": "This week", "paid_saturday": "Paid every Saturday in USDT", "warning_over_rebate": "Warning: network payouts exceed the actual PU Prime rebate. Kevin's net is negative.", "house_net": "Kevin net", "total_rebate": "PU Prime rebate", "total_payouts": "Network payouts", "cap_status": "Safety cap", "on": "ON", "off": "OFF", "statement_title": "Weekly statement", "statement_hint": "Compare with your own PU Prime trade history. Partners are anonymized (initials / last 3 digits of the account number).", "per_level": "By level", "per_partner": "By partner", "pct": "Share", "anonymized": "Anonymized", "pnl_approx": "Approximate P/L (info only)", "pnl_hint": "Equity change minus net deposits. For orientation only — not a basis for commissions.", "unmapped": "Unmapped", "map_to": "Map to", "map": "Map", "import_folder": "Folder import (rebate + funds + accounts)", "folder_hint": "Upload the three PU Prime xlsx files for a week, or run weekly_run.py on the server.", "ticker_live": "Network this week", "mapped": "Mapped", "credits": "Credits", "credits_hint": "Weekly Saturday credits to your portal balance. These are not blockchain transfers — USDT (BEP20) withdrawals are in the Wallet.", "credits_empty": "No credits yet.", "per_level_short": "By level", "download_csv": "Download CSV", "all_periods": "All weeks", "income_mix": "Income mix", "wallet": "Wallet", "wallet_hint": "Withdrawals in USDT on BNB Smart Chain (BEP20) only. Every withdrawal needs the email code and the 2FA code. The tx hash appears once the payout is sent.", "bep20": "BEP20 (BNB Smart Chain)", "bep20_only": "BEP20 only (USDT on BNB Smart Chain).", "invalid_address": "Please enter a valid BEP20 address (0x and 40 hex characters).", "invalid_tx": "Please enter a valid BEP20 transaction hash (0x and 64 hex characters).", "tx_hash": "Tx hash (BEP20)", "tx_required": "A BEP20 transaction hash is required to mark a payout as paid.", "view_on_bscscan": "View on BscScan", "onboarding": "PU Prime start", "onboarding_title": "Become a PU Prime client", "onboarding_hint": "Complete these steps once so lots and rebates can be matched.", "step_link": "Open the PU Prime link", "step_register": "Register at PU Prime", "step_kyc": "Verify your identity and address (ID / proof of address)", "step_account": "Open an account", "step_deposit": "Make a deposit", "step_ids": "Enter your PU Prime user ID and account number here", "step_verify": "Admin verification (via the import)", "mark_done": "Mark as done", "open_link": "Open link", "continue_dashboard": "Go to dashboard", "verify_pending": "Pending review", "verify_verified": "Verified", "show_name_to_upline": "Show my name to my upline", "show_name_help": "If off, your upline only sees your user ID, not your name. Admin always sees names.", "my_team": "My Team", "team_list": "List", "team_tree": "Tree", "active": "Active", "qualified": "Qualified", "inactive": "Inactive", "unqualified": "Not qualified", "compression": "Dynamic compression: skip an ineligible upline and pass that level's amount to the next eligible upline", "compression_help": "OFF by default. When on, an ineligible upline's level is not kept by the house (Kevin); it is paid to the next eligible person in the chain.", "pu_account_type": "PU Prime account type", "smtp_section": "Email (double opt-in / password reset)", "smtp_host": "SMTP host (empty = log the link to the console only)", "smtp_port": "SMTP port", "smtp_user": "SMTP user", "smtp_password": "SMTP password", "smtp_from": "From address", "smtp_tls": "Use TLS", "confirm_email": "Confirm email", "confirm_sent": "We sent you a confirmation link. Please check your inbox. (In this test setup without SMTP, the link is printed in the server console.)", "confirm_ok": "Email confirmed. You can log in now.", "confirm_bad": "This confirmation link is invalid or has expired.", "email_unverified": "Please confirm your email first. We can send the link again.", "resend_confirm": "Resend confirmation link", "forgot": "Forgot password", "forgot_hint": "We will send you a reset link.", "forgot_sent": "If an account exists for this email, a link was sent (without SMTP it is printed in the console).", "reset_password": "Set a new password", "reset_ok": "Password saved. Please log in.", "reset_bad": "This link is invalid or has expired.", "consent_terms": "I accept the terms of use", "consent_privacy": "I have read the privacy notice", "consent_risk": "I have read the risk notice (CFDs/leverage can lose more than your deposit; commissions come from volume, not profit; no return promise).", "need_consent": "Please accept all consents.", "need_ref": "No referral code — Kevin will be set as your referrer.", "ref_code": "Referral code", "hero_slogan": "Your share of the volume.", "hero_signal": "Paid every Saturday in USDT", "hero_sub": "Rebate-Share distributes the weekly network pool clearly and traceably — from traded lots, not from profit promises.", "cta_login": "Log in", "cta_register": "Sign up", "how_title": "How it works", "how_1_t": "Sign up", "how_1": "Register with a referral code, confirm your email and accept the risk notice.", "how_2_t": "Open PU Prime", "how_2": "Become a client via the IB link, open an account, deposit and enter your IDs in the portal.", "how_3_t": "Receive your share", "how_3": "The network pool is calculated weekly and credited to your balance on Saturday. Withdraw in USDT (BEP20).", "levels_title": "Network pool — $ per lot", "faq_title": "FAQ", "faq_1_q": "Is this a share of trading profits?", "faq_1_a": "No. Rebates from trading volume (lots) are shared, not trading profit or loss.", "faq_2_q": "When do I become eligible?", "faq_2_a": "Once you have at least two direct partners in your network. All 10 levels are then unlocked.", "faq_3_q": "How do payouts work?", "faq_3_a": "Credits hit your portal balance on Saturday. Withdrawals are USDT on BNB Smart Chain (BEP20). The tx hash appears in the Wallet once the transfer is sent.", "faq_4_q": "What if someone in my upline is not eligible?", "faq_4_a": "By default that level stays in the house residual (Kevin). The admin can optionally turn on dynamic compression, which passes the amount to the next eligible upline.", "risk_title": "Risk notice", "risk_body": "CFDs and leveraged products can result in the loss of your entire deposit and more. Network-pool commissions are calculated only from trading volume (PU Prime rebates), not from trading profit. There is no return promise and no investment advice. Rebate-Share is Kevin's private commission model; legal and tax questions are yours to check.", "guide_title": "Guide — from sign-up to your first withdrawal", "guide_intro": "Step by step: portal account, PU Prime, first credit, USDT withdrawal.", "glossary": "Glossary", "gl_lot": "Lot: unit of trading volume. Commission is calculated in USD per lot.", "gl_rebate": "Rebate: PU Prime's volume refund, the basis of the network pool.", "gl_level": "Level: position in the referral chain (L1 = your direct partner, L2 = their partner, …).", "gl_usdt": "USDT BEP20: Tether on BNB Smart Chain. Withdrawals only to a 0x address on this network.", "legal_terms": "Terms of use", "legal_privacy": "Privacy", "legal_risk": "Risk notice", "anleitung": "Guide", "avg_per_lot": "Avg $ / lot", "deal_history": "Deal history (lots)", "lot_page_hint": "Every lot credit in detail. Weekly Saturday totals are under Credits. On-chain withdrawals are in the Wallet.", "you": "You", "expand_all": "Expand all", "collapse_all": "Collapse", "zoom_reset": "Fit", "tree_hint": "Drag to move, scroll or pinch to zoom. Use +/− on a node to expand or collapse levels.", "all_levels": "All", "credits_wallet": "Credits & Wallet", "need_email": "Please enter a valid email.", "requested": "Requested", "sent": "Sent", "failed": "Failed", "twofa": "2FA", "twofa_setup": "Set up 2FA", "twofa_required": "2FA is required for admins.", "twofa_code": "Authenticator code", "email_code": "Email code", "send_email_code": "Send email code", "email_code_sent": "A 6-digit code was sent to your email (valid 10 minutes, single use).", "otp_rate": "Please wait before requesting another code.", "otp_invalid": "Email code or 2FA code is invalid.", "need_twofa": "Please set up 2FA first.", "recovery_codes": "Recovery codes", "recovery_hint": "Store these codes safely. Each can be used once.", "enable_2fa": "Enable 2FA", "scan_qr": "Scan the QR code with an authenticator app.", "totp_secret_manual": "Or enter the key manually", "confirm_code": "Confirm code", "recovery_code": "Recovery code", "twofa_ok": "2FA is active.", "twofa_mandatory": "2FA is mandatory for admin accounts.", "login_2fa": "2FA verification", "locked_out": "Too many failed attempts. Please try again later.", "address_cooldown": "A new wallet address can be used after {hours} hours.", "security_cooldown": "Withdrawals are locked for {hours} hours after a password or 2FA change.", "daily_limit": "Daily withdrawal limit reached.", "whitelist_only": "Withdrawals only to your saved, unlocked BEP20 address.", "approve_all": "Approve all", "payout_provider": "Payout provider", "payout_dry_run": "TEST / dry-run — no real USDT transfer.", "auto_approve": "Auto-approve", "auto_approve_help": "Optional, default OFF. Under X USDT for verified users with an unlocked address.", "auto_approve_max": "Auto-approve limit (USDT)", "address_cooldown_hours": "Cooldown after address change (hours)", "max_withdrawal_per_day": "Max withdrawal per day (USDT)", "security_cooldown_hours": "Cooldown after password/2FA (hours)", "admin_ip_allowlist": "Admin IP allowlist (empty = off)", "mapping": "Mapping", "assign": "Assign", "duplicate_id": "This client ID is already assigned to another account.", "help": "Help", "help_title": "Help & support", "faq_search": "Search FAQ", "explainer_videos": "Short explainer videos", "video_placeholder": "Video coming soon.", "support_contact": "Contact support", "support_sent": "Message saved. We'll get back to you.", "support_messages": "Support messages", "support_body": "Message", "onboarding_progress": "Setup", "steps_of": "{done} of {total} steps", "step_pu_account": "PU Prime account", "step_client_id": "Client ID entered", "step_twofa": "2FA active", "step_wallet": "Wallet address saved", "step_partners": "2 direct partners", "next_step": "Next step", "partners_needed": "{n} more partner(s) until unlock", "partners_unlocked": "All 10 levels are unlocked.", "calc_title": "Example calculator", "calc_hint": "Estimate based on the $13/lot model. Example only — no promise.", "calc_lots": "Team lots per level", "calc_result": "Estimated weekly credit", "share_ref": "Share referral link", "share_whatsapp": "Share on WhatsApp", "share_telegram": "Share on Telegram", "share_texts": "Ready-made share texts", "share_images": "Share images", "share_text_1": "I'm using Rebate-Share — a weekly network pool from PU Prime rebates, paid on Saturday in USDT. Here's my link: {url}", "share_text_2": "Sign up at PU Prime with my link and get started in the Rebate-Share portal: {url}", "download_card": "Download card", "qr_code": "QR code", "security_page": "Security", "payouts_queue": "Payout queue", "wd_need_codes": "Every withdrawal needs the 6-digit email code and your authenticator code.", "my_landing": "My landing page", "partner_cta": "Get started", "partner_hero_sub": "A weekly network pool from PU Prime rebates — paid on Saturday in USDT.", "partner_how": "How it works", "partner_how_1": "Use the button to start registration with this referral link.", "partner_how_2": "Open your PU Prime account via the IB link and enter your client ID.", "partner_how_3": "Eligible from 2 direct partners — then all 10 levels are unlocked.", "partner_risk": "Past results are no guarantee of future performance. Trading CFDs and leveraged products can result in the loss of your entire deposit. Commissions come from trading volume (rebates), not from trading profits. There is no return promise.", "partner_video": "Introduction", "partner_perf": "Verified performance (Myfxbook)", "myfxbook_placeholder": "Myfxbook link will appear once it is set.", "open_myfxbook": "View on Myfxbook", "myfxbook_strategy": "Gold Evolution by Robot FX", "myfxbook_live": "Live figures on Myfxbook — no performance numbers are hardcoded here.", "landing_video_url": "Landing-page video (global YouTube/Vimeo URL)", "myfxbook_url": "Myfxbook URL (global)", "video_override": "Video URL (this partner only)", "invited_by": "Invited by"}};
 (function (global) {
   var RATES = {1:5,2:2.5,3:1.5,4:1,5:0.5,6:0.5,7:0.5,8:0.5,9:0.5,10:0.5};
   function r2(n){ return Math.round((n + Number.EPSILON) * 100) / 100; }
@@ -548,7 +604,7 @@ window.T3_I18N = {"de": {"portal": "Rebate-Share", "tagline": "Wöchentlicher Ne
     var earned=0, reserved=0;
     state.commissions.forEach(function(c){ if(c.recipient_id===userId) earned+=c.amount; });
     state.withdrawals.forEach(function(w){
-      if(w.user_id===userId && ["pending","approved","paid"].indexOf(w.status)>=0) reserved+=w.amount;
+      if(w.user_id===userId && ["pending","requested","approved","sent","paid"].indexOf(w.status)>=0) reserved+=w.amount;
     });
     return r2(earned-reserved);
   }
@@ -565,6 +621,7 @@ window.T3_I18N = {"de": {"portal": "Rebate-Share", "tagline": "Wöchentlicher Ne
     available:available, anonymize:anonymize
   };
 })(this);
+
 (function (global) {
   var USERS = [
     {id:1,name:"Kevin Müller",email:"kevin@trading3.local",code:"KEVIN",referrer_id:null,client:"PU100000",deposit:10000,is_admin:1,is_example:1},
@@ -644,11 +701,11 @@ window.T3_I18N = {"de": {"portal": "Rebate-Share", "tagline": "Wöchentlicher Ne
       return Object.assign({
         usdt_address: u.is_admin ? "0x1111111111111111111111111111111111111111" : ("0xa11a"+("000000000000000000000000000000000000"+u.id.toString(16)).slice(-36)),
         usdt_network:"BEP20", language:"de", email_verified:1, show_name_to_upline:1,
-        pu_verify_status:"verified", onboard_completed:1, consent_terms:1
+        pu_verify_status:"verified", onboard_completed:1, consent_terms:1, totp_enabled:1
       }, u);
     });
     var state={
-      version:2,
+      version:3,
       lang:"de",
       view:"landing",
       uid:null,
@@ -657,11 +714,14 @@ window.T3_I18N = {"de": {"portal": "Rebate-Share", "tagline": "Wöchentlicher Ne
       weekly:weekly,
       commissions:[],
       runs:[],
-      withdrawals:[{id:1,user_id:2,amount:25,usdt_address:"0xa11a000000000000000000000000000000000002",usdt_network:"BEP20",status:"pending",created_at:"2026-11-13 16:20:00",tx_hash:null}],
+      withdrawals:[{id:1,user_id:2,amount:25,usdt_address:"0xa11a000000000000000000000000000000000002",usdt_network:"BEP20",status:"requested",created_at:"2026-11-13 16:20:00",tx_hash:null}],
+      unmapped:[{account:"PU-UNMAPPED-1",lots:0.40,rebate:4.80,name_on_file:"(EXAMPLE)"}],
+      support:[],
       settings:{
         pu_prime_ib_link:"https://puvip.co/la-partners/de/XIZDu6lw",
         pu_account_type:"CopyTrading Standard",
-        min_partners:2, min_withdrawal:10,
+        min_partners:2, min_withdrawal:10, auto_approve_enabled:false, auto_approve_max:50,
+        address_cooldown_hours:24, max_withdrawal_per_day:500, payout_provider:'dry-run', landing_video_url:'', myfxbook_url:'https://www.myfxbook.com/members/GoldEvolution/gold-evolution-by-robot-fx/12034345',
         rates:Object.assign({}, T3.RATES),
         network_per_lot:13,
         cap_enabled:false,
@@ -676,6 +736,7 @@ window.T3_I18N = {"de": {"portal": "Rebate-Share", "tagline": "Wöchentlicher Ne
   }
   global.T3_SEED = { USERS:USERS, WEEK:WEEK, PREV:PREV, defaultState:defaultState };
 })(this);
+
 (function (global) {
   var NODE_W = 148, NODE_H = 92, GAP_X = 22, GAP_Y = 124, PAD = 36, RAIL = 48;
 
@@ -962,6 +1023,7 @@ window.T3_I18N = {"de": {"portal": "Rebate-Share", "tagline": "Wöchentlicher Ne
 
   global.T3Tree = { mount: mount, mountFromScript: mountFromScript, initials: initials };
 })(this);
+
 (function () {
   var KEY="trading3-demo-v3";
   var I18N = window.T3_I18N;
@@ -969,7 +1031,7 @@ window.T3_I18N = {"de": {"portal": "Rebate-Share", "tagline": "Wöchentlicher Ne
   try {
     var raw=localStorage.getItem(KEY);
     state = raw ? JSON.parse(raw) : null;
-    if (!state || state.version!==2 || !state.users || !state.settings) state=null;
+    if (!state || state.version!==3 || !state.users || !state.settings) state=null;
   } catch(e){ state=null; }
   if (!state) state = T3_SEED.defaultState();
 
@@ -1054,6 +1116,8 @@ window.T3_I18N = {"de": {"portal": "Rebate-Share", "tagline": "Wöchentlicher Ne
     html+=navLink("credits",t("credits_wallet"));
     html+=navLink("onboarding",t("onboarding"));
     html+=navLink("guide",t("anleitung"));
+    html+=navLink("security",t("security_page"));
+    html+=navLink("help",t("help"));
     html+=navLink("profile",t("profile"));
     if(u.is_admin && !state.impersonator){
       html+='<div class="nav-label">'+t("admin")+'</div>';
@@ -1061,8 +1125,10 @@ window.T3_I18N = {"de": {"portal": "Rebate-Share", "tagline": "Wöchentlicher Ne
       html+=navLink("admin-users",t("users"));
       html+=navLink("admin-tree",t("tree"));
       html+=navLink("admin-import",t("import_data"));
+      html+=navLink("admin-mapping",t("mapping"));
       html+=navLink("admin-calculate",t("calculate"));
       html+=navLink("admin-payouts",t("payouts"));
+      html+=navLink("admin-support",t("support_messages"));
       html+=navLink("admin-settings",t("settings"));
     }
     html+='</nav><div class="side-foot"><div class="who"><span class="avatar">'+esc(u.name[0])+'</span><div><strong>'+esc(u.name)+'</strong> <em class="tag sm">'+t("example")+'</em>';
@@ -1150,9 +1216,49 @@ window.T3_I18N = {"de": {"portal": "Rebate-Share", "tagline": "Wöchentlicher Ne
     h+='<div class="card kpi"><span>'+t("lots_period")+'</span><strong>'+(snap?lots(snap.lots):"—")+'</strong><small>'+(snap?(t("rebate")+" "+money(snap.rebate)+" $"):t("no_pu_data"))+'</small></div>';
     h+='<div class="card kpi"><span>'+t("direct_partners")+'</span><strong>'+info.partners+'</strong><small>'+(info.eligible?'<span class="status ok sm">'+t("eligible")+'</span>':'<span class="status no sm">'+t("not_eligible")+'</span>')+'</small></div>';
     h+='</div>';
+    var minP=state.settings.min_partners||2;
+    var steps=[
+      {id:"pu_account",done:!!(u.onboard_account_opened||u.onboard_completed||u.pu_verify_status==="verified"||u.is_admin),href:"#/onboarding"},
+      {id:"client_id",done:!!(u.client||u.pu_prime_client_id||u.pu_user_id),href:"#/onboarding"},
+      {id:"twofa",done:!!u.totp_enabled,href:"#/security"},
+      {id:"wallet",done:!!u.usdt_address,href:"#/wallet"},
+      {id:"partners",done:info.partners>=minP,href:"#/network"}
+    ];
+    var done=steps.filter(function(s){return s.done;}).length;
+    var next=steps.filter(function(s){return !s.done;})[0];
+    var need=Math.max(0,minP-info.partners);
+    h+=(need?('<div class="goal-banner">'+t("partners_needed",{n:need})+'</div>'):('<div class="goal-banner">'+t("partners_unlocked")+'</div>'));
+    h+='<div class="card setup-card"><h2>'+t("onboarding_progress")+'</h2><p class="hint">'+t("steps_of",{done:done,total:5})+'</p>';
+    h+='<div class="bar"><i data-width="'+(Math.round(100*done/5))+'"></i></div><ul class="setup-steps">';
+    steps.forEach(function(s,i){
+      h+='<li class="'+(s.done?"done":(next&&next.id===s.id?"next":""))+'"><span class="dot">'+(s.done?"✓":(i+1))+'</span><span>'+t("step_"+s.id)+'</span></li>';
+    });
+    h+='</ul>';
+    if(next) h+='<p class="mt"><a class="btn" href="'+next.href+'">'+t("next_step")+': '+t("step_"+next.id)+'</a></p>';
+    h+='</div>';
+    var landing="https://v1cl00.github.io/trading3-demo/#/p/"+u.code;
     var ref="https://v1cl00.github.io/trading3-demo/#/r/"+u.code;
-    h+='<div class="card"><h2>'+t("ref_link")+'</h2><div class="copy-row"><input id="reflink" readonly value="'+ref+'"><button type="button" class="btn" data-copy="#reflink">'+t("copy")+'</button></div>';
+    var share1=t("share_text_1",{url:landing}), share2=t("share_text_2",{url:landing});
+    h+='<div class="card"><h2>'+t("my_landing")+'</h2>';
+    h+='<div class="copy-row"><input id="landinglink" readonly value="'+landing+'"><button type="button" class="btn" data-copy="#landinglink">'+t("copy")+'</button></div>';
+    h+='<div class="share-actions"><a class="btn sm" href="#/p/'+u.code+'">'+t("my_landing")+'</a>';
+    h+='<a class="btn sm" href="https://wa.me/?text='+encodeURIComponent(share1)+'" target="_blank" rel="noopener">'+t("share_whatsapp")+'</a>';
+    h+='<a class="btn sm" href="https://t.me/share/url?url='+encodeURIComponent(landing)+'&text='+encodeURIComponent(share1)+'" target="_blank" rel="noopener">'+t("share_telegram")+'</a></div>';
+    h+='<div class="qr-box" title="'+esc(landing)+'" style="width:160px;height:160px;background:#fff;display:grid;place-items:center;color:#111;font-weight:700">QR</div></div>';
+    h+='<div class="card"><h2>'+t("share_ref")+'</h2><div class="copy-row"><input id="reflink" readonly value="'+ref+'"><button type="button" class="btn" data-copy="#reflink">'+t("copy")+'</button></div>';
+    h+='<div class="share-actions"><a class="btn sm" href="https://wa.me/?text='+encodeURIComponent(share1)+'" target="_blank" rel="noopener">'+t("share_whatsapp")+'</a>';
+    h+='<a class="btn sm" href="https://t.me/share/url?url='+encodeURIComponent(ref)+'&text='+encodeURIComponent(share1)+'" target="_blank" rel="noopener">'+t("share_telegram")+'</a></div>';
+    h+='<div class="qr-box" title="'+esc(ref)+'" style="width:160px;height:160px;background:#fff;display:grid;place-items:center;color:#111;font-weight:700">QR</div>';
+    h+='<h3 class="mt">'+t("share_texts")+'</h3>';
+    h+='<p><textarea id="share1" readonly>'+esc(share1)+'</textarea></p><p><button type="button" class="btn sm" data-copy="#share1">'+t("copy")+'</button></p>';
+    h+='<p><textarea id="share2" readonly>'+esc(share2)+'</textarea></p><p><button type="button" class="btn sm" data-copy="#share2">'+t("copy")+'</button></p>';
+    h+='<h3>'+t("share_images")+'</h3><div class="share-card-preview" style="padding:32px;background:#06080f;border:1px solid rgba(224,192,120,.4);border-radius:16px"><strong style="color:#f5e2b0;font-size:22px">Rebate-Share</strong><div class="hint">'+esc(ref)+'</div></div>';
     h+='<p class="hint mt">'+t("open_pu")+': <span class="mono">'+esc(state.settings.pu_prime_ib_link)+'</span></p></div>';
+    var rates=state.settings.rates||{};
+    h+='<div class="card" data-calc data-rates="'+String(JSON.stringify(rates)).replace(/"/g,'&quot;')+'"><h2>'+t("calc_title")+' <span class="example-tag">'+t("example")+'</span></h2>';
+    h+='<p class="hint">'+t("calc_hint")+'</p><p class="hint">'+t("calc_lots")+'</p><div class="calc-grid">';
+    for(var i=1;i<=10;i++) h+='<label>L'+i+' ('+money(rates[i]||0)+' $)<input type="number" name="lots_'+i+'" min="0" step="0.01" value="0"></label>';
+    h+='</div><p class="calc-result">'+t("calc_result")+': <strong><span data-calc-out>0.00</span> $</strong></p></div>';
     return shell(h);
   }
 
@@ -1434,14 +1540,19 @@ window.T3_I18N = {"de": {"portal": "Rebate-Share", "tagline": "Wöchentlicher Ne
     return shell(h);
   }
   function adminPayouts(){
-    var h='<div class="page-head"><h1>'+t("payout_requests")+'</h1></div><div class="card"><div class="table-wrap"><table><thead><tr><th>'+t("name")+'</th><th class="num">'+t("amount")+'</th><th>'+t("usdt_address")+'</th><th>'+t("status")+'</th><th>'+t("actions")+'</th></tr></thead><tbody>';
+    var h='<div class="page-head"><h1>'+t("payouts_queue")+'</h1></div>';
+    h+='<div class="dry-run-banner">'+t("payout_dry_run")+' · '+t("payout_provider")+': TEST / dry-run</div>';
+    h+='<form data-approve-all class="card stack"><label>'+t("twofa_code")+' <input name="totp" inputmode="numeric" pattern="[0-9]{6}" required></label>';
+    h+='<p class="hint">Demo-2FA-Code: <strong>123456</strong></p><button class="btn" type="submit">'+t("approve_all")+'</button></form>';
+    h+='<div class="card"><div class="table-wrap"><table><thead><tr><th>'+t("name")+'</th><th class="num">'+t("amount")+'</th><th>'+t("usdt_address")+'</th><th>'+t("status")+'</th><th>'+t("tx_hash")+'</th><th>'+t("actions")+'</th></tr></thead><tbody>';
     state.withdrawals.slice().reverse().forEach(function(r){
       var u=userById(r.user_id);
-      h+='<tr><td>'+esc(u?u.name:"")+'</td><td class="num">'+money(r.amount)+'</td><td class="mono">'+esc(r.usdt_address)+'<div class="muted">'+esc(r.usdt_network)+'</div></td>';
-      h+='<td><span class="status '+r.status+' sm">'+t(r.status)+'</span></td><td class="actions">';
-      if(r.status==="pending") h+='<button class="btn sm" data-wd-act="approve" data-id="'+r.id+'">'+t("approve")+'</button> ';
-      if(r.status==="pending"||r.status==="approved") h+='<button class="btn sm" data-wd-act="paid" data-id="'+r.id+'">'+t("mark_paid")+'</button> ';
-      if(r.status!=="rejected"&&r.status!=="paid") h+='<button class="btn sm danger" data-wd-act="reject" data-id="'+r.id+'">'+t("reject")+'</button>';
+      var tx=r.tx_hash?('<a href="https://bscscan.com/tx/'+r.tx_hash+'" target="_blank" rel="noopener">'+r.tx_hash.slice(0,10)+'…</a>'):"—";
+      h+='<tr><td>'+esc(u?u.name:"")+'</td><td class="num">'+money(r.amount)+'</td><td class="mono">'+esc(r.usdt_address)+'<div class="muted">BEP20'+(r.provider?(" · "+esc(r.provider)):"")+'</div></td>';
+      h+='<td><span class="status '+r.status+' sm">'+t(r.status)+'</span></td><td class="mono">'+tx+'</td><td class="actions">';
+      if(["requested","pending","approved"].indexOf(r.status)>=0){
+        h+='<form data-wd-act="approve" data-id="'+r.id+'" class="inline-actions"><input name="totp" inputmode="numeric" pattern="[0-9]{6}" placeholder="2FA" required><button class="btn sm" type="submit">'+t("approve")+'</button></form>';
+      }
       h+='</td></tr>';
     });
     return shell(h+'</tbody></table></div></div>');
@@ -1455,6 +1566,13 @@ window.T3_I18N = {"de": {"portal": "Rebate-Share", "tagline": "Wöchentlicher Ne
     for(var i=1;i<=10;i++) h+='<label>L'+i+'<input name="rate_'+i+'" type="number" step="0.01" value="'+s.rates[i]+'"></label>';
     h+='</div></div><div class="card"><label class="check"><input type="checkbox" name="cap_enabled"'+(s.cap_enabled?" checked":"")+'> '+t("cap_enabled")+'</label><p class="hint">'+t("cap_help")+'</p>';
     h+='<label class="check"><input type="checkbox" name="compression_enabled"'+(s.compression_enabled?" checked":"")+'> '+t("compression")+'</label><p class="hint">'+t("compression_help")+'</p></div>';
+    h+='<div class="card"><h2>'+t("security_page")+'</h2>';
+    h+='<label class="check"><input type="checkbox" name="auto_approve_enabled"'+(s.auto_approve_enabled?" checked":"")+'> '+t("auto_approve")+'</label><p class="hint">'+t("auto_approve_help")+'</p>';
+    h+='<label>'+t("auto_approve_max")+'<input name="auto_approve_max" type="number" value="'+(s.auto_approve_max||50)+'"></label>';
+    h+='<label>'+t("admin_ip_allowlist")+'<input name="admin_ip_allowlist" value="'+esc(s.admin_ip_allowlist||"")+'"></label>';
+    h+='<p class="hint">'+t("payout_provider")+': dry-run · '+t("payout_dry_run")+'</p>';
+    h+='<label>'+t("landing_video_url")+'<input name="landing_video_url" value="'+esc(s.landing_video_url||"")+'" placeholder="https://…"></label>';
+    h+='<label>'+t("myfxbook_url")+'<input name="myfxbook_url" value="'+esc(s.myfxbook_url||"https://www.myfxbook.com/members/GoldEvolution/gold-evolution-by-robot-fx/12034345")+'"></label></div>';
     h+='<button class="btn" type="submit">'+t("save")+'</button></form>';
     return shell(h);
   }
@@ -1495,10 +1613,20 @@ window.T3_I18N = {"de": {"portal": "Rebate-Share", "tagline": "Wöchentlicher Ne
     var u=current(), bal=T3.available(state,u.id);
     var rows=state.withdrawals.filter(function(w){return w.user_id===u.id;}).slice().reverse();
     var h=moneyTabs()+'<p class="hint">'+t("wallet_hint")+'</p><div class="grid-2"><div class="card"><h2>'+t("request_withdrawal")+'</h2>';
-    h+='<p>'+t("available")+': <strong>'+money(bal)+' USDT</strong></p><p class="hint">'+t("bep20_only")+'</p>';
-    h+='<form data-wd class="stack"><label>'+t("amount")+'<input name="amount" type="number" step="0.01" min="'+state.settings.min_withdrawal+'" required></label>';
-    h+='<label>'+t("usdt_address")+' (BEP20)<input name="usdt_address" value="'+esc(u.usdt_address||"")+'" placeholder="0x…" required></label>';
-    h+='<button type="submit">'+t("request")+'</button></form></div><div class="card"><h2>'+t("withdrawals")+'</h2>';
+    h+='<p>'+t("available")+': <strong>'+money(bal)+' USDT</strong></p><p class="hint">'+t("bep20_only")+'</p><p class="hint">'+t("wd_need_codes")+'</p>';
+    if(!u.totp_enabled) h+='<p class="flash error">'+t("need_twofa")+' <a href="#/security">'+t("twofa_setup")+'</a></p>';
+    else {
+      if(state.demoEmailCode) h+='<div class="dry-run-banner">Demo-E-Mail-Code: <strong>'+state.demoEmailCode+'</strong></div>';
+      h+='<form data-send-otp class="stack"><label>'+t("amount")+'<input name="amount" type="number" step="0.01" min="'+state.settings.min_withdrawal+'" required></label>';
+      h+='<label>'+t("usdt_address")+' (BEP20)<input name="usdt_address" value="'+esc(u.usdt_address||"")+'" placeholder="0x…" required></label>';
+      h+='<button type="submit" class="btn ghost">'+t("send_email_code")+'</button></form>';
+      h+='<form data-wd class="stack"><div class="code-row">';
+      h+='<label>'+t("email_code")+'<input name="email_code" inputmode="numeric" pattern="[0-9]{6}" required></label>';
+      h+='<label>'+t("twofa_code")+'<input name="totp" inputmode="numeric" pattern="[0-9]{6}" required></label></div>';
+      h+='<p class="hint">Demo-2FA-Code: <strong>123456</strong></p>';
+      h+='<button type="submit">'+t("request")+'</button></form>';
+    }
+    h+='</div><div class="card"><h2>'+t("withdrawals")+'</h2>';
     if(!rows.length) h+='<p class="hint">'+t("no_withdrawals")+'</p>';
     else {
       h+='<div class="table-wrap"><table><thead><tr><th>'+t("date")+'</th><th class="num">'+t("amount")+'</th><th>'+t("status")+'</th><th>'+t("tx_hash")+'</th></tr></thead><tbody>';
@@ -1533,19 +1661,109 @@ window.T3_I18N = {"de": {"portal": "Rebate-Share", "tagline": "Wöchentlicher Ne
   }
 
 
+
+  function securityView(){
+    var u=current();
+    var h='<div class="page-head"><h1>'+t("security_page")+'</h1></div>';
+    if(u.is_admin && !u.totp_enabled) h+='<p class="flash error">'+t("twofa_mandatory")+'</p>';
+    h+='<div class="card twofa-box"><h2>'+t("twofa")+'</h2>';
+    if(u.totp_enabled) h+='<p><span class="status ok sm">'+t("twofa_ok")+'</span></p>';
+    else {
+      h+='<p class="hint">'+t("scan_qr")+'</p>';
+      h+='<div class="qr-box" style="width:160px;height:160px;background:#fff;display:grid;place-items:center;color:#111">QR</div>';
+      h+='<p class="hint">Demo-2FA-Code: <strong>123456</strong></p>';
+      h+='<form data-enable-2fa class="stack"><label>'+t("twofa_code")+'<input name="totp" inputmode="numeric" pattern="[0-9]{6}" required></label>';
+      h+='<button type="submit">'+t("enable_2fa")+'</button></form>';
+    }
+    h+='</div>';
+    return shell(h);
+  }
+  function helpView(){
+    var faqs=[];
+    for(var i=1;i<=7;i++){ var q=t("faq_"+i+"_q"), a=t("faq_"+i+"_a"); if(q && q!=="faq_"+i+"_q") faqs.push({q:q,a:a}); }
+    var h='<div class="page-head"><h1>'+t("help_title")+'</h1></div>';
+    h+='<input class="help-search" type="search" data-faq-search placeholder="'+t("faq_search")+'">';
+    h+='<div class="card">';
+    faqs.forEach(function(f){ h+='<div class="faq-item"><h3>'+esc(f.q)+'</h3><p>'+esc(f.a)+'</p></div>'; });
+    h+='</div><div class="grid-2"><div class="card"><h2>'+t("explainer_videos")+'</h2><div class="video-ph">▶ '+t("video_placeholder")+'</div></div>';
+    h+='<div class="card"><h2>'+t("support_contact")+'</h2><form data-support class="stack">';
+    h+='<label>'+t("name")+'<input name="name" value="'+esc(current()?current().name:"")+'" required></label>';
+    h+='<label>'+t("email")+'<input name="email" type="email" value="'+esc(current()?current().email:"")+'" required></label>';
+    h+='<label>'+t("support_body")+'<textarea name="body" required rows="5"></textarea></label>';
+    h+='<button type="submit">'+t("request")+'</button></form></div></div>';
+    return current()?shell(h):h;
+  }
+  function mappingView(){
+    var rows=(state.unmapped||[{account:"PU-UNMAPPED-1",lots:0.4,rebate:4.8,name_on_file:"(EXAMPLE)"}]);
+    var h='<div class="page-head"><h1>'+t("mapping")+'</h1></div><div class="card"><div class="table-wrap"><table><thead><tr><th>'+t("trader")+'</th><th class="num">'+t("lots")+'</th><th>'+t("actions")+'</th></tr></thead><tbody>';
+    rows.forEach(function(r,i){
+      h+='<tr><td class="mono">'+esc(r.account)+'</td><td class="num">'+lots(r.lots||0)+'</td><td><form data-map data-i="'+i+'"><select name="user_id">';
+      state.users.forEach(function(u){ h+='<option value="'+u.id+'">'+esc(u.name)+'</option>'; });
+      h+='</select> <button class="btn sm" type="submit">'+t("assign")+'</button></form></td></tr>';
+    });
+    if(!rows.length) h+='<tr><td colspan="3" class="hint">'+t("unmapped")+': 0</td></tr>';
+    return shell(h+'</tbody></table></div></div>');
+  }
+  function supportAdminView(){
+    var rows=state.support||[];
+    var h='<div class="page-head"><h1>'+t("support_messages")+'</h1></div><div class="card">';
+    if(!rows.length) h+='<p class="hint">—</p>';
+    else {
+      h+='<div class="table-wrap"><table><thead><tr><th>'+t("name")+'</th><th>'+t("email")+'</th><th>'+t("support_body")+'</th></tr></thead><tbody>';
+      rows.slice().reverse().forEach(function(r){ h+='<tr><td>'+esc(r.name)+'</td><td>'+esc(r.email)+'</td><td>'+esc(r.body)+'</td></tr>'; });
+      h+='</tbody></table></div>';
+    }
+    return shell(h+'</div>');
+  }
+  function dryRunHash(){ var s="d200"; for(var i=0;i<60;i++) s+="abcdef0123456789".charAt(Math.floor(Math.random()*16)); return "0x"+s; }
+  function demoApprove(w){
+    w.status="sent"; w.tx_hash=dryRunHash(); w.provider="TEST / dry-run";
+  }
+
+
+  function partnerView(){
+    var code=state.partnerCode||"";
+    var u=state.users.filter(function(x){return x.code===code;})[0];
+    if(!u){
+      return pubHead()+'<section class="partner-page"><p class="hint">404</p></section>'+pubFoot();
+    }
+    state.pendingRef=code;
+    var initials=(u.name||"?").split(/\s+/).filter(Boolean).map(function(p){return p[0];}).join("").slice(0,2).toUpperCase();
+    var mfx=state.settings.myfxbook_url||"https://www.myfxbook.com/members/GoldEvolution/gold-evolution-by-robot-fx/12034345";
+    var h=pubHead();
+    h+='<section class="partner-page"><div class="partner-hero">';
+    h+='<div class="partner-avatar" aria-hidden="true">'+esc(initials)+'</div>';
+    h+='<p class="hint">'+t("invited_by")+'</p><h1>'+esc(u.name)+'</h1>';
+    if(u.is_example) h+='<em class="tag">'+t("example")+'</em>';
+    h+='<p class="hero-sub">'+t("partner_hero_sub")+'</p>';
+    h+='<div class="hero-ctas"><a class="btn" href="#/r/'+encodeURIComponent(code)+'">'+t("partner_cta")+'</a></div></div>';
+    h+='<div class="partner-grid"><div class="card"><h2>'+t("partner_video")+'</h2><div class="video-ph">▶ '+t("video_placeholder")+'</div></div>';
+    h+='<div class="card"><h2>'+t("partner_perf")+'</h2><p class="hint">'+t("myfxbook_live")+'</p><p><strong>'+t("myfxbook_strategy")+'</strong></p>';
+    h+='<p class="mt"><a class="btn" href="'+esc(mfx)+'" target="_blank" rel="noopener">'+t("open_myfxbook")+'</a></p></div></div>';
+    h+='<div class="card"><h2>'+t("partner_how")+'</h2><ol class="how-list"><li>'+t("partner_how_1")+'</li><li>'+t("partner_how_2")+'</li><li>'+t("partner_how_3")+'</li></ol>';
+    h+='<p class="mt"><a class="btn" href="#/r/'+encodeURIComponent(code)+'">'+t("partner_cta")+'</a></p></div>';
+    h+='<p class="fine partner-risk">'+t("partner_risk")+'</p></section>';
+    return h+pubFoot();
+  }
+
     var VIEWS={
-    landing:landingView, login:loginView, register:registerView, confirm:confirmView, forgot:forgotView,
+
+    landing:landingView, login:loginView, register:registerView, confirm:confirmView, forgot:forgotView, partner:partnerView,
     guide:guideView, risk:riskView, dashboard:dashView, network:networkView, commissions:poolView,
     credits:creditsView, statement:statementView, withdrawals:walletView, wallet:walletView,
-    onboarding:onboardingView, profile:profileView,
+    onboarding:onboardingView, profile:profileView, security:securityView, help:helpView,
     admin:adminHome, "admin-users":adminUsers, "admin-tree":adminTree,
-    "admin-import":adminImport, "admin-calculate":adminCalc, "admin-payouts":adminPayouts,
-    "admin-settings":adminSettings
+    "admin-import":adminImport, "admin-mapping":mappingView, "admin-calculate":adminCalc, "admin-payouts":adminPayouts,
+    "admin-support":supportAdminView, "admin-settings":adminSettings
   };
-  var PUBLIC={"landing":1,"login":1,"register":1,"confirm":1,"forgot":1,"guide":1,"risk":1};
+  var PUBLIC={"landing":1,"login":1,"register":1,"confirm":1,"forgot":1,"guide":1,"risk":1,"help":1,"partner":1};
 
   function render(){
     if(!state.uid && !PUBLIC[state.view]) state.view="landing";
+    var cu=state.uid && state.users.filter(function(x){return x.id===state.uid;})[0];
+    if(cu && cu.is_admin && !cu.totp_enabled && !state.impersonator && state.view!=="security" && state.view!=="logout" && state.view!=="partner"){
+      state.view="security";
+    }
     var fn=VIEWS[state.view]||dashView;
     document.body.classList.remove("nav-open","pub-nav-open");
     if(state.view==="login") document.body.innerHTML=loginView();
@@ -1645,41 +1863,99 @@ window.T3_I18N = {"de": {"portal": "Rebate-Share", "tagline": "Wöchentlicher Ne
         save(); render();
       });
     });
-    document.querySelectorAll("[data-wd-act]").forEach(function(b){
-      b.addEventListener("click", function(){
-        var id=+b.getAttribute("data-id"), act=b.getAttribute("data-wd-act");
-        var map={approve:"approved",paid:"paid",reject:"rejected"};
-        var ok=true;
-        state.withdrawals.forEach(function(w){
-          if(w.id===id){
-            if(act==="paid"){
-              var inp=document.querySelector("input[name=tx_"+id+"]");
-              var tx=inp?inp.value.trim():"";
-              if(!isTx(tx)){ ok=false; state.flash={cat:"error",msg:t("tx_required")}; return; }
-              w.tx_hash=tx;
-            }
-            w.status=map[act];
-          }
-        });
-        if(ok && !state.flash) state.flash={cat:"ok",msg:t("saved")};
-        else if(ok) state.flash=state.flash||{cat:"ok",msg:t("saved")};
-        save(); render();
+    function requireDemoTotp(form){
+      var v=(form.querySelector("[name=totp]")||{}).value||"";
+      if(v!=="123456"){ state.flash={cat:"error",msg:t("otp_invalid")}; render(); return false; }
+      return true;
+    }
+    document.querySelectorAll("form[data-wd-act]").forEach(function(f){
+      f.addEventListener("submit", function(e){
+        e.preventDefault();
+        if(!requireDemoTotp(f)) return;
+        var id=+f.getAttribute("data-id");
+        state.withdrawals.forEach(function(w){ if(w.id===id) demoApprove(w); });
+        state.flash={cat:"ok",msg:t("saved")}; save(); render();
       });
+    });
+    var aa=document.querySelector("form[data-approve-all]");
+    if(aa) aa.addEventListener("submit", function(e){
+      e.preventDefault();
+      if(!requireDemoTotp(aa)) return;
+      state.withdrawals.forEach(function(w){ if(["requested","pending","approved"].indexOf(w.status)>=0) demoApprove(w); });
+      state.flash={cat:"ok",msg:t("saved")}; save(); render();
+    });
+    var sendOtp=document.querySelector("form[data-send-otp]");
+    if(sendOtp) sendOtp.addEventListener("submit", function(e){
+      e.preventDefault();
+      state.demoEmailCode="654321";
+      state.pendingWd={amount:parseFloat(sendOtp.amount.value||"0"),addr:sendOtp.usdt_address.value};
+      state.flash={cat:"ok",msg:t("email_code_sent")}; save(); render();
     });
     var wd=document.querySelector("form[data-wd]");
     if(wd) wd.addEventListener("submit", function(e){
       e.preventDefault();
-      var amt=parseFloat(wd.amount.value||"0");
       var u=current(), bal=T3.available(state,u.id);
-      var addr=(wd.usdt_address&&wd.usdt_address.value)||u.usdt_address||"";
+      if(!u.totp_enabled){ state.flash={cat:"error",msg:t("need_twofa")}; render(); return; }
+      var amt=(state.pendingWd&&state.pendingWd.amount)||0;
+      var addr=(state.pendingWd&&state.pendingWd.addr)||u.usdt_address||"";
+      var email=(wd.email_code&&wd.email_code.value)||"";
+      var totp=(wd.totp&&wd.totp.value)||"";
+      if(email!==(state.demoEmailCode||"") || totp!=="123456"){ state.flash={cat:"error",msg:t("otp_invalid")}; render(); return; }
       if(!isBep20(addr)){ state.flash={cat:"error",msg:t("invalid_address")}; render(); return; }
       if(isNaN(amt)||amt<state.settings.min_withdrawal){ state.flash={cat:"error",msg:t("invalid_amount")}; render(); return; }
       if(amt>bal+1e-9){ state.flash={cat:"error",msg:t("insufficient")}; render(); return; }
-      u.usdt_address=addr; u.usdt_network="BEP20";
       var nid=state.withdrawals.reduce(function(m,w){return Math.max(m,w.id);},0)+1;
-      state.withdrawals.push({id:nid,user_id:u.id,amount:T3.r2(amt),usdt_address:addr,usdt_network:"BEP20",status:"pending",created_at:"2026-11-14 15:00:00",tx_hash:null});
+      state.withdrawals.push({id:nid,user_id:u.id,amount:T3.r2(amt),usdt_address:addr,usdt_network:"BEP20",status:"requested",created_at:"2026-11-14 19:00:00",tx_hash:null});
+      state.demoEmailCode=null; state.pendingWd=null;
       state.flash={cat:"ok",msg:t("withdrawal_ok")}; save(); render();
     });
+    var en2=document.querySelector("form[data-enable-2fa]");
+    if(en2) en2.addEventListener("submit", function(e){
+      e.preventDefault();
+      if((en2.totp.value||"")!=="123456"){ state.flash={cat:"error",msg:t("otp_invalid")}; render(); return; }
+      current().totp_enabled=1; state.flash={cat:"ok",msg:t("twofa_ok")}; save(); go("dashboard");
+    });
+    var sup=document.querySelector("form[data-support]");
+    if(sup) sup.addEventListener("submit", function(e){
+      e.preventDefault();
+      state.support=state.support||[];
+      state.support.push({name:sup.name.value,email:sup.email.value,body:sup.body.value});
+      state.flash={cat:"ok",msg:t("support_sent")}; save(); render();
+    });
+    document.querySelectorAll("form[data-map]").forEach(function(f){
+      f.addEventListener("submit", function(e){
+        e.preventDefault();
+        var i=+f.getAttribute("data-i");
+        if(state.unmapped && state.unmapped[i]) state.unmapped.splice(i,1);
+        else state.unmapped=[];
+        state.flash={cat:"ok",msg:t("saved")}; save(); render();
+      });
+    });
+    var calcBox=document.querySelector("[data-calc]");
+    if(calcBox){
+      function runCalc(){
+        var rates={}; try{ rates=JSON.parse(calcBox.getAttribute("data-rates")||"{}"); }catch(e){}
+        var total=0;
+        for(var i=1;i<=10;i++){
+          var inp=calcBox.querySelector('[name="lots_'+i+'"]');
+          var lotsN=inp?parseFloat(String(inp.value||"0").replace(",","."))||0:0;
+          total += lotsN * (parseFloat(rates[i]||rates[String(i)]||0)||0);
+        }
+        var out=calcBox.querySelector("[data-calc-out]");
+        if(out) out.textContent=total.toFixed(2);
+      }
+      calcBox.querySelectorAll("input").forEach(function(el){ el.addEventListener("input", runCalc); });
+      runCalc();
+    }
+    var search=document.querySelector("[data-faq-search]");
+    if(search){
+      search.addEventListener("input", function(){
+        var q=search.value.toLowerCase();
+        document.querySelectorAll(".faq-item").forEach(function(item){
+          item.style.display=!q||item.textContent.toLowerCase().indexOf(q)>=0?"":"none";
+        });
+      });
+    }
     var pf=document.querySelector("form[data-profile]");
     if(pf) pf.addEventListener("submit", function(e){
       e.preventDefault();
@@ -1698,6 +1974,10 @@ window.T3_I18N = {"de": {"portal": "Rebate-Share", "tagline": "Wöchentlicher Ne
       state.settings.min_withdrawal=parseFloat(sf.min_withdrawal.value||10);
       state.settings.cap_enabled=!!sf.cap_enabled.checked;
       state.settings.compression_enabled=!!(sf.compression_enabled&&sf.compression_enabled.checked);
+      if(sf.auto_approve_enabled) state.settings.auto_approve_enabled=!!sf.auto_approve_enabled.checked;
+      if(sf.auto_approve_max) state.settings.auto_approve_max=parseFloat(sf.auto_approve_max.value||50);
+      if(sf.landing_video_url) state.settings.landing_video_url=sf.landing_video_url.value;
+      if(sf.myfxbook_url) state.settings.myfxbook_url=sf.myfxbook_url.value;
       var rates={}, sum=0;
       for(var i=1;i<=10;i++){ rates[i]=parseFloat(sf["rate_"+i].value||T3.RATES[i]); sum+=rates[i]; }
       state.settings.rates=rates; state.settings.network_per_lot=T3.r2(sum);
@@ -1735,6 +2015,7 @@ window.T3_I18N = {"de": {"portal": "Rebate-Share", "tagline": "Wöchentlicher Ne
     if(h==="logout"){ state.uid=null; state.impersonator=null; go("landing"); return; }
     if(h==="stop-impersonate"){ if(state.impersonator){ state.uid=state.impersonator; state.impersonator=null; go("admin"); } return; }
     if(h.indexOf("r/")===0){ state.pendingRef=h.slice(2); state.view="register"; render(); return; }
+    if(h.indexOf("p/")===0){ state.partnerCode=h.slice(2).split("?")[0]; state.view="partner"; render(); return; }
     if(h.indexOf("register")===0){ var m=h.match(/ref=([^&]+)/); if(m) state.pendingRef=decodeURIComponent(m[1]); }
     if(VIEWS[h.split("?")[0]]) { state.view=h.split("?")[0]; if(!PUBLIC[state.view] && !state.uid) state.view="landing"; save(); render(); }
     else render();
@@ -1743,6 +2024,8 @@ window.T3_I18N = {"de": {"portal": "Rebate-Share", "tagline": "Wöchentlicher Ne
   if(location.hash && location.hash.length>2) onHash();
   else render();
 })();
+
+  if("serviceWorker" in navigator){ navigator.serviceWorker.register("sw.js").catch(function(){}); }
   </script>
 </body>
 </html>
